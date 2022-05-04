@@ -1,0 +1,85 @@
+{
+    "current_run_index": 1,
+    "params_to_vary": [
+        "hz",
+        "dAz",
+        "fz"
+    ],
+    "mmode_output": {
+        "freq_channel": {
+            "start": 500,
+            "end": 600
+        },
+        "klmode": "kl_5thresh_nofg"
+    },
+    "mcmc": {
+        "nsteps": 100000,
+        "do_update_thetacov": "yes",
+        "dothetacovupdateafterevery": 100,
+        "thetacovold_until": 10000,
+        "TRFold_until": 16000,
+        "thetacov0": {
+            "do_override": "no",
+            "manual_input_variance": {
+                "H0": 25,
+                "Omk": 0.002,
+                "Oml": 0.01,
+                "w0": 0.2,
+                "wa": 1.5
+            }
+        }
+    },
+    "PARAMS": {
+        "H0": {
+            "prior": [
+                50,
+                90
+            ]
+        },
+        "Omk": {
+            "prior": [
+                -0.2,
+                0.2
+            ]
+        },
+        "Oml": {
+            "prior": [
+                0.5,
+                0.9
+            ]
+        },
+        "w0": {
+            "prior": [
+                -3,
+                1
+            ]
+        },
+        "wa": {
+            "prior": [
+                -5,
+                5
+            ]
+        },
+        "h(z)": {
+            "prior": [
+                0.0001,
+                0.001
+            ],
+            "freqdep": true
+        },
+        "dA(z)": {
+            "prior": [
+                800,
+                3000
+            ],
+            "freqdep": true
+        },
+        "f(z)": {
+            "prior": [
+                0.2,
+                1
+            ],
+            "freqdep": true
+        }
+    }
+}

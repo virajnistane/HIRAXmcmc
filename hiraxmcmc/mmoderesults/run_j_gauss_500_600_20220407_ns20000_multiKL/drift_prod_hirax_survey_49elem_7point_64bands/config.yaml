@@ -1,0 +1,287 @@
+config:
+    # Only generate Beam Transfers.
+    beamtransfers:      No
+    kltransform:        No
+    psfisher:           Yes
+
+    output_directory:   /gpfs/fs0/scratch/s/sievers/nistanev/run_j_gauss_500_600_20220407_noFG/hirax/drift_prod_hirax_survey_49elem_7point_64bands
+
+    svcut: 1e-6
+    polsvcut: 1e-6
+
+telescope:
+    type:
+        class:  HIRAXSurvey
+        module: hirax_transfer.core
+
+    # Set the elevation pointings of a HIRAX survey
+    pointing_start: -10.
+    pointing_stop: 10.
+    npointings: 7
+
+    hirax_spec:
+        # Set band parameters:
+        freq_lower: 500.
+        freq_upper: 600.
+        num_freq: 64
+        freq_mode: edge
+
+        # Other parameters (See drift.core.telescope)
+        auto_correlations: Yes
+        tsys_flat: 50.0
+        redundancy_boost: 20.0 # Approx a 1024 element array
+        dish_width: 6.0
+        lmax: 400
+        mmax: 400
+        ndays: 120 # When noise weighting is needed, will assume an integration
+                   # time of this many days.
+
+        hirax_layout: # See hirax_transfer.layouts
+            type: square_grid
+            spacing: 6.0
+            grid_size: 7
+
+        hirax_beam: # See hirax_transfer.beams
+            type: gaussian
+            diameter: 6.0
+            fwhm_factor: 1.0
+
+
+
+## KL transform configuration
+## Set up the KL-filters that will be generated (there can be multiple ones as listed below).
+kltransform:
+
+#    - type: DoubleKL    #1
+#      name: dk_5thresh_fg_10thresh
+#      inverse: Yes  
+#      threshold: 5
+#      use_thermal: Yes
+#      use_foregrounds: Yes
+#      use_polarised: Yes
+#      foreground_threshold: 10
+
+#    - type: DoubleKL    #2
+#      name: dk_5thresh_fg_100thresh
+#      inverse: Yes
+#      threshold: 5
+#      use_thermal: Yes
+#      use_foregrounds: Yes
+#      use_polarised: Yes
+#      foreground_threshold: 100
+
+    - type: DoubleKL    #3
+      name: dk_5thresh_fg_1000thresh
+      inverse: Yes  
+      threshold: 5
+      use_thermal: Yes
+      use_foregrounds: Yes
+      use_polarised: Yes
+      foreground_threshold: 1000
+
+#    - type: DoubleKL    #4
+#      name: dk_10thresh_fg_100thresh
+#      inverse: Yes
+#      threshold: 10
+#      use_thermal: Yes
+#      use_foregrounds: Yes
+#      use_polarised: Yes
+#      foreground_threshold: 100
+
+#    - type: DoubleKL    #5
+#      name: dk_1thresh_fg_100thresh
+#      inverse: Yes
+#      threshold: 1
+#      use_thermal: Yes
+#      use_foregrounds: Yes
+#      use_polarised: Yes
+#      foreground_threshold: 100
+
+    - type: KLTransform    #6
+      name: kl_0thresh_nofg
+      inverse: Yes
+      threshold: 0
+      use_thermal: Yes
+      use_foregrounds: No
+      use_polarised: Yes
+
+#    - type: KLTransform    #7
+#      name: kl_1thresh_nofg
+#      inverse: Yes
+#      threshold: 1
+#      use_thermal: Yes
+#      use_foregrounds: No
+#      use_polarised: Yes
+
+    - type: KLTransform    #8
+      name: kl_5thresh_nofg
+      inverse: Yes
+      threshold: 5
+      use_thermal: Yes
+      use_foregrounds: No
+      use_polarised: Yes
+
+#    - type: KLTransform    #9
+#      name: kl_10thresh_nofg
+#      inverse: Yes
+#      threshold: 10
+#      use_thermal: Yes
+#      use_foregrounds: No
+#      use_polarised: Yes
+
+psfisher:
+#    -   type:           MonteCarlo    #1
+#        name:           psmc_dk_5thresh_fg_10thresh_1threshold
+#        klname:         dk_5thresh_fg_10thresh
+#        threshold:      1
+#        bandtype:       cartesian
+#        kpar_bands:
+#        -   spacing:    linear
+#            start:      0.0
+#            stop:       0.30                   
+#            num:        31
+#        
+#        kperp_bands:
+#        -   spacing:    linear
+#            start:      0.0
+#            stop:       0.10                   #corresponds to l=426
+#            num:        10
+
+#    -   type:           MonteCarlo    #2
+#        name:           psmc_dk_5thresh_fg_100thresh_1threshold
+#        klname:         dk_5thresh_fg_100thresh
+#        threshold:      1
+#        bandtype:       cartesian
+#        kpar_bands:
+#        -   spacing:    linear
+#            start:      0.0
+#            stop:       0.30                   
+#            num:        31
+#
+#        kperp_bands:
+#        -   spacing:    linear
+#            start:      0.0
+#            stop:       0.10                   #corresponds to l=426
+#            num:        10
+
+    -   type:           MonteCarlo    #3
+        name:           psmc_dk_5thresh_fg_1000thresh_1threshold
+        klname:         dk_5thresh_fg_1000thresh
+        threshold:      1
+        bandtype:       cartesian
+        nsamples:       20000
+        kpar_bands:
+        -   spacing:    linear
+            start:      0.01
+            stop:       0.14                   
+            num:        14
+
+        kperp_bands:
+        -   spacing:    linear
+            start:      0.01
+            stop:       0.10                   #corresponds to l=426
+            num:        9
+
+#    -   type:           MonteCarlo    #4
+#        name:           psmc_dk_10thresh_fg_100thresh_1threshold
+#        klname:         dk_10thresh_fg_100thresh
+#        threshold:      1
+#        bandtype:       cartesian
+#        kpar_bands:
+#        -   spacing:    linear
+#            start:      0.0
+#            stop:       0.30                   
+#            num:        31
+#
+#        kperp_bands:
+#        -   spacing:    linear
+#            start:      0.0
+#            stop:       0.10                   #corresponds to l=426
+#            num:        10
+
+#    -   type:           MonteCarlo    #5
+#        name:           psmc_dk_1thresh_fg_100thresh_1threshold
+#        klname:         dk_1thresh_fg_100thresh
+#        threshold:      1
+#        bandtype:       cartesian
+#        kpar_bands:
+#        -   spacing:    linear
+#            start:      0.0
+#            stop:       0.30                   
+#            num:        31
+#
+#        kperp_bands:
+#        -   spacing:    linear
+#            start:      0.0
+#            stop:       0.10                   #corresponds to l=426
+#            num:        10
+
+    -   type:           MonteCarlo    #6
+        name:           psmc_kl_0thresh_nofg_1threshold
+        klname:         kl_0thresh_nofg
+        threshold:      1
+        bandtype:       cartesian
+        nsamples:       20000
+        kpar_bands:
+        -   spacing:    linear
+            start:      0.0
+            stop:       0.30                   
+            num:        31
+
+        kperp_bands:
+        -   spacing:    linear
+            start:      0.0
+            stop:       0.10                   #corresponds to l=426
+            num:        10
+
+#    -   type:           MonteCarlo    #7
+#        name:           psmc_kl_1thresh_nofg_1threshold
+#        klname:         kl_1thresh_nofg
+#        threshold:      1
+#        bandtype:       cartesian
+#        kpar_bands:
+#        -   spacing:    linear
+#            start:      0.0
+#            stop:       0.30                   
+#            num:        31
+#
+#        kperp_bands:
+#        -   spacing:    linear
+#            start:      0.0
+#            stop:       0.10                   #corresponds to l=426
+#            num:        10
+
+    -   type:           MonteCarlo    #8
+        name:           psmc_kl_5thresh_nofg_1threshold
+        klname:         kl_5thresh_nofg
+        threshold:      1
+        bandtype:       cartesian
+        nsamples:       20000
+        kpar_bands:
+        -   spacing:    linear
+            start:      0.0
+            stop:       0.30                   
+            num:        31
+
+        kperp_bands:
+        -   spacing:    linear
+            start:      0.0
+            stop:       0.10                   #corresponds to l=426
+            num:        10
+
+#    -   type:           MonteCarlo    #9
+#        name:           psmc_kl_10thresh_nofg_1threshold
+#        klname:         kl_10thresh_nofg
+#        threshold:      1
+#        bandtype:       cartesian
+#        kpar_bands:
+#        -   spacing:    linear
+#            start:      0.0
+#            stop:       0.30                  
+#            num:        31
+#
+#        kperp_bands:
+#        -   spacing:    linear
+#            start:      0.0
+#            stop:       0.10                   #corresponds to l=426
+#            num:        10
