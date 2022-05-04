@@ -1,3 +1,4 @@
+.eggs/
 hiraxmcmc.egg-info
 build
 dist
