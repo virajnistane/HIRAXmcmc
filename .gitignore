@@ -5,3 +5,4 @@ hiraxmcmc.egg-info
 build
 dist
 .pytest_cache
+hiraxmcmc/inputfiles/*/
