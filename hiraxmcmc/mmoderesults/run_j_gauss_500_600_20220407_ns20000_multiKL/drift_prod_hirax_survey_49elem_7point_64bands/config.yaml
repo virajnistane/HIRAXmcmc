@@ -4,7 +4,7 @@ config:
     kltransform:        No
     psfisher:           Yes
 
-    output_directory:   /gpfs/fs0/scratch/s/sievers/nistanev/run_j_gauss_500_600_20220407_noFG/hirax/drift_prod_hirax_survey_49elem_7point_64bands
+    output_directory:   /gpfs/fs0/scratch/s/sievers/nistanev/run_j_gauss_500_600_20220407_ns20000_multiKL/hirax/drift_prod_hirax_survey_49elem_7point_64bands
 
     svcut: 1e-6
     polsvcut: 1e-6
@@ -172,15 +172,15 @@ psfisher:
         nsamples:       20000
         kpar_bands:
         -   spacing:    linear
-            start:      0.01
-            stop:       0.14                   
-            num:        14
+            start:      0.0
+            stop:       0.30
+            num:        31
 
         kperp_bands:
         -   spacing:    linear
-            start:      0.01
+            start:      0.0
             stop:       0.10                   #corresponds to l=426
-            num:        9
+            num:        10
 
 #    -   type:           MonteCarlo    #4
 #        name:           psmc_dk_10thresh_fg_100thresh_1threshold

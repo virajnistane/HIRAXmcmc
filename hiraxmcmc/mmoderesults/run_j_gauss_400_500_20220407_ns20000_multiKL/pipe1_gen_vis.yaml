@@ -1,0 +1,32 @@
+pipeline:
+    tasks:
+        -   type:       draco.core.task.SetMPILogging
+
+        -   type:       draco.core.io.LoadProductManager
+            out:        pm
+            params:
+              product_directory: "./hirax/drift_prod_hirax_survey_49elem_7point_64bands"
+
+        -   type:       draco.core.io.LoadMaps
+            out:        imap
+            params:
+                maps:
+                  - files:
+                    - "./hirax/21cm_sims/double_freq/21cm_01_nside_512.h5"
+                    - "./hirax/21cm_sims/double_freq/galaxy_nside_512.h5"
+
+        -   type:       draco.synthesis.stream.SimulateSidereal
+            requires:   pm
+            in:         imap
+            out:        sstream
+
+        -   type:       draco.synthesis.noise.GaussianNoise
+            requires:   pm
+            in:         sstream
+            out:        sstream_wnoise
+            params:
+              recv_temp: 50.0
+              ndays: 120
+              save:   Yes
+              output_root: "./hirax/draco/sstream_wnoise_"
+

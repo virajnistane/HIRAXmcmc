@@ -1,0 +1,135 @@
+config:
+    # Only generate Beam Transfers.
+    beamtransfers:      No
+    kltransform:        No
+    psfisher:           Yes
+
+    output_directory:   /gpfs/fs0/scratch/s/sievers/nistanev/run_j_gauss_700_800_20220407_ns20000_multiKL/hirax/drift_prod_hirax_survey_49elem_7point_64bands
+
+    svcut: 1e-6
+    polsvcut: 1e-6
+
+telescope:
+    type:
+        class:  HIRAXSurvey
+        module: hirax_transfer.core
+
+    # Set the elevation pointings of a HIRAX survey
+    pointing_start: -10.
+    pointing_stop: 10.
+    npointings: 7
+
+    hirax_spec:
+        # Set band parameters:
+        freq_lower: 700.
+        freq_upper: 800.
+        num_freq: 64
+        freq_mode: edge
+
+        # Other parameters (See drift.core.telescope)
+        auto_correlations: Yes
+        tsys_flat: 50.0
+        redundancy_boost: 20.0 # Approx a 1024 element array
+        dish_width: 6.0
+        lmax: 400
+        mmax: 400
+        ndays: 120 # When noise weighting is needed, will assume an integration
+                   # time of this many days.
+
+        hirax_layout: # See hirax_transfer.layouts
+            type: square_grid
+            spacing: 6.0
+            grid_size: 7
+
+        hirax_beam: # See hirax_transfer.beams
+            type: gaussian
+            diameter: 6.0
+            fwhm_factor: 1.0
+
+## KL transform configuration
+## Set up the KL-filters that will be generated (there can be multiple ones as listed below).
+
+kltransform:
+
+    - type: DoubleKL    #3
+      name: dk_5thresh_fg_1000thresh
+      inverse: Yes  
+      threshold: 5
+      use_thermal: Yes
+      use_foregrounds: Yes
+      use_polarised: Yes
+      foreground_threshold: 1000
+
+    - type: KLTransform    #6
+      name: kl_0thresh_nofg
+      inverse: Yes
+      threshold: 0
+      use_thermal: Yes
+      use_foregrounds: No
+      use_polarised: Yes
+
+    - type: KLTransform    #8
+      name: kl_5thresh_nofg
+      inverse: Yes
+      threshold: 5
+      use_thermal: Yes
+      use_foregrounds: No
+      use_polarised: Yes
+
+
+psfisher:
+
+    -   type:           MonteCarlo    #3
+        name:           psmc_dk_5thresh_fg_1000thresh_1threshold
+        klname:         dk_5thresh_fg_1000thresh
+        threshold:      1
+        bandtype:       cartesian
+        nsamples:       20000
+        kpar_bands:
+        -   spacing:    linear
+            start:      0.0
+            stop:       0.30                   
+            num:        31
+
+        kperp_bands:
+        -   spacing:    linear
+            start:      0.0
+            stop:       0.20                   #corresponds to l=426
+            num:        20
+
+    -   type:           MonteCarlo    #6
+        name:           psmc_kl_0thresh_nofg_1threshold
+        klname:         kl_0thresh_nofg
+        threshold:      1
+        bandtype:       cartesian
+        nsamples:       20000
+        kpar_bands:
+        -   spacing:    linear
+            start:      0.0
+            stop:       0.30
+            num:        31
+
+        kperp_bands:
+        -   spacing:    linear
+            start:      0.0
+            stop:       0.20                   #corresponds to l=426
+            num:        20
+
+    -   type:           MonteCarlo    #8
+        name:           psmc_kl_5thresh_nofg_1threshold
+        klname:         kl_5thresh_nofg
+        threshold:      1
+        bandtype:       cartesian
+        nsamples:       20000
+        kpar_bands:
+        -   spacing:    linear
+            start:      0.0
+            stop:       0.30
+            num:        31
+
+        kperp_bands:
+        -   spacing:    linear
+            start:      0.0
+            stop:       0.20                   #corresponds to l=426
+            num:        20
+
