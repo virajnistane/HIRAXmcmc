@@ -29,22 +29,21 @@ class Chi2Func:
         self.inputforhiraxoutput = inputforhiraxoutput
         
         
-        self.kperp_limits_hunits = {'l':0.025, 'u':0.1}
-        self.kparlimits_hunits = {'l':0.025, 'u':0.25}
-        self.kcenterlimits_hunits = {'l':0.04575835618216445, 'u':0.15149053672110804} # {'l':0.05, 'u':0.15}
-        
-        
         """ hirax output """
         self.hirax_output        =   HiraxOutput(inputforhiraxoutput)
-        self.kpar_all, self.kpe_all, self.kc_all = self.hirax_output.k_space_parameters()
+        self.kpar_all, self.kperp_all, self.kc_all = self.hirax_output.k_space_parameters()
         
         self.kpar       =   self.kpar_all['kpar']
-        self.kperp      =   self.kpe_all['kperp']
+        self.kperp      =   self.kperp_all['kperp']
         self.kcenter    =   self.kc_all['kcenter']
         
         self.errs = self.hirax_output.rel_err
         self.covhirax = self.hirax_output.covhirax
         
+        self.kparstart = self.kpar_all['kpar_bands'][:-1]
+        self.kparend = self.kpar_all['kpar_bands'][1:]
+        self.kperpstart = self.kperp_all['kperp_bands'][:-1]
+        self.kperpend = self.kperp_all['kperp_bands'][1:]
         
         self.psrel_estimatedfromhirax = self.hirax_output.ps_relative_estimated_from_hirax
         
@@ -53,6 +52,14 @@ class Chi2Func:
         # print("Inside the chi2_function instance, hiraxrundirname is ",hirax_output.hiraxrundir_name)
         
         """ select k-bins """
+        
+        
+        
+        self.kperp_limits_hunits =  {'l':self.kperpstart[2], 'u':self.kperpend[6]}  # {'l':0.025, 'u':0.1}
+        self.kparlimits_hunits =    {'l':self.kparstart[4], 'u':self.kparend[12]} # {'l':0.025, 'u':0.25}
+        self.kcenterlimits_hunits = {'l':0.05, 'u':0.15}
+        
+        
         
         self.xsens =  (self.kperp > self.kperp_limits_hunits['l']) * (self.kperp < self.kperp_limits_hunits['u']) *  (
             self.kpar > self.kparlimits_hunits['l']) * (self.kpar < self.kparlimits_hunits['u']) * (
