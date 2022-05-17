@@ -31,7 +31,7 @@ class Chi2Func:
         
         self.kperp_limits_hunits = {'l':0.025, 'u':0.1}
         self.kparlimits_hunits = {'l':0.025, 'u':0.25}
-        self.kcenterlimits_hunits = {'l':0.05, 'u':0.15}
+        self.kcenterlimits_hunits = {'l':0.04575835618216445, 'u':0.15149053672110804} # {'l':0.05, 'u':0.15}
         
         
         """ hirax output """
