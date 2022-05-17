@@ -56,8 +56,8 @@ class Chi2Func:
         
         
         self.kperp_limits_hunits =  {'l':self.kperpstart[2], 'u':self.kperpend[6]}  # {'l':0.025, 'u':0.1}
-        self.kparlimits_hunits =    {'l':self.kparstart[4], 'u':self.kparend[12]} # {'l':0.025, 'u':0.25}
-        self.kcenterlimits_hunits = {'l':0.05, 'u':0.15}
+        self.kpar_limits_hunits =    {'l':self.kparstart[4], 'u':self.kparend[12]} # {'l':0.025, 'u':0.25}
+        self.kcenter_limits_hunits = {'l':0.05, 'u':0.15}
         
         
         
