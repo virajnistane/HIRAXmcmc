@@ -62,9 +62,9 @@ class Chi2Func:
         
         
         self.xsens =  (self.kperp > self.kperp_limits_hunits['l']) * (self.kperp < self.kperp_limits_hunits['u']) *  (
-            self.kpar > self.kparlimits_hunits['l']) * (self.kpar < self.kparlimits_hunits['u']) * (
+            self.kpar > self.kpar_limits_hunits['l']) * (self.kpar < self.kpar_limits_hunits['u']) * (
                 abs(self.errs) < 1) *  (
-                    self.kcenter > self.kcenterlimits_hunits['l']) * (self.kcenter < self.kcenterlimits_hunits['u']) #(k_center.flat > 0.1) * (k_center.flat < 0.15) * (np.diag(y['cov']) < 1)
+                    self.kcenter > self.kcenter_limits_hunits['l']) * (self.kcenter < self.kcenter_limits_hunits['u']) #(k_center.flat > 0.1) * (k_center.flat < 0.15) * (np.diag(y['cov']) < 1)
         
         
         self.xsensflat = np.array(self.xsens.flat)
