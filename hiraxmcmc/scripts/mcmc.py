@@ -164,7 +164,7 @@ except:
         
         
         # (optional, change to True if you want to save the input params to a file)
-        if 1:
+        if 0:
             with open('../inputfiles/input_example_fcdep.json','w') as f:
                 json.dump(INPUT, f, indent=4)
             raise ValueError
