@@ -114,7 +114,8 @@ except:
         INPUT = {'current_run_index': 1,
                   'params_to_vary': ['hz', 'dAz', 'fz'],
                   'mmode_output': {'freq_channel': {'start': 400, 'end': 800},
-                                    'klmode': 'kl_5thresh_nofg'},
+                                    'klmode': 'kl_5thresh_nofg',
+                                    'power_spectrum_estimator_type': 'minvar'},
                   'mcmc': {'nsteps': 100000,
                           'do_update_thetacov': 'yes',
                           'dothetacovupdateafterevery': 100,
@@ -133,17 +134,18 @@ except:
                             'wa': {'prior': [-5, 5]},
                             'h(z)': {'prior': [0.0001, 0.001], 'freqdep': True},
                             'dA(z)': {'prior': [800, 3000], 'freqdep': True},
-                            'f(z)': {'prior': [0.2, 1], 'freqdep': True}}}
+                            'f(z)': {'prior': [0.2, 1.2], 'freqdep': True}}}
         
         # INPUT = {'current_run_index': 1,
         #           'params_to_vary': ['H0', 'Omk', 'Oml'],
         #           'mmode_output': {'freq_channel': {'start': 400, 'end': 800},
-        #                           'klmode': 'dk_5thresh_fg_1000thresh'},
-        #           'mcmc': {'nsteps': 200,
+        #                           'klmode': 'dk_5thresh_fg_1000thresh',
+        #                           'power_spectrum_estimator_type': 'minvar'},
+        #           'mcmc': {'nsteps': 20000,
         #                   'do_update_thetacov': 'yes',
-        #                   'dothetacovupdateafterevery': 10,
-        #                   'thetacovold_until': 40,
-        #                   'TRFold_until': 60,
+        #                   'dothetacovupdateafterevery': 100,
+        #                   'thetacovold_until': 4000,
+        #                   'TRFold_until': 6000,
         #                   'thetacov0': {'do_override': 'yes',
         #                                 'manual_input_variance': {'H0': 25,
         #                                                           'Omk': 0.002,
@@ -157,15 +159,21 @@ except:
         #                     'wa': {'prior': [-5, 5]},
         #                     'h(z)': {'prior': [0.0001, 0.001], 'freqdep': True},
         #                     'dA(z)': {'prior': [800, 3000], 'freqdep': True},
-        #                     'f(z)': {'prior': [0.2, 1], 'freqdep': True}}}
+        #                     'f(z)': {'prior': [0.2, 1.2], 'freqdep': True}}}
         
         
         
         # (optional, change to True if you want to save the input params to a file)
-        if False:
-            with open('input_example_fcdep.json','w') as f:
+        if 1:
+            with open('../inputfiles/input_example_fcdep.json','w') as f:
                 json.dump(INPUT, f, indent=4)
-
+            raise ValueError
+        
+        if 0:
+            with open('../inputfiles/input_example_cosmo.json','w') as f:
+                json.dump(INPUT, f, indent=4)
+            raise ValueError
+        
 
 
 
@@ -289,7 +297,7 @@ for index, freqlimits1 in enumerate(auto_hiraxoutput_kw_list):
     assert freqlimits1 in auto_hiraxoutput_selection_dir[index]
     inputforhiraxoutput[freqlimits1] = {}
     inputforhiraxoutput[freqlimits1]['result_dir_name'] = auto_hiraxoutput_selection_dir[index]
-    inputforhiraxoutput[freqlimits1]['estimator_type'] = 'minvar'
+    inputforhiraxoutput[freqlimits1]['estimator_type'] = INPUT['mmode_output']['power_spectrum_estimator_type']
     inputforhiraxoutput[freqlimits1]['redshift'] = redshiftlist[index]
     
     btdir = os.path.join(find_subdirs_containing('drift_prod', auto_hiraxoutput_selection_dir[index], fullpathoutput=True)[0],'bt')

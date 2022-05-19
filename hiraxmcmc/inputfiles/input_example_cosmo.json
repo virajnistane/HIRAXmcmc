@@ -10,7 +10,8 @@
             "start": 400,
             "end": 800
         },
-        "klmode": "dk_5thresh_fg_1000thresh"
+        "klmode": "dk_5thresh_fg_1000thresh",
+        "power_spectrum_estimator_type": "minvar"
     },
     "mcmc": {
         "nsteps": 20000,
@@ -77,7 +78,7 @@
         "f(z)": {
             "prior": [
                 0.2,
-                1
+                1.2
             ],
             "freqdep": true
         }
