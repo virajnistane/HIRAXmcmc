@@ -30,6 +30,12 @@
             }
         }
     },
+    "likelihood": {
+        "ps_rel_err": {
+            "override": "no",
+            "filename": ""
+        }
+    },
     "PARAMS": {
         "H0": {
             "prior": [
