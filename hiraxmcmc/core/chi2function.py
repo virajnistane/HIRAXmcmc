@@ -24,7 +24,7 @@ from hiraxmcmc.util.cosmoparamvalues import ParametersFixed
 
 class Chi2Func:
     
-    def __init__(self, inputforhiraxoutput, INPUT):
+    def __init__(self, inputforhiraxoutput, INPUT=None):
         
         self.modulelocation = os.path.dirname(hiraxmcmc.__file__)
         self.inputforhiraxoutput = inputforhiraxoutput
@@ -40,11 +40,13 @@ class Chi2Func:
         
         
         try:
-            assert INPUT['likelihood']['ps_rel_err']['override'] == 'no'
+            if INPUT != None:
+                assert INPUT['likelihood']['ps_rel_err']['override'] == 'no'
             self.covhirax = self.hirax_output.covhirax
             self.errs = self.hirax_output.rel_err
         except:
-            assert INPUT['likelihood']['ps_rel_err']['override'] == 'yes'
+            if INPUT != None:
+                assert INPUT['likelihood']['ps_rel_err']['override'] == 'yes'
             self.covhirax = np.loadtxt(os.path.join(self.modulelocation, 'inputfiles', INPUT['likelihood']['ps_rel_err']['filename']))
             self.errs  =  np.sqrt(abs(np.diag(self.covhirax))).reshape(self.kpar_all['kpar_size'],self.kperp_all['kperp_size'])
         
