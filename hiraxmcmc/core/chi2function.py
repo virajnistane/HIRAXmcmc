@@ -7,6 +7,8 @@ import numpy.linalg as la
 
 from scipy.constants import speed_of_light as cc
 
+import hiraxmcmc
+
 from hiraxmcmc.util.basicfunctions import *
 from hiraxmcmc.core.hiraxoutput import HiraxOutput
 from hiraxmcmc.core.powerspectrum import CreatePs2d
