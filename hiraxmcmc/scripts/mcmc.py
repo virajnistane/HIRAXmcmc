@@ -113,7 +113,7 @@ except:
         
         INPUT = {'current_run_index': 1,
                   'params_to_vary': ['hz', 'dAz', 'fz'],
-                  'mmode_output': {'freq_channel': {'start': 400, 'end': 800},
+                  'mmode_output': {'freq_channel': {'start': 400, 'end': 500},
                                     'klmode': 'kl_5thresh_nofg',
                                     'power_spectrum_estimator_type': 'minvar'},
                   'mcmc': {'nsteps': 100000,
@@ -127,6 +127,8 @@ except:
                                                                   'Oml': 0.01,
                                                                   'w0': 0.2,
                                                                   'wa': 1.5}}},
+                  'likelihood': {'ps_rel_err': {'override': 'no', 
+                                                'filename': ''}},
                   'PARAMS': {'H0': {'prior': [50, 90]},
                             'Omk': {'prior': [-0.2, 0.2]},
                             'Oml': {'prior': [0.5, 0.9]},
@@ -152,6 +154,8 @@ except:
         #                                                           'Oml': 0.01,
         #                                                           'w0': 0.2,
         #                                                           'wa': 1.5}}},
+        #           'likelihood': {'ps_rel_err': {'override': 'no', 
+        #                                         'filename': ''}},
         #           'PARAMS': {'H0': {'prior': [50, 90]},
         #                     'Omk': {'prior': [-0.2, 0.2]},
         #                     'Oml': {'prior': [0.5, 0.9]},
@@ -585,7 +589,7 @@ if len(params_to_vary) > len(load_old_res.prev_params_varied):
 
 chi2_func = {}
 for freqc,value_inputforhiraxoutput in inputforhiraxoutput.items():
-    chi2_func[freqc] = Chi2Func(value_inputforhiraxoutput)
+    chi2_func[freqc] = Chi2Func(value_inputforhiraxoutput, INPUT)
     
 
 

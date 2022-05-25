@@ -24,10 +24,11 @@ from hiraxmcmc.util.cosmoparamvalues import ParametersFixed
 
 class Chi2Func:
     
-    def __init__(self, inputforhiraxoutput):
+    def __init__(self, inputforhiraxoutput, INPUT):
         
+        self.modulelocation = os.path.dirname(hiraxmcmc.__file__)
         self.inputforhiraxoutput = inputforhiraxoutput
-        
+        self.INPUT = INPUT
         
         """ hirax output """
         self.hirax_output        =   HiraxOutput(inputforhiraxoutput)
@@ -37,8 +38,15 @@ class Chi2Func:
         self.kperp      =   self.kperp_all['kperp']
         self.kcenter    =   self.kc_all['kcenter']
         
-        self.errs = self.hirax_output.rel_err
-        self.covhirax = self.hirax_output.covhirax
+        
+        try:
+            assert INPUT['likelihood']['ps_rel_err']['override'] == 'no'
+            self.covhirax = self.hirax_output.covhirax
+            self.errs = self.hirax_output.rel_err
+        except:
+            assert INPUT['likelihood']['ps_rel_err']['override'] == 'yes'
+            self.covhirax = np.loadtxt(os.path.join(self.modulelocation, 'inputfiles', INPUT['likelihood']['ps_rel_err']['filename']))
+            self.errs  =  np.sqrt(abs(np.diag(self.covhirax))).reshape(self.kpar_all['kpar_size'],self.kperp_all['kperp_size'])
         
         self.kparstart = self.kpar_all['kpar_bands'][:-1]
         self.kparend = self.kpar_all['kpar_bands'][1:]
