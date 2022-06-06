@@ -241,6 +241,8 @@ if rank_mpi == 0:
                 else:
                     currentInput_isDoneBefore += 0
             
+            # Now, if this input is not present already as 'input.json' file, then create a new one with a different suffix
+            
             if currentInput_isDoneBefore == 0:
                 with open(os.path.join(mcmc_mainrun_dir_relpath, 'input%s.json'%(addsuffix)),'w') as ff:
                     json.dump(INPUT, ff, indent=4)
