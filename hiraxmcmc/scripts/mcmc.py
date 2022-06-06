@@ -219,9 +219,33 @@ if rank_mpi == 0:
             lastinputjsonsuffix = find_last_suffix('input', '', filetype='inputjson')
             xx = lastinputjsonsuffix.split('_')[1]
             addsuffix = '_' + '%02d'%(int(xx)+1)
-            with open(os.path.join(mcmc_mainrun_dir_relpath, 'input%s.json'%(addsuffix)),'w') as ff:
-                json.dump(INPUT, ff, indent=4)
-
+            
+            #first compare the two inputs: current input dict and the previous file present
+            
+            INPUT_wo_cri = INPUT.copy()
+            del INPUT_wo_cri['current_run_index']               # current input dict without 'current_run_index' key
+            
+            
+            currentInput_isDoneBefore = 0
+            for previnputfile in find_files_containing('input', mcmc_mainrun_dir_relpath):
+                with open(os.path.join(mcmc_mainrun_dir_relpath, previnputfile),'r') as ftemp:
+                    inputdicttemp = json.load(ftemp)
+                # prev_input_dictlist.append(inputdicttemp)
+                
+                inputdicttemp_wo_cri = inputdicttemp.copy()     # prev input dict without 'current_run_index' key
+                del inputdicttemp_wo_cri['current_run_index']
+                
+                
+                if inputdicttemp_wo_cri == INPUT_wo_cri:
+                    currentInput_isDoneBefore += 1
+                else:
+                    currentInput_isDoneBefore += 0
+            
+            if currentInput_isDoneBefore == 0:
+                with open(os.path.join(mcmc_mainrun_dir_relpath, 'input%s.json'%(addsuffix)),'w') as ff:
+                    json.dump(INPUT, ff, indent=4)
+            
+            
 
 
 MCMCmodulespath = os.path.dirname(hiraxmcmc.__file__)
