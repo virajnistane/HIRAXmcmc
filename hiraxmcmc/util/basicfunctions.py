@@ -362,6 +362,29 @@ def find_last_suffix(filenamepartToSearchFor ,dirnameToSearchIn , filetype='chai
                 return lastsuffix
             else:
                 return '_-1'
+        elif filetype.lower() == 'inputjson':
+            listofPrevChainsNames = find_files_containing(filenamepartToSearchFor , dirnameToSearchIn)
+            if len(listofPrevChainsNames) != 0:
+                prevfiles0 = listofPrevChainsNames
+                suffixList = []
+                for pfile in prevfiles0:
+                    try:
+                        suffixList.append(int(pfile.split('.')[0][-2:]))
+                    except:
+                        suffixList.append(0)
+                lastsuffnumber = np.max(suffixList)
+                for ffy in prevfiles0:
+                    try:
+                        if int(ffy.split('.')[0][-2:]) == lastsuffnumber:
+                            prevfiles0_latest = ffy
+                        lastsuffix = prevfiles0_latest.split('.')[0][-3:]
+                    except:
+                        if 0 == lastsuffnumber:
+                            prevfiles0_latest = ffy
+                        lastsuffix = '_00'
+                return lastsuffix
+            else:
+                return '_-1'
         else:
             raise Exception("Invalid filetype given. Check again.")
     except: 
