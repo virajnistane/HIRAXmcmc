@@ -212,8 +212,16 @@ if rank_mpi == 0:
             json.dump(INPUT, ff, indent=4)
     else:
         print('Output stored at (already existing) location: %s'%(mcmc_mainrun_dir_relpath)); sys.stdout.flush()
-        with open(os.path.join(mcmc_mainrun_dir_relpath, 'input.json'),'w') as ff:
-            json.dump(INPUT, ff, indent=4)
+        if len(find_files_containing('input', mcmc_mainrun_dir_relpath)) == 0:            
+            with open(os.path.join(mcmc_mainrun_dir_relpath, 'input.json'),'w') as ff:
+                json.dump(INPUT, ff, indent=4)
+        else:
+            lastinputjsonsuffix = find_last_suffix('input', '', filetype='inputjson')
+            xx = lastinputjsonsuffix.split('_')[1]
+            addsuffix = '_' + '%02d'%(int(xx)+1)
+            with open(os.path.join(mcmc_mainrun_dir_relpath, 'input%s.json'%(addsuffix)),'w') as ff:
+                json.dump(INPUT, ff, indent=4)
+
 
 
 MCMCmodulespath = os.path.dirname(hiraxmcmc.__file__)
