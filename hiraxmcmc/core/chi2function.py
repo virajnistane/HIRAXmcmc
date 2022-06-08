@@ -135,7 +135,6 @@ class Chi2Func:
         
         freqdep_paramstovary = checkconditionforlist(list(currentparams.keys()), allelements_have_subpart='(z)')
         
-        
         try:
             assert not(freqdep_paramstovary)
             
