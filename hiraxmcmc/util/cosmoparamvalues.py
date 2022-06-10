@@ -132,7 +132,7 @@ class ParametersFixed:
         return temp
     
     
-    def current_params_to_vary_fixed(self, params_to_vary, input_for_hiraxoutput, freqdep_paramstovary=False):
+    def current_params_to_vary_fixed(self, params_to_vary, fclist, freqdep_paramstovary=False):
         truncdict = {}
         for pp in params_to_vary:
             try:
@@ -140,7 +140,7 @@ class ParametersFixed:
                 truncdict[pp] = self.current_allparams_fixed[pp]
             except:
                 assert freqdep_paramstovary
-                for fc in input_for_hiraxoutput.keys():
+                for fc in fclist:
                     truncdict[pp] = self.current_allparams_fixed[pp][fc]
         return truncdict
     
