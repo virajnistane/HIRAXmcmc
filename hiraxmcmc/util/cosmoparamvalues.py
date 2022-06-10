@@ -43,7 +43,7 @@ class ParametersFixed:
         # omch2_fix = 0.1201075
         # ombh2_fix = 0.0223828
     
-        self.OmG_fix = 1 - _OmM_fix - _Omk_fix - _Oml_fix
+        self.OmG_fix = 1 - self._OmM_fix - self._Omk_fix - self._Oml_fix
     
     ###### ###### ###### ######
     
