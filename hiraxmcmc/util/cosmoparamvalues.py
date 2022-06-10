@@ -9,6 +9,9 @@ from scipy.constants import speed_of_light as cc
 
 class ParametersFixed:
     
+    # if there is no __init__ function and if the values are instead defined just 
+    # within the class, then the values won't reinitialize each time the class 
+    # object is generated
     
     def __init__(self):
         self._H0_fix = 67.80
