@@ -351,7 +351,10 @@ class CreatePs2d:
     def pofk_from_camb(self, 
                        currentparams =  ParametersFixed().cosmoparams_fixed,
                        z = None,
-                       output_CAMB_instance = True):   # redshift should be overwritten by self.redshift_from_hiraxoutput
+                       output_CAMB_instance = True,
+                       k_hunit_override = None,
+                       hubble_units_override = None,
+                       ):   # redshift should be overwritten by self.redshift_from_hiraxoutput
         """
         This function generates matter power spectrum P(k) at redshift <z> for
         given values of parameters using CAMB.
@@ -400,18 +403,37 @@ class CreatePs2d:
         
         kmax = 20.0
         
+        
+        
+        
         self.cambpars.set_cosmology(H0 = currentparamstemp['H0'] , omk = currentparamstemp['Omk'], ombh2 = self.cambpars.ombh2, omch2 = omch2v)
         self.cambpars.NonLinear = model.NonLinear_both
         self.cambpars.DarkEnergy.set_params(w = currentparamstemp['w0'] , wa = currentparamstemp['wa'])
         
         self.cambresults = camb.get_results(self.cambpars)
         
+        
+        try:
+            assert k_hunit_override != None
+            self.k_hunit_val = k_hunit_override
+        except:
+            assert k_hunit_override == None
+            self.k_hunit_val = True
+        
+        
+        try:
+            assert hubble_units_override != None
+            self.hubble_units_val = hubble_units_override
+        except:
+            assert hubble_units_override == None
+            self.hubble_units_val = True
+        
         PK = camb.get_matter_power_interpolator(self.cambpars, 
                                                 nonlinear=False, 
                                                 kmax=kmax,
                                                 zmax=250, 
-                                                k_hunit=True,
-                                                hubble_units=True)
+                                                k_hunit=self.k_hunit_val,
+                                                hubble_units=self.hubble_units_val)
         
         # pk_kh = lambda kh: PK.P(zv, kh)
         pk_kh = lambda k: PK.P(zv, k)
