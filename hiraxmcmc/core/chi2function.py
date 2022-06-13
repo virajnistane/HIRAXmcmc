@@ -145,8 +145,12 @@ class Chi2Func:
                 except:
                     currentparamstemp[i] = cosmoparams[i]
             
-            q_perp = current_class_instance.angular_distance(z) / self.dA_fid   * (currentparamstemp['H0']/100)/self.h_fiducial
-            q_par = self.hz_fid / current_class_instance.Hubble(z)              * (currentparamstemp['H0']/100)/self.h_fiducial
+            
+            # temporarily commenting out the h/h_fid ratio rescaling of q_par and q_perp
+            # only on the branch "q_no_rescale_with_h_ratio"
+            
+            q_perp = current_class_instance.angular_distance(z) / self.dA_fid   #* (currentparamstemp['H0']/100)/self.h_fiducial
+            q_par = self.hz_fid / current_class_instance.Hubble(z)              #* (currentparamstemp['H0']/100)/self.h_fiducial
             f_growth = current_class_instance.scale_independent_growth_factor_f(z)
             currentparams_input_for_pscalc = currentparamstemp
         except:
