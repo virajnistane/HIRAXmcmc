@@ -374,6 +374,17 @@ class CreatePs2d:
             DESCRIPTION. function of k and redshift <z>
             pk = lambda kh: PK.P(z, kh)
             
+            hubble_units   -->   power spectra 
+            -----------------------------------
+               True                 (Mpc/h)^3
+               False                (Mpc)^3
+              
+            k_hunit        -->   power spectra
+            -----------------------------------
+               True                 P(k*h)
+               False                P(k)
+            
+            
         """
         
         if z == None:
@@ -418,7 +429,7 @@ class CreatePs2d:
             self.k_hunit_val = k_hunit_override
         except:
             assert k_hunit_override == None
-            self.k_hunit_val = True
+            self.k_hunit_val = False
         
         
         try:
@@ -426,7 +437,7 @@ class CreatePs2d:
             self.hubble_units_val = hubble_units_override
         except:
             assert hubble_units_override == None
-            self.hubble_units_val = True
+            self.hubble_units_val = False
         
         PK = camb.get_matter_power_interpolator(self.cambpars, 
                                                 nonlinear=False, 
@@ -435,8 +446,12 @@ class CreatePs2d:
                                                 k_hunit=self.k_hunit_val,
                                                 hubble_units=self.hubble_units_val)
         
-        # pk_kh = lambda kh: PK.P(zv, kh)
-        pk_kh = lambda k: PK.P(zv, k)
+
+        pk_kh = lambda kh: PK.P(zv, kh)    
+        # the input k from hirax mmode runs are in h units already (i.e., h/Mpc)
+            # So, we don't need to use the k_hunit = True here, 
+            # because using this multiplies the arg-input k's by h
+            # and we don't want the mmode input k (h/Mpc) to be further multiplied by h
         
         
         if output_CAMB_instance:
@@ -521,7 +536,7 @@ class CreatePs2d:
         
         PK = self.pcl.pk
         
-        pk_k_z = lambda k,zv: PK(k *h, zv) *  h**3
+        pk_k_z = lambda k,zv: PK(k, zv)
         
         if output_CLASS_instance:
             return pk_k_z, self.pcl
