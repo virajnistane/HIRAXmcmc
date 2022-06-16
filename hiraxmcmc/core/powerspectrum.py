@@ -118,7 +118,7 @@ class Ps2dFromPofk:
                 if pspackage == 'class':
                     pofk_final = lambda k: PK_k_zClass(k,self.redshift_from_hiraxoutput)
                 elif pspackage == 'camb':
-                    pofk_final = lambda k: PK_k_zClass(k) 
+                    pofk_final = lambda k: PK_k_zClass(k)
             except:
                 print("PKinterp argument entered! Running exception")
                 if pspackage == 'class':
@@ -426,28 +426,28 @@ class CreatePs2d:
         
         try:
             assert k_hunit_override != None
-            self.k_hunit_val = k_hunit_override
+            k_hunit_val = k_hunit_override
         except:
             assert k_hunit_override == None
-            self.k_hunit_val = False
+            k_hunit_val = True
         
         
         try:
             assert hubble_units_override != None
-            self.hubble_units_val = hubble_units_override
+            hubble_units_val = hubble_units_override
         except:
             assert hubble_units_override == None
-            self.hubble_units_val = False
+            hubble_units_val = False
         
         PK = camb.get_matter_power_interpolator(self.cambpars, 
                                                 nonlinear=False, 
                                                 kmax=kmax,
                                                 zmax=250, 
-                                                k_hunit=self.k_hunit_val,
-                                                hubble_units=self.hubble_units_val)
+                                                k_hunit=k_hunit_val,
+                                                hubble_units=hubble_units_val)
         
-
-        pk_kh = lambda kh: PK.P(zv, kh)    
+        
+        pk_kh = lambda kh: PK.P(zv, kh)
         # the input k from hirax mmode runs are in h units already (i.e., h/Mpc)
             # So, we don't need to use the k_hunit = True here, 
             # because using this multiplies the arg-input k's by h
@@ -465,10 +465,19 @@ class CreatePs2d:
     def pofk_from_class(self,
                         currentparams, #=  ParametersFixed().current_params_fixed,
                         z = None, 
-                        output_CLASS_instance = True):   # redshift should be overwritten by self.redshift_from_hiraxoutput
+                        output_CLASS_instance = True,
+                        k_hunit_override = None,
+                        hubble_units_override = None
+                        ):   # redshift should be overwritten by self.redshift_from_hiraxoutput
         """
         This function generates matter power spectrum P(k) at redshift <z> for
         given values of parameters using CLASS.
+        
+        k-units: When the k_hunits is True, the input arguments (k values) need 
+        to be in h-units so that the function multiplies inherently the input by
+        the h value (input in currentparams).
+        When the k_hunits is False, the input k should be in Mpc^-1 units and not 
+        h/Mpc units.
         
         Parameters
         ----------
@@ -536,7 +545,33 @@ class CreatePs2d:
         
         PK = self.pcl.pk
         
-        pk_k_z = lambda k,zv: PK(k, zv)
+        
+        try:
+            assert k_hunit_override != None
+            k_hunit_val = k_hunit_override
+        except:
+            assert k_hunit_override == None
+            k_hunit_val = True
+        
+        
+        try:
+            assert hubble_units_override != None
+            hubble_units_val = hubble_units_override
+        except:
+            assert hubble_units_override == None
+            hubble_units_val = False
+        
+            
+        if k_hunit_val == True and hubble_units_val==True:
+            pk_k_z = lambda k,zv: PK(k*h, zv) * h**3
+        elif k_hunit_val == True and hubble_units_val==False:
+            pk_k_z = lambda k,zv: PK(k*h, zv)
+        elif k_hunit_val == False and hubble_units_val==True:
+            pk_k_z = lambda k,zv: PK(k, zv) * h**3
+        elif k_hunit_val == False and hubble_units_val==False:
+            pk_k_z = lambda k,zv: PK(k, zv)
+        
+        
         
         if output_CLASS_instance:
             return pk_k_z, self.pcl
