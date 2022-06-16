@@ -146,17 +146,18 @@ class Chi2Func:
                     currentparamstemp[i] = cosmoparams[i]
             
             
-            # temporarily commenting out the h/h_fid ratio rescaling of q_par and q_perp
-            # only on the branch "q_no_rescale_with_h_ratio"
+            q_perp = current_class_instance.angular_distance(z) / self.dA_fid * self.h_fiducial/(currentparamstemp['H0']/100)
+            q_par = self.hz_fid / current_class_instance.Hubble(z)            * self.h_fiducial/(currentparamstemp['H0']/100)
+            # this second ratio is to remove the h-units of the k-values (so, it is only needed when the k values are in h/Mpc units)
+            # for example: kpar_obs[h/Mpc] = kpar_fid[h/Mpc]/ q_par * (h/h_fid) = kpar_fid[h/Mpc]/ (q_par * (h_fid/h))
+                # Then this h/h_fid ratio, when including in the q_par, becomes (h_fid/h)
             
-            q_perp = current_class_instance.angular_distance(z) / self.dA_fid   #* (currentparamstemp['H0']/100)/self.h_fiducial   ### this second ratio is to remove the h-units of the k-values
-            q_par = self.hz_fid / current_class_instance.Hubble(z)              #* (currentparamstemp['H0']/100)/self.h_fiducial
             f_growth = current_class_instance.scale_independent_growth_factor_f(z)
             currentparams_input_for_pscalc = currentparamstemp
         except:
             assert freqdep_paramstovary
-            q_perp = currentparams['dA(z)'] / self.dA_fid     * (cosmoparams['H0']/100)/self.h_fiducial
-            q_par = self.hz_fid / currentparams['h(z)']       * (cosmoparams['H0']/100)/self.h_fiducial
+            q_perp = currentparams['dA(z)'] / self.dA_fid     * self.h_fiducial/(cosmoparams['H0']/100)
+            q_par = self.hz_fid / currentparams['h(z)']       * self.h_fiducial/(cosmoparams['H0']/100)
             f_growth = currentparams['f(z)']
             currentparams_input_for_pscalc = cosmoparams
         
