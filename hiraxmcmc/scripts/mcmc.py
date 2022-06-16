@@ -634,11 +634,27 @@ key0 = list(inputforhiraxoutput.keys())[0]
 
 try:
     assert not(freqdep_paramstovary)
-    PK_k_z_current , CLASS_instance_current = chi2_func[key0].cp_params.pofk_from_class(currentparams=currentparams)
+    initial_success = 0
+    while initial_success == 0:
+        try:
+            PK_k_z_current , CLASS_instance_current = chi2_func[key0].cp_params.pofk_from_class(currentparams=currentparams)
+            initial_success = 1
+        except:
+            assert int(currentrunindex) == 1
+            load_old_res.firstrunparams(thetacov0)
+            currentparams = load_old_res.currentparams
 except:
     assert freqdep_paramstovary
-    PK_k_z_current , CLASS_instance_current = chi2_func[key0].cp_params.pofk_from_class(currentparams=cosmoparams_fixed)
-    
+    initial_success = 0
+    while initial_success == 0:
+        try:
+            PK_k_z_current , CLASS_instance_current = chi2_func[key0].cp_params.pofk_from_class(currentparams=cosmoparams_fixed)
+            initial_success = 1
+        except:
+            assert int(currentrunindex) == 1
+            load_old_res.firstrunparams(thetacov0)
+            currentparams = load_old_res.currentparams
+
 
 
 # for param in list(currentparams.keys()):
@@ -660,7 +676,6 @@ for freqc,val in inputforhiraxoutput.items():
 
 
 chi2old = np.sum(list(chi2old1.values()))
-
 
 
 if rank_mpi==0:
