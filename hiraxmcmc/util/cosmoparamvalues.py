@@ -135,14 +135,15 @@ class ParametersFixed:
         return temp
     
     
-    def current_params_to_vary_fixed(self, params_to_vary, fclist, freqdep_paramstovary=False):
+    def current_params_to_vary_fixed(self, params_to_vary, fclist=None, toggle_paramstovary_freqdep=False):
         truncdict = {}
         for pp in params_to_vary:
             try:
-                assert not(freqdep_paramstovary)
+                assert not(toggle_paramstovary_freqdep)
                 truncdict[pp] = self.current_allparams_fixed[pp]
             except:
-                assert freqdep_paramstovary
+                assert toggle_paramstovary_freqdep
+                assert fclist!=None
                 for fc in fclist:
                     truncdict[pp] = self.current_allparams_fixed[pp][fc]
         return truncdict

@@ -382,10 +382,10 @@ for paramname, paramval in allparams_fixed.items():
 
 
 
-currentparams_fixed = params_fixed.current_params_to_vary_fixed(params_to_vary, inputforhiraxoutput.keys(), freqdep_paramstovary=freqdep_paramstovary)
+currentparams_fixed = params_fixed.current_params_to_vary_fixed(params_to_vary, fclist=inputforhiraxoutput.keys(), toggle_paramstovary_freqdep=freqdep_paramstovary)
 
 # Initialization of currentparams
-currentparams = params_fixed.current_params_to_vary_fixed(params_to_vary, inputforhiraxoutput.keys(), freqdep_paramstovary=freqdep_paramstovary)
+currentparams = params_fixed.current_params_to_vary_fixed(params_to_vary, fclist=inputforhiraxoutput.keys(), toggle_paramstovary_freqdep=freqdep_paramstovary)
 
 
 
