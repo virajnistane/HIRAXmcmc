@@ -137,17 +137,24 @@ class ParametersFixed:
         return temp
     
     
-    def current_params_to_vary_fixed(self, params_to_vary, fclist=None, toggle_paramstovary_freqdep=False):
+    def current_params_to_vary_fixed(self, params_to_vary, fclist=None, toggle_paramstovary_freqdep=False, external_current_allparams_fixed=None):
         truncdict = {}
         for pp in params_to_vary:
             try:
                 assert not(toggle_paramstovary_freqdep)
-                truncdict[pp] = self.current_allparams_fixed[pp]
+                if external_current_allparams_fixed == None:
+                    truncdict[pp] = self.current_allparams_fixed[pp]
+                else:
+                    truncdict[pp] = external_current_allparams_fixed[pp]
             except:
                 assert toggle_paramstovary_freqdep
                 assert fclist!=None
-                for fc in fclist:
-                    truncdict[pp] = self.current_allparams_fixed[pp][fc]
+                if external_current_allparams_fixed == None:
+                    for fc in fclist:
+                        truncdict[pp] = self.current_allparams_fixed[pp][fc]
+                else:
+                    for fc in fclist:
+                        truncdict[pp] = external_current_allparams_fixed[pp][fc]
         return truncdict
     
     
