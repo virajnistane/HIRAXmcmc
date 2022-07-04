@@ -126,6 +126,10 @@ class ParametersFixed:
         return {'H0':self.H0_fix, 'Omk':self.Omk_fix, 'Oml':self.Oml_fix, 'w0':self.w0_fix, 'wa':self.wa_fix,
                 'h(z)':self._hz_fix,'dA(z)':self._dA_fix, 'f(z)':self._fz_fix }
     
+    @current_allparams_fixed.setter
+    def current_allparams_fixed(self,current_allparams_fixed_new):
+        self.current_allparams_fixed = current_allparams_fixed_new
+    
     @property
     def cosmoparams_fixed(self):
         temp = {}
