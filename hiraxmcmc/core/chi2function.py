@@ -49,7 +49,7 @@ class Chi2Func:
         except:
             if INPUT != None:
                 assert INPUT['likelihood']['ps_rel_err']['override'] == 'yes'
-            self.covhirax = np.loadtxt(os.path.join(self.modulelocation, 'inputfiles', INPUT['likelihood']['ps_rel_err']['filename']))
+            self.covhirax = np.loadtxt(os.path.join(INPUT['likelihood']['PS_cov']['filename_fullpath']))
             self.errs  =  np.sqrt(abs(np.diag(self.covhirax))).reshape(self.kpar_all['kpar_size'],self.kperp_all['kperp_size'])
         
         self.kparstart = self.kpar_all['kpar_bands'][:-1]
