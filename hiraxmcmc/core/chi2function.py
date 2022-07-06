@@ -43,12 +43,12 @@ class Chi2Func:
         
         try:
             if INPUT != None:
-                assert INPUT['likelihood']['ps_rel_err']['override'] == 'no'
+                assert INPUT['likelihood']['PS_cov']['override'] == 'no'
             self.covhirax = self.hirax_output.covhirax
             self.errs = self.hirax_output.rel_err
         except:
             if INPUT != None:
-                assert INPUT['likelihood']['ps_rel_err']['override'] == 'yes'
+                assert INPUT['likelihood']['PS_cov']['override'] == 'yes'
             self.covhirax = np.loadtxt(os.path.join(INPUT['likelihood']['PS_cov']['filename_fullpath']))
             self.errs  =  np.sqrt(abs(np.diag(self.covhirax))).reshape(self.kpar_all['kpar_size'],self.kperp_all['kperp_size'])
         
