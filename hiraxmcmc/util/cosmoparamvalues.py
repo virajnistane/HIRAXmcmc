@@ -137,7 +137,7 @@ class ParametersFixed:
         return temp
     
     
-    def current_params_to_vary_fixed(self, params_to_vary, fclist=None, toggle_paramstovary_freqdep=False, external_current_allparams_fixed=None):
+    def current_params_to_vary_fixed(self, params_to_vary, toggle_paramstovary_freqdep, fclist, external_current_allparams_fixed=None):
         truncdict = {}
         for pp in params_to_vary:
             try:
