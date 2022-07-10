@@ -83,7 +83,7 @@ if rank_mpi == 0:
 # IIIIIIIIIIII   N      N    P             UUUU          T
 # =============================================================================
 
-input_override = False
+input_override = 0
 
 try:
     assert not(input_override)
@@ -122,7 +122,7 @@ except:
         #                   'thetacovold_until': 10000,
         #                   'TRFold_until': 16000,
         #                   'thetacov0': {'do_override': 'no',
-        #                                 'manual_input_variance': {'H0': 25,
+        #                                 'manual_input_variance': {'H0': 0.8,
         #                                                           'Omk': 0.002,
         #                                                           'Oml': 0.01,
         #                                                           'w0': 0.2,
@@ -152,7 +152,7 @@ except:
                           'thetacovold_until': 4000,
                           'TRFold_until': 6000,
                           'thetacov0': {'do_override': 'yes',
-                                        'manual_input_variance': {'H0': 25,
+                                        'manual_input_variance': {'h': 0.8,
                                                                   'Omk': 0.002,
                                                                   'Oml': 0.01,
                                                                   'w0': 0.2,
