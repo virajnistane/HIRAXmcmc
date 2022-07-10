@@ -152,7 +152,7 @@ except:
                           'thetacovold_until': 4000,
                           'TRFold_until': 6000,
                           'thetacov0': {'do_override': 'yes',
-                                        'manual_input_variance': {'h': 0.8,
+                                        'manual_input_variance': {'h': 0.25,
                                                                   'Omk': 0.002,
                                                                   'Oml': 0.01,
                                                                   'w0': 0.2,
