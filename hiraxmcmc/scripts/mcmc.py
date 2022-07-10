@@ -112,7 +112,7 @@ except:
     if input_override:
         
         # INPUT = {'current_run_index': 1,
-        #           'params_to_vary': ['hz', 'dAz', 'fz'],
+        #           'params_to_vary': ['qpar(z)', 'qperp(z)', 'f(z)'],
         #           'mmode_output': {'freq_channel': {'start': 400, 'end': 500},
         #                             'klmode': 'kl_5thresh_nofg',
         #                             'power_spectrum_estimator_type': 'minvar'},
@@ -130,16 +130,19 @@ except:
         #           'likelihood': {'PS_cov': {'override': 'no', 
         #                                     'filename_fullpath': ''}},
         #           'PARAMS': {'H0': {'prior': [50, 90]},
-        #                     'Omk': {'prior': [-0.2, 0.2]},
-        #                     'Oml': {'prior': [0.5, 0.9]},
-        #                     'w0': {'prior': [-3, 1]},
-        #                     'wa': {'prior': [-5, 5]},
-        #                     'h(z)': {'prior': [0.0001, 0.001], 'freqdep': True},
-        #                     'dA(z)': {'prior': [800, 3000], 'freqdep': True},
-        #                     'f(z)': {'prior': [0.2, 1.2], 'freqdep': True}}}
+        #                       'h': {'prior': [0.5, 0.9]},
+        #                       'Omk': {'prior': [-0.2, 0.2]},
+        #                       'Oml': {'prior': [0.5, 0.9]},
+        #                       'w0': {'prior': [-3, 1]},
+        #                       'wa': {'prior': [-5, 5]},
+        #                       'qpar(z)': {'prior': [0.3, 1.7], 'freqdep': True},
+        #                       'h(z)': {'prior': [0.0001, 0.001], 'freqdep': True},
+        #                       'qperp(z)': {'prior': [0.3, 1.7], 'freqdep': True},
+        #                       'dA(z)': {'prior': [800, 3000], 'freqdep': True},
+        #                       'f(z)': {'prior': [0.2, 1.2], 'freqdep': True}}}
         
         INPUT = {'current_run_index': 1,
-                  'params_to_vary': ['H0', 'Omk', 'Oml'],
+                  'params_to_vary': ['h', 'Omk', 'Oml'],
                   'mmode_output': {'freq_channel': {'start': 400, 'end': 800},
                                   'klmode': 'dk_5thresh_fg_1000thresh',
                                   'power_spectrum_estimator_type': 'minvar'},
@@ -157,13 +160,16 @@ except:
                   'likelihood': {'PS_cov': {'override': 'no', 
                                             'filename_fullpath': ''}},
                   'PARAMS': {'H0': {'prior': [50, 90]},
-                            'Omk': {'prior': [-0.2, 0.2]},
-                            'Oml': {'prior': [0.5, 0.9]},
-                            'w0': {'prior': [-3, 1]},
-                            'wa': {'prior': [-5, 5]},
-                            'h(z)': {'prior': [0.0001, 0.001], 'freqdep': True},
-                            'dA(z)': {'prior': [800, 3000], 'freqdep': True},
-                            'f(z)': {'prior': [0.2, 1.2], 'freqdep': True}}}
+                              'h': {'prior': [0.5, 0.9]},
+                              'Omk': {'prior': [-0.2, 0.2]},
+                              'Oml': {'prior': [0.5, 0.9]},
+                              'w0': {'prior': [-3, 1]},
+                              'wa': {'prior': [-5, 5]},
+                              'qpar(z)': {'prior': [0.3, 1.7], 'freqdep': True},
+                              'h(z)': {'prior': [0.0001, 0.001], 'freqdep': True},
+                              'qperp(z)': {'prior': [0.3, 1.7], 'freqdep': True},
+                              'dA(z)': {'prior': [800, 3000], 'freqdep': True},
+                              'f(z)': {'prior': [0.2, 1.2], 'freqdep': True}}}
         
         
         
