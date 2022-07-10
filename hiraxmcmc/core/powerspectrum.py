@@ -44,7 +44,8 @@ class Ps2dFromPofk:
         #    |
         #   \|/
         #    V
-        self.h_fix = self.parameters_fixed.h(self.parameters_fixed.H0_fix)
+        # self.h_fix = self.parameters_fixed.h(self.parameters_fixed.H0_fix)
+        self.h_fix = self.parameters_fixed._h_fix
         
         self.hirax_output = HiraxOutput(inputforhiraxoutput)    # inputforhiraxoutput = hiraxrundirname, psetype
         # |__
@@ -301,7 +302,7 @@ class CreatePs2d:
         
         # ====================================================================
         if pstype == 'sample':
-            self.OmMh2 = self.parameters_fixed.Om_to_omh2(self.parameters_fixed.OmM_fix, self.parameters_fixed.H0_fix)
+            self.OmMh2 = self.parameters_fixed.OmM_fix * self.parameters_fixed._h_fix**2 #self.parameters_fixed.Om_to_omh2(self.parameters_fixed.OmM_fix, self.parameters_fixed.H0_fix)
         elif pstype == 'param':
             self.OmGv = self.parameters_fixed.OmG_fix
         

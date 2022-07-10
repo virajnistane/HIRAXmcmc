@@ -94,6 +94,7 @@ class Chi2Func:
         self.cosmoparams_fixed = self.params_fixed.cosmoparams_fixed
         
         
+        
         """ createPS2D instances """
         
         self.ps2d_from_Pofk = Ps2dFromPofk(inputforhiraxoutput = self.inputforhiraxoutput)
@@ -114,11 +115,17 @@ class Chi2Func:
             self.hz_fid = self.pspackage_properties_class.Hubble(self.redshift)
             self.pk_estimated = self.pk_z_estimated_class
         
-        self.h_fiducial = self.params_fixed.cosmoparams_fixed['H0']/100
+        # self.h_fiducial = self.params_fixed.cosmoparams_fixed['H0']/100
+        try:
+            self.h_fiducial = self.cosmoparams_fixed['h']
+            H0 = self.h_fiducial * 100
+        except:
+            H0 = self.cosmoparams_fixed['H0']
+            self.h_fiducial = H0/100
         self.f_growth_for_ps_estimated = self.pspackage_properties_class.scale_independent_growth_factor_f(self.redshift)
         
-        self.q_perp_for_ps_estimated =  self.pspackage_properties_class.angular_distance(self.redshift) / self.dA_fid * (self.params_fixed.cosmoparams_fixed['H0']/100)/self.h_fiducial
-        self.q_par_for_ps_estimated =  self.hz_fid / self.pspackage_properties_class.Hubble(self.redshift) * (self.params_fixed.cosmoparams_fixed['H0']/100)/self.h_fiducial
+        self.q_perp_for_ps_estimated =  self.pspackage_properties_class.angular_distance(self.redshift) / self.dA_fid   * self.cosmoparams_fixed['h']/self.h_fiducial
+        self.q_par_for_ps_estimated =  self.hz_fid / self.pspackage_properties_class.Hubble(self.redshift)              * self.cosmoparams_fixed['h']/self.h_fiducial
         
         
         self.ps_estimated = self.cp_sample.get_ps2d_from_pok(PK_k_zClass = self.pk_estimated,
