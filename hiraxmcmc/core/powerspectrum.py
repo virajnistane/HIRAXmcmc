@@ -406,7 +406,7 @@ class CreatePs2d:
             H0 = h * 100
         except:
             H0 = currentparamstemp['H0']
-            h = h/100
+            h = H0/100
             
         
         if self.pstype == 'sample':
@@ -517,7 +517,7 @@ class CreatePs2d:
             H0 = h * 100
         except:
             H0 = currentparamstemp['H0']
-            h = h/100
+            h = H0/100
         
         # H0v, Omkv, Omlv, w0v, wav = currentparams.values()
         

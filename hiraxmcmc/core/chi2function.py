@@ -150,7 +150,7 @@ class Chi2Func:
                 H0 = h * 100
             except:
                 H0 = currentparamstemp['H0']
-                h = h/100
+                h = H0/100
             
             
             q_perp = current_class_instance.angular_distance(z) / self.dA_fid * self.h_fiducial/h
@@ -169,7 +169,7 @@ class Chi2Func:
                 H0 = h * 100
             except:
                 H0 = cosmoparams['H0']
-                h = h/100
+                h = H0/100
             
             try:
                 q_par = currentparams['qpar(z)']                * self.h_fiducial/h
