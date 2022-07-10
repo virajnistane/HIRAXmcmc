@@ -145,9 +145,16 @@ class Chi2Func:
                 except:
                     currentparamstemp[i] = cosmoparams[i]
             
+            try:
+                h = currentparamstemp['h']
+                H0 = h * 100
+            except:
+                H0 = currentparamstemp['H0']
+                h = h/100
             
-            q_perp = current_class_instance.angular_distance(z) / self.dA_fid * self.h_fiducial/(currentparamstemp['H0']/100)
-            q_par = self.hz_fid / current_class_instance.Hubble(z)            * self.h_fiducial/(currentparamstemp['H0']/100)
+            
+            q_perp = current_class_instance.angular_distance(z) / self.dA_fid * self.h_fiducial/h
+            q_par = self.hz_fid / current_class_instance.Hubble(z)            * self.h_fiducial/h
             # this second ratio is to remove the h-units of the k-values (so, it is only needed when the k values are in h/Mpc units)
             # for example: kpar_obs[h/Mpc] = kpar_fid[h/Mpc]/ q_par * (h/h_fid) = kpar_fid[h/Mpc]/ (q_par * (h_fid/h))
                 # Then this h/h_fid ratio, when including in the q_par, becomes (h_fid/h)
@@ -156,8 +163,25 @@ class Chi2Func:
             currentparams_input_for_pscalc = currentparamstemp
         except:
             assert freqdep_paramstovary
-            q_perp = currentparams['dA(z)'] / self.dA_fid     * self.h_fiducial/(cosmoparams['H0']/100)
-            q_par = self.hz_fid / currentparams['h(z)']       * self.h_fiducial/(cosmoparams['H0']/100)
+            
+            try:
+                h = cosmoparams['h']
+                H0 = h * 100
+            except:
+                H0 = cosmoparams['H0']
+                h = h/100
+            
+            try:
+                q_par = currentparams['qpar(z)']                * self.h_fiducial/h
+            except:
+                q_par = self.hz_fid / currentparams['h(z)']     * self.h_fiducial/h
+                
+            try:
+                q_perp = currentparams['qperp(z)']              * self.h_fiducial/h
+            except:
+                q_perp = currentparams['dA(z)'] / self.dA_fid   * self.h_fiducial/h
+                
+            
             f_growth = currentparams['f(z)']
             currentparams_input_for_pscalc = cosmoparams
         

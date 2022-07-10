@@ -15,6 +15,7 @@ class ParametersFixed:
     
     def __init__(self):
         self._H0_fix = 67.80
+        self._h_fix = 0.678
         self._Omk_fix = 0.0
         self._Oml_fix = 0.684
         self._w0_fix = -1.0
@@ -30,16 +31,19 @@ class ParametersFixed:
                         '600_700':0.0004498518311851779 * cc/1e3, 
                         '700_800':0.000379575515395735  * cc/1e3}
         
+        self._qpar_fix = 1
+        
         self._dA_fix = {'400_500':1751.0952983505435, 
                         '500_600':1792.9837345626768, 
                         '600_700':1755.9106803363068, 
                         '700_800':1653.5773864998494}
         
+        self._qperp_fix = 1
+        
         self._fz_fix = {'400_500':0.9604491314463909, 
                         '500_600':0.9331817576718678, 
                         '600_700':0.8974290025235386, 
                         '700_800':0.8543701735721654}
-        
         
         self._OmM_fix = 0.308
     
@@ -56,6 +60,13 @@ class ParametersFixed:
     @H0_fix.setter
     def H0_fix(self, H0_fix_new):
         self._H0_fix = H0_fix_new
+        
+    @property
+    def h_fix(self):
+        return self._h_fix
+    @h_fix.setter
+    def h_fix(self, h_fix_new):
+        self._h_fix = h_fix_new
     
     @property
     def Omk_fix(self):
@@ -110,22 +121,10 @@ class ParametersFixed:
         h_temp = cls.h(H0)
         return omXh2/h_temp**2
     
-    # ###### ###### ###### ######
-    # allparamsfixdict = {'H0':H0_fix, 
-    #                     'Omk':Omk_fix,
-    #                     'Oml':Oml_fix, 
-    #                     'w0':w0_fix, 
-    #                     'wa':wa_fix,
-    #                     'h(z)':_hz_fix,
-    #                     'dA(z)':_dA_fix,
-    #                     'f(z)':_fz_fix
-    #                     }
-    
     @property
     def current_allparams_fixed(self):
-        return {'H0':self.H0_fix, 'Omk':self.Omk_fix, 'Oml':self.Oml_fix, 'w0':self.w0_fix, 'wa':self.wa_fix,
-                'h(z)':self._hz_fix,'dA(z)':self._dA_fix, 'f(z)':self._fz_fix }
-    
+        return {'h':self._h_fix ,'Omk':self.Omk_fix, 'Oml':self.Oml_fix, 'w0':self.w0_fix, 'wa':self.wa_fix,
+                'h(z)':self._hz_fix, 'qpar(z)':self._qpar_fix, 'dA(z)':self._dA_fix, 'qperp(z)':self._qperp_fix, 'f(z)':self._fz_fix }
     
     
     @property
@@ -137,24 +136,61 @@ class ParametersFixed:
         return temp
     
     
-    def current_params_to_vary_fixed(self, params_to_vary, fclist=None, toggle_paramstovary_freqdep=False, external_current_allparams_fixed=None):
+    def current_params_to_vary_fixed(self, params_to_vary, toggle_paramstovary_freqdep, fclist, external_current_allparams_fixed=None):
+        """
+        Function to get the values of the currently varying params (in the respective single freq bin)
+        
+        Parameters
+        ----------
+        params_to_vary : TYPE
+            DESCRIPTION.
+        toggle_paramstovary_freqdep : TYPE
+            DESCRIPTION.
+        fclist : TYPE
+            DESCRIPTION.
+        external_current_allparams_fixed : TYPE, optional
+            DESCRIPTION. The default is None.
+
+        Returns
+        -------
+        truncdict : TYPE
+            DESCRIPTION.
+
+        """
         truncdict = {}
-        for pp in params_to_vary:
-            try:
-                assert not(toggle_paramstovary_freqdep)
+        # for cosmological parameters
+        if not(toggle_paramstovary_freqdep):
+            fclist = None
+            for pp in params_to_vary:
                 if external_current_allparams_fixed == None:
                     truncdict[pp] = self.current_allparams_fixed[pp]
                 else:
                     truncdict[pp] = external_current_allparams_fixed[pp]
-            except:
-                assert toggle_paramstovary_freqdep
+        # for scaling parameters (freq dependent)
+        elif toggle_paramstovary_freqdep:
+            for pp in params_to_vary:
                 assert fclist!=None
+                assert len(fclist) == 1 
+                # Using the default current_allparams_fixed from the class 
+                # property to get the values
                 if external_current_allparams_fixed == None:
-                    for fc in fclist:
-                        truncdict[pp] = self.current_allparams_fixed[pp][fc]
+                    try:
+                        # for qpar(z) and qperp(z), no freq channel keys
+                        assert type(self.current_allparams_fixed[pp]) != dict
+                        truncdict[pp] = self.current_allparams_fixed[pp]
+                    except:
+                        # for f(z)
+                        truncdict[pp] = self.current_allparams_fixed[pp][fclist[0]]
+                # Using an external list of current_allparams_fixed  
+                # to get the values
                 else:
-                    for fc in fclist:
-                        truncdict[pp] = external_current_allparams_fixed[pp][fc]
+                    try:
+                        # for qpar(z) and qperp(z), no freq channel keys
+                        assert type(self.current_allparams_fixed[pp]) != dict
+                        truncdict[pp] = external_current_allparams_fixed[pp]
+                    except:
+                        # for f(z)
+                        truncdict[pp] = external_current_allparams_fixed[pp][fclist[0]]
         return truncdict
     
     
