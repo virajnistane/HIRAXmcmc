@@ -136,7 +136,7 @@ class ParametersFixed:
         return temp
     
     
-    def current_params_to_vary_fixed(self, params_to_vary, toggle_paramstovary_freqdep, fclist, external_current_allparams_fixed=None):
+    def current_params_to_vary_fixed(self, params_to_vary, toggle_paramstovary_freqdep, fcbin, external_current_allparams_fixed=None):
         """
         Function to get the values of the currently varying params (in the respective single freq bin)
         
@@ -160,7 +160,7 @@ class ParametersFixed:
         truncdict = {}
         # for cosmological parameters
         if not(toggle_paramstovary_freqdep):
-            fclist = None
+            # fclist = None
             for pp in params_to_vary:
                 if external_current_allparams_fixed == None:
                     truncdict[pp] = self.current_allparams_fixed[pp]
@@ -169,8 +169,8 @@ class ParametersFixed:
         # for scaling parameters (freq dependent)
         elif toggle_paramstovary_freqdep:
             for pp in params_to_vary:
-                assert fclist!=None
-                assert len(fclist) == 1 
+                assert fcbin!=None
+                # assert len(fclist) == 1 
                 # Using the default current_allparams_fixed from the class 
                 # property to get the values
                 if external_current_allparams_fixed == None:
@@ -180,7 +180,7 @@ class ParametersFixed:
                         truncdict[pp] = self.current_allparams_fixed[pp]
                     except:
                         # for f(z)
-                        truncdict[pp] = self.current_allparams_fixed[pp][fclist[0]]
+                        truncdict[pp] = self.current_allparams_fixed[pp][fcbin]
                 # Using an external list of current_allparams_fixed  
                 # to get the values
                 else:
@@ -190,7 +190,7 @@ class ParametersFixed:
                         truncdict[pp] = external_current_allparams_fixed[pp]
                     except:
                         # for f(z)
-                        truncdict[pp] = external_current_allparams_fixed[pp][fclist[0]]
+                        truncdict[pp] = external_current_allparams_fixed[pp][fcbin]
         return truncdict
     
     
