@@ -1,14 +1,14 @@
 {
     "current_run_index": 1,
     "params_to_vary": [
-        "H0",
+        "h",
         "Omk",
         "Oml"
     ],
     "mmode_output": {
         "freq_channel": {
             "start": 400,
-            "end": 800
+            "end": 500
         },
         "klmode": "dk_5thresh_fg_1000thresh",
         "power_spectrum_estimator_type": "minvar"
@@ -22,7 +22,7 @@
         "thetacov0": {
             "do_override": "yes",
             "manual_input_variance": {
-                "H0": 25,
+                "h": 0.25,
                 "Omk": 0.002,
                 "Oml": 0.01,
                 "w0": 0.2,
@@ -41,6 +41,12 @@
             "prior": [
                 50,
                 90
+            ]
+        },
+        "h": {
+            "prior": [
+                0.5,
+                0.9
             ]
         },
         "Omk": {
@@ -67,10 +73,24 @@
                 5
             ]
         },
+        "qpar(z)": {
+            "prior": [
+                0.3,
+                1.7
+            ],
+            "freqdep": true
+        },
         "h(z)": {
             "prior": [
                 0.0001,
                 0.001
+            ],
+            "freqdep": true
+        },
+        "qperp(z)": {
+            "prior": [
+                0.3,
+                1.7
             ],
             "freqdep": true
         },

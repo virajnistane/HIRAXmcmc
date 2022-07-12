@@ -44,7 +44,8 @@ class Ps2dFromPofk:
         #    |
         #   \|/
         #    V
-        self.h_fix = self.parameters_fixed.h(self.parameters_fixed.H0_fix)
+        # self.h_fix = self.parameters_fixed.h(self.parameters_fixed.H0_fix)
+        self.h_fix = self.parameters_fixed._h_fix
         
         self.hirax_output = HiraxOutput(inputforhiraxoutput)    # inputforhiraxoutput = hiraxrundirname, psetype
         # |__
@@ -301,7 +302,7 @@ class CreatePs2d:
         
         # ====================================================================
         if pstype == 'sample':
-            self.OmMh2 = self.parameters_fixed.Om_to_omh2(self.parameters_fixed.OmM_fix, self.parameters_fixed.H0_fix)
+            self.OmMh2 = self.parameters_fixed.OmM_fix * self.parameters_fixed._h_fix**2 #self.parameters_fixed.Om_to_omh2(self.parameters_fixed.OmM_fix, self.parameters_fixed.H0_fix)
         elif pstype == 'param':
             self.OmGv = self.parameters_fixed.OmG_fix
         
@@ -401,8 +402,13 @@ class CreatePs2d:
         
         # H0v, Omkv, Omlv, w0v, wav = currentparams.values()
         
-        
-        h = currentparamstemp['H0']/100
+        try:
+            h = currentparamstemp['h']
+            H0 = h * 100
+        except:
+            H0 = currentparamstemp['H0']
+            h = H0/100
+            
         
         if self.pstype == 'sample':
             # ombh2v = self.OmMh2 - self.cambpars.omch2 - self.cambpars.omnuh2
@@ -417,7 +423,7 @@ class CreatePs2d:
         
         
         
-        self.cambpars.set_cosmology(H0 = currentparamstemp['H0'] , omk = currentparamstemp['Omk'], ombh2 = self.cambpars.ombh2, omch2 = omch2v)
+        self.cambpars.set_cosmology(H0 = H0 , omk = currentparamstemp['Omk'], ombh2 = self.cambpars.ombh2, omch2 = omch2v)
         self.cambpars.NonLinear = model.NonLinear_both
         self.cambpars.DarkEnergy.set_params(w = currentparamstemp['w0'] , wa = currentparamstemp['wa'])
         
@@ -506,11 +512,17 @@ class CreatePs2d:
                 assert i in currentparamstemp.keys()
             except:
                 currentparamstemp[i] = self.cosmoparams_fixed[i]
-                
+        
+        try:
+            h = currentparamstemp['h']
+            H0 = h * 100
+        except:
+            H0 = currentparamstemp['H0']
+            h = H0/100
         
         # H0v, Omkv, Omlv, w0v, wav = currentparams.values()
         
-        h = currentparamstemp['H0']/100
+        # h = currentparamstemp['H0']/100
         
         if self.pstype == 'param':
             omch2 = (1 - currentparamstemp['Oml'] - currentparamstemp['Omk'] - self.OmGv) * h**2 - self.classpars['omega_b'] - self.cambpars.omnuh2
@@ -521,7 +533,7 @@ class CreatePs2d:
         
         self.pcl.set(dict(self.classpars))
         
-        self.pcl.set({'H0': currentparamstemp['H0'],
+        self.pcl.set({'H0': H0,
                       'omega_b': float(self.classpars['omega_b']),
                       'omega_cdm': omch2,
                       'Omega_k': currentparamstemp['Omk'],

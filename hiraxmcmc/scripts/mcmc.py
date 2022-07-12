@@ -83,7 +83,7 @@ if rank_mpi == 0:
 # IIIIIIIIIIII   N      N    P             UUUU          T
 # =============================================================================
 
-input_override = False
+input_override = 0
 
 try:
     assert not(input_override)
@@ -112,7 +112,7 @@ except:
     if input_override:
         
         # INPUT = {'current_run_index': 1,
-        #           'params_to_vary': ['hz', 'dAz', 'fz'],
+        #           'params_to_vary': ['qpar(z)', 'qperp(z)', 'f(z)'],
         #           'mmode_output': {'freq_channel': {'start': 400, 'end': 500},
         #                             'klmode': 'kl_5thresh_nofg',
         #                             'power_spectrum_estimator_type': 'minvar'},
@@ -122,7 +122,7 @@ except:
         #                   'thetacovold_until': 10000,
         #                   'TRFold_until': 16000,
         #                   'thetacov0': {'do_override': 'no',
-        #                                 'manual_input_variance': {'H0': 25,
+        #                                 'manual_input_variance': {'H0': 0.8,
         #                                                           'Omk': 0.002,
         #                                                           'Oml': 0.01,
         #                                                           'w0': 0.2,
@@ -130,17 +130,20 @@ except:
         #           'likelihood': {'PS_cov': {'override': 'no', 
         #                                     'filename_fullpath': ''}},
         #           'PARAMS': {'H0': {'prior': [50, 90]},
-        #                     'Omk': {'prior': [-0.2, 0.2]},
-        #                     'Oml': {'prior': [0.5, 0.9]},
-        #                     'w0': {'prior': [-3, 1]},
-        #                     'wa': {'prior': [-5, 5]},
-        #                     'h(z)': {'prior': [0.0001, 0.001], 'freqdep': True},
-        #                     'dA(z)': {'prior': [800, 3000], 'freqdep': True},
-        #                     'f(z)': {'prior': [0.2, 1.2], 'freqdep': True}}}
+        #                       'h': {'prior': [0.5, 0.9]},
+        #                       'Omk': {'prior': [-0.2, 0.2]},
+        #                       'Oml': {'prior': [0.5, 0.9]},
+        #                       'w0': {'prior': [-3, 1]},
+        #                       'wa': {'prior': [-5, 5]},
+        #                       'qpar(z)': {'prior': [0.3, 1.7], 'freqdep': True},
+        #                       'h(z)': {'prior': [0.0001, 0.001], 'freqdep': True},
+        #                       'qperp(z)': {'prior': [0.3, 1.7], 'freqdep': True},
+        #                       'dA(z)': {'prior': [800, 3000], 'freqdep': True},
+        #                       'f(z)': {'prior': [0.2, 1.2], 'freqdep': True}}}
         
         INPUT = {'current_run_index': 1,
-                  'params_to_vary': ['H0', 'Omk', 'Oml'],
-                  'mmode_output': {'freq_channel': {'start': 400, 'end': 800},
+                  'params_to_vary': ['h', 'Omk', 'Oml'],
+                  'mmode_output': {'freq_channel': {'start': 400, 'end': 500},
                                   'klmode': 'dk_5thresh_fg_1000thresh',
                                   'power_spectrum_estimator_type': 'minvar'},
                   'mcmc': {'nsteps': 20000,
@@ -149,7 +152,7 @@ except:
                           'thetacovold_until': 4000,
                           'TRFold_until': 6000,
                           'thetacov0': {'do_override': 'yes',
-                                        'manual_input_variance': {'H0': 25,
+                                        'manual_input_variance': {'h': 0.25,
                                                                   'Omk': 0.002,
                                                                   'Oml': 0.01,
                                                                   'w0': 0.2,
@@ -157,13 +160,16 @@ except:
                   'likelihood': {'PS_cov': {'override': 'no', 
                                             'filename_fullpath': ''}},
                   'PARAMS': {'H0': {'prior': [50, 90]},
-                            'Omk': {'prior': [-0.2, 0.2]},
-                            'Oml': {'prior': [0.5, 0.9]},
-                            'w0': {'prior': [-3, 1]},
-                            'wa': {'prior': [-5, 5]},
-                            'h(z)': {'prior': [0.0001, 0.001], 'freqdep': True},
-                            'dA(z)': {'prior': [800, 3000], 'freqdep': True},
-                            'f(z)': {'prior': [0.2, 1.2], 'freqdep': True}}}
+                              'h': {'prior': [0.5, 0.9]},
+                              'Omk': {'prior': [-0.2, 0.2]},
+                              'Oml': {'prior': [0.5, 0.9]},
+                              'w0': {'prior': [-3, 1]},
+                              'wa': {'prior': [-5, 5]},
+                              'qpar(z)': {'prior': [0.3, 1.7], 'freqdep': True},
+                              'h(z)': {'prior': [0.0001, 0.001], 'freqdep': True},
+                              'qperp(z)': {'prior': [0.3, 1.7], 'freqdep': True},
+                              'dA(z)': {'prior': [800, 3000], 'freqdep': True},
+                              'f(z)': {'prior': [0.2, 1.2], 'freqdep': True}}}
         
         
         
@@ -382,10 +388,17 @@ for paramname, paramval in allparams_fixed.items():
 
 
 
+<<<<<<< HEAD
 currentparams_fixed = params_fixed.current_params_to_vary_fixed(params_to_vary, toggle_paramstovary_freqdep=freqdep_paramstovary, fclist=inputforhiraxoutput.keys())
 
 # Initialization of currentparams
 currentparams = params_fixed.current_params_to_vary_fixed(params_to_vary, toggle_paramstovary_freqdep=freqdep_paramstovary, fclist=inputforhiraxoutput.keys())
+=======
+currentparams_fixed = params_fixed.current_params_to_vary_fixed(params_to_vary, toggle_paramstovary_freqdep=freqdep_paramstovary, fcbin=auto_hiraxoutput_kw)
+
+# Initialization of currentparams
+currentparams = params_fixed.current_params_to_vary_fixed(params_to_vary, toggle_paramstovary_freqdep=freqdep_paramstovary, fcbin=auto_hiraxoutput_kw)
+>>>>>>> add_qparqperp_p2v
 
 
 
