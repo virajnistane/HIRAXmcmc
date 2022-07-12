@@ -8,7 +8,7 @@
     "mmode_output": {
         "freq_channel": {
             "start": 400,
-            "end": 800
+            "end": 500
         },
         "klmode": "dk_5thresh_fg_1000thresh",
         "power_spectrum_estimator_type": "minvar"
