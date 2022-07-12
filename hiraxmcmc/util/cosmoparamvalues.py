@@ -135,10 +135,7 @@ class ParametersFixed:
                 temp[key] = val
         return temp
     
-    
-<<<<<<< HEAD
-    def current_params_to_vary_fixed(self, params_to_vary, toggle_paramstovary_freqdep, fclist, external_current_allparams_fixed=None):
-=======
+
     def current_params_to_vary_fixed(self, params_to_vary, toggle_paramstovary_freqdep, fcbin, external_current_allparams_fixed=None):
         """
         Function to get the values of the currently varying params (in the respective single freq bin)
@@ -160,7 +157,7 @@ class ParametersFixed:
             DESCRIPTION.
 
         """
->>>>>>> add_qparqperp_p2v
+
         truncdict = {}
         # for cosmological parameters
         if not(toggle_paramstovary_freqdep):
