@@ -143,7 +143,7 @@ except:
         
         INPUT = {'current_run_index': 1,
                   'params_to_vary': ['h', 'Omk', 'Oml'],
-                  'mmode_output': {'freq_channel': {'start': 400, 'end': 800},
+                  'mmode_output': {'freq_channel': {'start': 400, 'end': 500},
                                   'klmode': 'dk_5thresh_fg_1000thresh',
                                   'power_spectrum_estimator_type': 'minvar'},
                   'mcmc': {'nsteps': 20000,
