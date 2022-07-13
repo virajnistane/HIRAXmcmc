@@ -71,6 +71,13 @@ class Ps2dFromPofk:
             return mu_fid/qpar * (mu_fid**2/qpar**2 + (1-mu_fid**2)/qperp**2)**(-0.5)
         self.mu_obs = mu_obs
         
+        def k_fid(k_obs, mu_obs, qpar, qperp):
+            return k_obs * (mu_obs**2 * qpar**2 + (1-mu_obs**2) * qperp**2)**(0.5)
+        self.k_fid = k_fid
+        
+        def mu_fid(mu_obs, qpar, qperp):
+            return mu_obs * qpar * (mu_obs**2 * qpar**2 + (1-mu_obs**2) * qperp**2)**(-0.5)
+        self.mu_fid = mu_fid
         
         """
         For band func method for 2D PS 
@@ -134,10 +141,14 @@ class Ps2dFromPofk:
         """
         self.band_pk = [(lambda bandt: (lambda k, mu: 
                                         rescaling_factor 
-                                        * P_kmu(self.k_obs(k,mu,
+                                        # * P_kmu(self.k_obs(k,mu,
+                                        #                    qpar=q_par,qperp=q_perp),
+                                        #         self.mu_obs(mu,
+                                        #                     qpar=q_par,qperp=q_perp))
+                                        * P_kmu(self.k_fid(k,mu,
                                                            qpar=q_par,qperp=q_perp), 
-                                                self.mu_obs(mu,
-                                                            qpar=q_par,qperp=q_perp)) 
+                                                self.mu_fid(mu,
+                                                            qpar=q_par,qperp=q_perp))
                                         * bandt(k, mu)
                                         # check if you need to enter kobs and muobs as bandt args
                                         )
