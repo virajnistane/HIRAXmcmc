@@ -144,7 +144,7 @@ except:
         INPUT = {'current_run_index': 1,
                   'params_to_vary': ['h', 'Omk', 'Oml'],
                   'mmode_output': {'freq_channel': {'start': 400, 'end': 500},
-                                  'klmode': 'dk_5thresh_fg_1000thresh',
+                                  'klmode': 'kl_5thresh_nofg',
                                   'power_spectrum_estimator_type': 'minvar'},
                   'mcmc': {'nsteps': 20000,
                           'do_update_thetacov': 'yes',
@@ -183,7 +183,22 @@ except:
             with open('../inputfiles/input_example_cosmo.json','w') as f:
                 json.dump(INPUT, f, indent=4)
             raise ValueError
-        
+            
+        if 0:
+            INPUT['mcmc'] = {'nsteps': 200,
+                             'do_update_thetacov': 'yes',
+                             'dothetacovupdateafterevery': 10,
+                             'thetacovold_until': 40,
+                             'TRFold_until': 60,
+                             'thetacov0': {'do_override': 'yes',
+                                           'manual_input_variance': {'h': 0.25,
+                                                                     'Omk': 0.002,
+                                                                     'Oml': 0.01,
+                                                                     'w0': 0.2,
+                                                                     'wa': 1.5}}}
+            with open('../inputfiles/input_example_cosmo_local.json','w') as f:
+                json.dump(INPUT, f, indent=4)
+            raise ValueError
 
 
 

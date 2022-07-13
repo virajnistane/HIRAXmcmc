@@ -63,6 +63,13 @@ class Ps2dFromPofk:
         self.redshift_from_hiraxoutput = self.hirax_output.redshift
         
         
+        def k_obs(k_fid, mu_fid, qpar, qperp):
+            return k_fid * (mu_fid**2/qpar**2 + (1-mu_fid**2)/qperp**2)**(0.5)
+        self.k_obs = k_obs
+        
+        def mu_obs(mu_fid, qpar, qperp):
+            return mu_fid/qpar * (mu_fid**2/qpar**2 + (1-mu_fid**2)/qperp**2)**(-0.5)
+        self.mu_obs = mu_obs
         
         
         """
@@ -103,13 +110,6 @@ class Ps2dFromPofk:
         
         # h = currentparams['H0']/100
         
-        def k_obs(k_fid, mu_fid):
-            return k_fid * (mu_fid**2/q_par**2 + (1-mu_fid**2)/q_perp**2)**(0.5)
-        self.k_obs = k_obs
-        
-        def mu_obs(mu_fid):
-            return mu_fid/q_par * (mu_fid**2/q_par**2 + (1-mu_fid**2)/q_perp**2)**(-0.5)
-        self.mu_obs = mu_obs
         
         rescaling_factor = 1/(q_perp**2 * q_par)
         
@@ -133,7 +133,12 @@ class Ps2dFromPofk:
         check comment here!
         """
         self.band_pk = [(lambda bandt: (lambda k, mu: 
-                                        rescaling_factor * P_kmu(k_obs(k,mu), mu_obs(mu)) * bandt(k, mu)
+                                        rescaling_factor 
+                                        * P_kmu(self.k_obs(k,mu,
+                                                           qpar=q_par,qperp=q_perp), 
+                                                self.mu_obs(mu,
+                                                            qpar=q_par,qperp=q_perp)) 
+                                        * bandt(k, mu)
                                         # check if you need to enter kobs and muobs as bandt args
                                         )
                          )
