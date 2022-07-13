@@ -137,10 +137,10 @@ class Ps2dFromPofk:
             return pofk_final(k) * (bias + f_growth * mu**2)**2
         
         """
-        check comment here!
+        Major change here!
         """
         self.band_pk = [(lambda bandt: (lambda k, mu: 
-                                        rescaling_factor 
+                                        1/rescaling_factor 
                                         # * P_kmu(self.k_obs(k,mu,
                                         #                    qpar=q_par,qperp=q_perp),
                                         #         self.mu_obs(mu,
