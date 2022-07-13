@@ -1,9 +1,9 @@
 {
     "current_run_index": 1,
     "params_to_vary": [
-        "hz",
-        "dAz",
-        "fz"
+        "qpar(z)",
+        "qperp(z)",
+        "f(z)"
     ],
     "mmode_output": {
         "freq_channel": {
@@ -31,9 +31,9 @@
         }
     },
     "likelihood": {
-        "ps_rel_err": {
+        "PS_cov": {
             "override": "no",
-            "filename": ""
+            "filename_fullpath": ""
         }
     },
     "PARAMS": {
@@ -41,6 +41,12 @@
             "prior": [
                 50,
                 90
+            ]
+        },
+        "h": {
+            "prior": [
+                0.5,
+                0.9
             ]
         },
         "Omk": {
@@ -67,10 +73,24 @@
                 5
             ]
         },
+        "qpar(z)": {
+            "prior": [
+                0.3,
+                1.7
+            ],
+            "freqdep": true
+        },
         "h(z)": {
             "prior": [
                 0.0001,
                 0.001
+            ],
+            "freqdep": true
+        },
+        "qperp(z)": {
+            "prior": [
+                0.3,
+                1.7
             ],
             "freqdep": true
         },

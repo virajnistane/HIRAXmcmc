@@ -8,7 +8,7 @@ with open('requirements.txt', 'r') as fh:
 setup(
     name='hiraxmcmc',
     packages=find_packages(),
-    version='0.1.1',
+    version='0.1.2',
     description='MCMC pipeline for parameter estimation from 21cm PS in HIRAX m-mode simulations',
     author='Viraj Nistane',
     license='MIT',

@@ -1,16 +1,17 @@
 {
     "current_run_index": 1,
     "params_to_vary": [
-        "H0",
+        "h",
         "Omk",
         "Oml"
     ],
     "mmode_output": {
         "freq_channel": {
             "start": 400,
-            "end": 800
+            "end": 500
         },
-        "klmode": "dk_5thresh_fg_1000thresh"
+        "klmode": "kl_5thresh_nofg",
+        "power_spectrum_estimator_type": "minvar"
     },
     "mcmc": {
         "nsteps": 200,
@@ -21,7 +22,7 @@
         "thetacov0": {
             "do_override": "yes",
             "manual_input_variance": {
-                "H0": 25,
+                "h": 0.25,
                 "Omk": 0.002,
                 "Oml": 0.01,
                 "w0": 0.2,
@@ -29,11 +30,23 @@
             }
         }
     },
+    "likelihood": {
+        "PS_cov": {
+            "override": "no",
+            "filename_fullpath": ""
+        }
+    },
     "PARAMS": {
         "H0": {
             "prior": [
                 50,
                 90
+            ]
+        },
+        "h": {
+            "prior": [
+                0.5,
+                0.9
             ]
         },
         "Omk": {
@@ -60,10 +73,24 @@
                 5
             ]
         },
+        "qpar(z)": {
+            "prior": [
+                0.3,
+                1.7
+            ],
+            "freqdep": true
+        },
         "h(z)": {
             "prior": [
                 0.0001,
                 0.001
+            ],
+            "freqdep": true
+        },
+        "qperp(z)": {
+            "prior": [
+                0.3,
+                1.7
             ],
             "freqdep": true
         },
@@ -77,7 +104,7 @@
         "f(z)": {
             "prior": [
                 0.2,
-                1
+                1.2
             ],
             "freqdep": true
         }

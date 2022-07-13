@@ -44,7 +44,8 @@ class Ps2dFromPofk:
         #    |
         #   \|/
         #    V
-        self.h_fix = self.parameters_fixed.h(self.parameters_fixed.H0_fix)
+        # self.h_fix = self.parameters_fixed.h(self.parameters_fixed.H0_fix)
+        self.h_fix = self.parameters_fixed._h_fix
         
         self.hirax_output = HiraxOutput(inputforhiraxoutput)    # inputforhiraxoutput = hiraxrundirname, psetype
         # |__
@@ -62,6 +63,13 @@ class Ps2dFromPofk:
         self.redshift_from_hiraxoutput = self.hirax_output.redshift
         
         
+        def k_obs(k_fid, mu_fid, qpar, qperp):
+            return k_fid * (mu_fid**2/qpar**2 + (1-mu_fid**2)/qperp**2)**(0.5)
+        self.k_obs = k_obs
+        
+        def mu_obs(mu_fid, qpar, qperp):
+            return mu_fid/qpar * (mu_fid**2/qpar**2 + (1-mu_fid**2)/qperp**2)**(-0.5)
+        self.mu_obs = mu_obs
         
         
         """
@@ -102,13 +110,6 @@ class Ps2dFromPofk:
         
         # h = currentparams['H0']/100
         
-        def k_obs(k_fid, mu_fid):
-            return k_fid * (mu_fid**2/q_par**2 + (1-mu_fid**2)/q_perp**2)**(0.5)
-        self.k_obs = k_obs
-        
-        def mu_obs(mu_fid):
-            return mu_fid/q_par * (mu_fid**2/q_par**2 + (1-mu_fid**2)/q_perp**2)**(-0.5)
-        self.mu_obs = mu_obs
         
         rescaling_factor = 1/(q_perp**2 * q_par)
         
@@ -118,7 +119,7 @@ class Ps2dFromPofk:
                 if pspackage == 'class':
                     pofk_final = lambda k: PK_k_zClass(k,self.redshift_from_hiraxoutput)
                 elif pspackage == 'camb':
-                    pofk_final = lambda k: PK_k_zClass(k) 
+                    pofk_final = lambda k: PK_k_zClass(k)
             except:
                 print("PKinterp argument entered! Running exception")
                 if pspackage == 'class':
@@ -132,7 +133,12 @@ class Ps2dFromPofk:
         check comment here!
         """
         self.band_pk = [(lambda bandt: (lambda k, mu: 
-                                        rescaling_factor * P_kmu(k_obs(k,mu), mu_obs(mu)) * bandt(k, mu)
+                                        rescaling_factor 
+                                        * P_kmu(self.k_obs(k,mu,
+                                                           qpar=q_par,qperp=q_perp), 
+                                                self.mu_obs(mu,
+                                                            qpar=q_par,qperp=q_perp)) 
+                                        * bandt(k, mu)
                                         # check if you need to enter kobs and muobs as bandt args
                                         )
                          )
@@ -303,7 +309,7 @@ class CreatePs2d:
         
         # ====================================================================
         if pstype == 'sample':
-            self.OmMh2 = self.parameters_fixed.Om_to_omh2(self.parameters_fixed.OmM_fix, self.parameters_fixed.H0_fix)
+            self.OmMh2 = self.parameters_fixed.OmM_fix * self.parameters_fixed._h_fix**2 #self.parameters_fixed.Om_to_omh2(self.parameters_fixed.OmM_fix, self.parameters_fixed.H0_fix)
         elif pstype == 'param':
             self.OmGv = self.parameters_fixed.OmG_fix
         
@@ -353,7 +359,10 @@ class CreatePs2d:
     def pofk_from_camb(self, 
                        currentparams =  ParametersFixed().cosmoparams_fixed,
                        z = None,
-                       output_CAMB_instance = True):   # redshift should be overwritten by self.redshift_from_hiraxoutput
+                       output_CAMB_instance = True,
+                       k_hunit_override = None,
+                       hubble_units_override = None,
+                       ):   # redshift should be overwritten by self.redshift_from_hiraxoutput
         """
         This function generates matter power spectrum P(k) at redshift <z> for
         given values of parameters using CAMB.
@@ -373,6 +382,17 @@ class CreatePs2d:
             DESCRIPTION. function of k and redshift <z>
             pk = lambda kh: PK.P(z, kh)
             
+            hubble_units   -->   power spectra 
+            -----------------------------------
+               True                 (Mpc/h)^3
+               False                (Mpc)^3
+              
+            k_hunit        -->   power spectra
+            -----------------------------------
+               True                 P(k*h)
+               False                P(k)
+            
+            
         """
         
         if z == None:
@@ -389,8 +409,13 @@ class CreatePs2d:
         
         # H0v, Omkv, Omlv, w0v, wav = currentparams.values()
         
-        
-        h = currentparamstemp['H0']/100
+        try:
+            h = currentparamstemp['h']
+            H0 = h * 100
+        except:
+            H0 = currentparamstemp['H0']
+            h = H0/100
+            
         
         if self.pstype == 'sample':
             # ombh2v = self.OmMh2 - self.cambpars.omch2 - self.cambpars.omnuh2
@@ -402,21 +427,44 @@ class CreatePs2d:
         
         kmax = 20.0
         
-        self.cambpars.set_cosmology(H0 = currentparamstemp['H0'] , omk = currentparamstemp['Omk'], ombh2 = self.cambpars.ombh2, omch2 = omch2v)
+        
+        
+        
+        self.cambpars.set_cosmology(H0 = H0 , omk = currentparamstemp['Omk'], ombh2 = self.cambpars.ombh2, omch2 = omch2v)
         self.cambpars.NonLinear = model.NonLinear_both
         self.cambpars.DarkEnergy.set_params(w = currentparamstemp['w0'] , wa = currentparamstemp['wa'])
         
         self.cambresults = camb.get_results(self.cambpars)
         
+        
+        try:
+            assert k_hunit_override != None
+            k_hunit_val = k_hunit_override
+        except:
+            assert k_hunit_override == None
+            k_hunit_val = True
+        
+        
+        try:
+            assert hubble_units_override != None
+            hubble_units_val = hubble_units_override
+        except:
+            assert hubble_units_override == None
+            hubble_units_val = False
+        
         PK = camb.get_matter_power_interpolator(self.cambpars, 
                                                 nonlinear=False, 
                                                 kmax=kmax,
                                                 zmax=250, 
-                                                k_hunit=True,
-                                                hubble_units=True)
+                                                k_hunit=k_hunit_val,
+                                                hubble_units=hubble_units_val)
         
-        # pk_kh = lambda kh: PK.P(zv, kh)
-        pk_kh = lambda k: PK.P(zv, k)
+        
+        pk_kh = lambda kh: PK.P(zv, kh)
+        # the input k from hirax mmode runs are in h units already (i.e., h/Mpc)
+            # So, we don't need to use the k_hunit = True here, 
+            # because using this multiplies the arg-input k's by h
+            # and we don't want the mmode input k (h/Mpc) to be further multiplied by h
         
         
         if output_CAMB_instance:
@@ -430,10 +478,19 @@ class CreatePs2d:
     def pofk_from_class(self,
                         currentparams, #=  ParametersFixed().current_params_fixed,
                         z = None, 
-                        output_CLASS_instance = True):   # redshift should be overwritten by self.redshift_from_hiraxoutput
+                        output_CLASS_instance = True,
+                        k_hunit_override = None,
+                        hubble_units_override = None
+                        ):   # redshift should be overwritten by self.redshift_from_hiraxoutput
         """
         This function generates matter power spectrum P(k) at redshift <z> for
         given values of parameters using CLASS.
+        
+        k-units: When the k_hunits is True, the input arguments (k values) need 
+        to be in h-units so that the function multiplies inherently the input by
+        the h value (input in currentparams).
+        When the k_hunits is False, the input k should be in Mpc^-1 units and not 
+        h/Mpc units.
         
         Parameters
         ----------
@@ -462,11 +519,17 @@ class CreatePs2d:
                 assert i in currentparamstemp.keys()
             except:
                 currentparamstemp[i] = self.cosmoparams_fixed[i]
-                
+        
+        try:
+            h = currentparamstemp['h']
+            H0 = h * 100
+        except:
+            H0 = currentparamstemp['H0']
+            h = H0/100
         
         # H0v, Omkv, Omlv, w0v, wav = currentparams.values()
         
-        h = currentparamstemp['H0']/100
+        # h = currentparamstemp['H0']/100
         
         if self.pstype == 'param':
             omch2 = (1 - currentparamstemp['Oml'] - currentparamstemp['Omk'] - self.OmGv) * h**2 - self.classpars['omega_b'] - self.cambpars.omnuh2
@@ -477,7 +540,7 @@ class CreatePs2d:
         
         self.pcl.set(dict(self.classpars))
         
-        self.pcl.set({'H0': currentparamstemp['H0'],
+        self.pcl.set({'H0': H0,
                       'omega_b': float(self.classpars['omega_b']),
                       'omega_cdm': omch2,
                       'Omega_k': currentparamstemp['Omk'],
@@ -501,7 +564,33 @@ class CreatePs2d:
         
         PK = self.pcl.pk
         
-        pk_k_z = lambda k,zv: PK(k *h, zv) *  h**3
+        
+        try:
+            assert k_hunit_override != None
+            k_hunit_val = k_hunit_override
+        except:
+            assert k_hunit_override == None
+            k_hunit_val = True
+        
+        
+        try:
+            assert hubble_units_override != None
+            hubble_units_val = hubble_units_override
+        except:
+            assert hubble_units_override == None
+            hubble_units_val = False
+        
+            
+        if k_hunit_val == True and hubble_units_val==True:
+            pk_k_z = lambda k,zv: PK(k*h, zv) * h**3
+        elif k_hunit_val == True and hubble_units_val==False:
+            pk_k_z = lambda k,zv: PK(k*h, zv)
+        elif k_hunit_val == False and hubble_units_val==True:
+            pk_k_z = lambda k,zv: PK(k, zv) * h**3
+        elif k_hunit_val == False and hubble_units_val==False:
+            pk_k_z = lambda k,zv: PK(k, zv)
+        
+        
         
         if output_CLASS_instance:
             return pk_k_z, self.pcl
@@ -532,6 +621,9 @@ class CreatePs2d:
                                                      f_growth = f_growth) #currentparams, 
         
         return psds
+    
+    
+    
     
     # =========================================================================
     # =========================================================================

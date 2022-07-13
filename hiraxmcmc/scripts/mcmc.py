@@ -83,7 +83,7 @@ if rank_mpi == 0:
 # IIIIIIIIIIII   N      N    P             UUUU          T
 # =============================================================================
 
-input_override = False
+input_override = 0
 
 try:
     assert not(input_override)
@@ -111,59 +111,65 @@ except:
     
     if input_override:
         
-        INPUT = {'current_run_index': 1,
-                  'params_to_vary': ['hz', 'dAz', 'fz'],
-                  'mmode_output': {'freq_channel': {'start': 400, 'end': 500},
-                                    'klmode': 'kl_5thresh_nofg',
-                                    'power_spectrum_estimator_type': 'minvar'},
-                  'mcmc': {'nsteps': 100000,
-                          'do_update_thetacov': 'yes',
-                          'dothetacovupdateafterevery': 100,
-                          'thetacovold_until': 10000,
-                          'TRFold_until': 16000,
-                          'thetacov0': {'do_override': 'no',
-                                        'manual_input_variance': {'H0': 25,
-                                                                  'Omk': 0.002,
-                                                                  'Oml': 0.01,
-                                                                  'w0': 0.2,
-                                                                  'wa': 1.5}}},
-                  'likelihood': {'ps_rel_err': {'override': 'no', 
-                                                'filename': ''}},
-                  'PARAMS': {'H0': {'prior': [50, 90]},
-                            'Omk': {'prior': [-0.2, 0.2]},
-                            'Oml': {'prior': [0.5, 0.9]},
-                            'w0': {'prior': [-3, 1]},
-                            'wa': {'prior': [-5, 5]},
-                            'h(z)': {'prior': [0.0001, 0.001], 'freqdep': True},
-                            'dA(z)': {'prior': [800, 3000], 'freqdep': True},
-                            'f(z)': {'prior': [0.2, 1.2], 'freqdep': True}}}
-        
         # INPUT = {'current_run_index': 1,
-        #           'params_to_vary': ['H0', 'Omk', 'Oml'],
-        #           'mmode_output': {'freq_channel': {'start': 400, 'end': 800},
-        #                           'klmode': 'dk_5thresh_fg_1000thresh',
-        #                           'power_spectrum_estimator_type': 'minvar'},
-        #           'mcmc': {'nsteps': 20000,
+        #           'params_to_vary': ['qpar(z)', 'qperp(z)', 'f(z)'],
+        #           'mmode_output': {'freq_channel': {'start': 400, 'end': 500},
+        #                             'klmode': 'kl_5thresh_nofg',
+        #                             'power_spectrum_estimator_type': 'minvar'},
+        #           'mcmc': {'nsteps': 100000,
         #                   'do_update_thetacov': 'yes',
         #                   'dothetacovupdateafterevery': 100,
-        #                   'thetacovold_until': 4000,
-        #                   'TRFold_until': 6000,
-        #                   'thetacov0': {'do_override': 'yes',
-        #                                 'manual_input_variance': {'H0': 25,
+        #                   'thetacovold_until': 10000,
+        #                   'TRFold_until': 16000,
+        #                   'thetacov0': {'do_override': 'no',
+        #                                 'manual_input_variance': {'H0': 0.8,
         #                                                           'Omk': 0.002,
         #                                                           'Oml': 0.01,
         #                                                           'w0': 0.2,
         #                                                           'wa': 1.5}}},
-        #           'likelihood': {'ps_rel_err': {'override': 'no', 
-        #                                         'filename': ''}},
+        #           'likelihood': {'PS_cov': {'override': 'no', 
+        #                                     'filename_fullpath': ''}},
         #           'PARAMS': {'H0': {'prior': [50, 90]},
-        #                     'Omk': {'prior': [-0.2, 0.2]},
-        #                     'Oml': {'prior': [0.5, 0.9]},
-        #                     'w0': {'prior': [-3, 1]},
-        #                     'wa': {'prior': [-5, 5]},
-        #                     'h(z)': {'prior': [0.0001, 0.001], 'freqdep': True},
-        #                     'dA(z)': {'prior': [800, 3000], 'freqdep': True},
-        #                     'f(z)': {'prior': [0.2, 1.2], 'freqdep': True}}}
+        #                       'h': {'prior': [0.5, 0.9]},
+        #                       'Omk': {'prior': [-0.2, 0.2]},
+        #                       'Oml': {'prior': [0.5, 0.9]},
+        #                       'w0': {'prior': [-3, 1]},
+        #                       'wa': {'prior': [-5, 5]},
+        #                       'qpar(z)': {'prior': [0.3, 1.7], 'freqdep': True},
+        #                       'h(z)': {'prior': [0.0001, 0.001], 'freqdep': True},
+        #                       'qperp(z)': {'prior': [0.3, 1.7], 'freqdep': True},
+        #                       'dA(z)': {'prior': [800, 3000], 'freqdep': True},
+        #                       'f(z)': {'prior': [0.2, 1.2], 'freqdep': True}}}
+        
+        INPUT = {'current_run_index': 1,
+                  'params_to_vary': ['h', 'Omk', 'Oml'],
+                  'mmode_output': {'freq_channel': {'start': 400, 'end': 500},
+                                  'klmode': 'kl_5thresh_nofg',
+                                  'power_spectrum_estimator_type': 'minvar'},
+                  'mcmc': {'nsteps': 20000,
+                          'do_update_thetacov': 'yes',
+                          'dothetacovupdateafterevery': 100,
+                          'thetacovold_until': 4000,
+                          'TRFold_until': 6000,
+                          'thetacov0': {'do_override': 'yes',
+                                        'manual_input_variance': {'h': 0.25,
+                                                                  'Omk': 0.002,
+                                                                  'Oml': 0.01,
+                                                                  'w0': 0.2,
+                                                                  'wa': 1.5}}},
+                  'likelihood': {'PS_cov': {'override': 'no', 
+                                            'filename_fullpath': ''}},
+                  'PARAMS': {'H0': {'prior': [50, 90]},
+                              'h': {'prior': [0.5, 0.9]},
+                              'Omk': {'prior': [-0.2, 0.2]},
+                              'Oml': {'prior': [0.5, 0.9]},
+                              'w0': {'prior': [-3, 1]},
+                              'wa': {'prior': [-5, 5]},
+                              'qpar(z)': {'prior': [0.3, 1.7], 'freqdep': True},
+                              'h(z)': {'prior': [0.0001, 0.001], 'freqdep': True},
+                              'qperp(z)': {'prior': [0.3, 1.7], 'freqdep': True},
+                              'dA(z)': {'prior': [800, 3000], 'freqdep': True},
+                              'f(z)': {'prior': [0.2, 1.2], 'freqdep': True}}}
         
         
         
@@ -177,7 +183,22 @@ except:
             with open('../inputfiles/input_example_cosmo.json','w') as f:
                 json.dump(INPUT, f, indent=4)
             raise ValueError
-        
+            
+        if 0:
+            INPUT['mcmc'] = {'nsteps': 200,
+                             'do_update_thetacov': 'yes',
+                             'dothetacovupdateafterevery': 10,
+                             'thetacovold_until': 40,
+                             'TRFold_until': 60,
+                             'thetacov0': {'do_override': 'yes',
+                                           'manual_input_variance': {'h': 0.25,
+                                                                     'Omk': 0.002,
+                                                                     'Oml': 0.01,
+                                                                     'w0': 0.2,
+                                                                     'wa': 1.5}}}
+            with open('../inputfiles/input_example_cosmo_local.json','w') as f:
+                json.dump(INPUT, f, indent=4)
+            raise ValueError
 
 
 
@@ -380,12 +401,12 @@ for paramname, paramval in allparams_fixed.items():
         cosmoparams_fixed[paramname] = paramval
         
 
-
-
-currentparams_fixed = params_fixed.current_params_to_vary_fixed(params_to_vary, inputforhiraxoutput.keys(), freqdep_paramstovary=freqdep_paramstovary)
+currentparams_fixed = params_fixed.current_params_to_vary_fixed(params_to_vary, toggle_paramstovary_freqdep=freqdep_paramstovary, fcbin=auto_hiraxoutput_kw)
 
 # Initialization of currentparams
-currentparams = params_fixed.current_params_to_vary_fixed(params_to_vary, inputforhiraxoutput.keys(), freqdep_paramstovary=freqdep_paramstovary)
+currentparams = params_fixed.current_params_to_vary_fixed(params_to_vary, toggle_paramstovary_freqdep=freqdep_paramstovary, fcbin=auto_hiraxoutput_kw)
+
+
 
 
 
@@ -634,11 +655,27 @@ key0 = list(inputforhiraxoutput.keys())[0]
 
 try:
     assert not(freqdep_paramstovary)
-    PK_k_z_current , CLASS_instance_current = chi2_func[key0].cp_params.pofk_from_class(currentparams=currentparams)
+    initial_success = 0
+    while initial_success == 0:
+        try:
+            PK_k_z_current , CLASS_instance_current = chi2_func[key0].cp_params.pofk_from_class(currentparams=currentparams)
+            initial_success = 1
+        except:
+            assert int(currentrunindex) == 1
+            load_old_res.firstrunparams(thetacov0)
+            currentparams = load_old_res.currentparams
 except:
     assert freqdep_paramstovary
-    PK_k_z_current , CLASS_instance_current = chi2_func[key0].cp_params.pofk_from_class(currentparams=cosmoparams_fixed)
-    
+    initial_success = 0
+    while initial_success == 0:
+        try:
+            PK_k_z_current , CLASS_instance_current = chi2_func[key0].cp_params.pofk_from_class(currentparams=cosmoparams_fixed)
+            initial_success = 1
+        except:
+            assert int(currentrunindex) == 1
+            load_old_res.firstrunparams(thetacov0)
+            currentparams = load_old_res.currentparams
+
 
 
 # for param in list(currentparams.keys()):
@@ -660,7 +697,6 @@ for freqc,val in inputforhiraxoutput.items():
 
 
 chi2old = np.sum(list(chi2old1.values()))
-
 
 
 if rank_mpi==0:
