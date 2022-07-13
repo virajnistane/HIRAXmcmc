@@ -140,7 +140,7 @@ class Ps2dFromPofk:
         Major change here!
         """
         self.band_pk = [(lambda bandt: (lambda k, mu: 
-                                        1/rescaling_factor 
+                                        rescaling_factor 
                                         # * P_kmu(self.k_obs(k,mu,
                                         #                    qpar=q_par,qperp=q_perp),
                                         #         self.mu_obs(mu,
