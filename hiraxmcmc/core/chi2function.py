@@ -103,7 +103,8 @@ class Chi2Func:
         self.cp_sample = CreatePs2d(inputforhiraxoutput = inputforhiraxoutput, pspackage='camb', pstype = 'sample')
         self.cp_params = CreatePs2d(inputforhiraxoutput = inputforhiraxoutput, pspackage='camb', pstype = 'param')
         
-        self.pk_z_estimated_class, self.pspackage_properties_class = self.cp_params.pofk_from_class(currentparams = self.params_fixed.cosmoparams_fixed)
+        # self.pk_z_estimated_class, self.pspackage_properties_class = self.cp_params.pofk_from_class(currentparams = self.params_fixed.cosmoparams_fixed)
+        self.pk_z_estimated_class, self.pspackage_properties_class = self.cp_params.pofk_from_camb(currentparams = self.params_fixed.cosmoparams_fixed)
         
         if self.cp_sample.pspackage == 'camb':
             self.pk_estimated_camb, self.pspackage_properties_camb = self.cp_sample.pofk_from_camb(currentparams = self.params_fixed.cosmoparams_fixed)
