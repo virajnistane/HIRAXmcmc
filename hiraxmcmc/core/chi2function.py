@@ -123,6 +123,11 @@ class Chi2Func:
         except:
             H0 = self.cosmoparams_fixed['H0']
             self.h_fiducial = H0/100
+            
+            
+# =============================================================================
+#         CHECK HERE MAN... what is happening?
+# =============================================================================
         self.f_growth_for_ps_estimated = self.pspackage_properties_class.scale_independent_growth_factor_f(self.redshift)
         
         self.q_perp_for_ps_estimated =  self.pspackage_properties_class.angular_distance(self.redshift) / self.dA_fid   * self.cosmoparams_fixed['h']/self.h_fiducial
