@@ -11,7 +11,7 @@ from hiraxmcmc.util.basicfunctions import *
 
 class Chains:
     
-    def __init__(self, currentrunindex, totalParams_inclChi2, sysargs, rankmpi, comm, testfilekw, parameterssavetxt, mcmc_mainrun_dir_relpath, write_out_paramsTrulyAccepted = False, deletePrevChainFiles=False):
+    def __init__(self, currentrunindex, totalParams_inclChi2, rankmpi, comm, testfilekw, parameterssavetxt, mcmc_mainrun_dir_relpath, write_out_paramsTrulyAccepted = False, deletePrevChainFiles=False):
         
         self.columnsInFile = totalParams_inclChi2
         self.currentrunindex = currentrunindex
@@ -23,8 +23,6 @@ class Chains:
         self.mcmc_mainrun_dir_relpath = mcmc_mainrun_dir_relpath
         
         self.deletePrevChainFiles = deletePrevChainFiles
-        
-        self.sysargs = sysargs
         
         self.comm = comm
         
@@ -74,7 +72,10 @@ class Chains:
         
         self.write_out_paramsTrulyAccepted = write_out_paramsTrulyAccepted
         
-        
+    
+    # =============================================================================
+    # WARNING: This function is not updated !!!
+    # =============================================================================
     def remove_olderChainFiles_forThisRun(self):
         if self.deletePrevChainFiles == True:
             try:
@@ -85,13 +86,13 @@ class Chains:
                                                           ##
                                                           os.path.join(mcmc_mainrun_dir,
                                                                        'chains',
-                                                                       'run%s'%(self.sysargs[1])))
+                                                                       'run%s'%(self.currentrunindex)))
                 
                 if len(listofChainsNames) != 0:
                     for filex in listofChainsNames:
                         os.remove(os.path.join(self.mcmc_mainrun_dir_relpath, 
                                                'chains',
-                                               'run%s'%(self.sysargs[1]),
+                                               'run%s'%(self.currentrunindex),
                                                '%s'%(filex)))
                         
                     for filey in os.listdir(os.path.join(self.mcmc_mainrun_dir_relpath,
