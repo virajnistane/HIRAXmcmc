@@ -658,7 +658,7 @@ try:
     initial_success = 0
     while initial_success == 0:
         try:
-            PK_k_z_current , CLASS_instance_current = chi2_func[key0].cp_params.pofk_from_class(currentparams=currentparams)
+            PK_k_z_current , CLASS_instance_current = chi2_func[key0].cp_params.get_pk_and_prop(currentparams=currentparams)
             initial_success = 1
         except:
             assert int(currentrunindex) == 1
@@ -669,7 +669,7 @@ except:
     initial_success = 0
     while initial_success == 0:
         try:
-            PK_k_z_current , CLASS_instance_current = chi2_func[key0].cp_params.pofk_from_class(currentparams=cosmoparams_fixed)
+            PK_k_z_current , CLASS_instance_current = chi2_func[key0].cp_params.get_pk_and_prop(currentparams=cosmoparams_fixed)
             initial_success = 1
         except:
             assert int(currentrunindex) == 1
@@ -680,15 +680,15 @@ except:
 
 # for param in list(currentparams.keys()):
 #     if '(z)' not in param:
-#         PK_k_z_current , CLASS_instance_current = chi2_func[key0].cp_params.pofk_from_class(currentparams=currentparams)
+#         PK_k_z_current , CLASS_instance_current = chi2_func[key0].cp_params.get_pk_and_prop(currentparams=currentparams)
 #     else:
-#         PK_k_z_current , CLASS_instance_current = chi2_func[key0].cp_params.pofk_from_class(currentparams=cosmoparams_fixed)
+#         PK_k_z_current , CLASS_instance_current = chi2_func[key0].cp_params.get_pk_and_prop(currentparams=cosmoparams_fixed)
 
 
 chi2old1 = {}
 for freqc,val in inputforhiraxoutput.items():
     chi2old1[freqc] = chi2_func[freqc].chi2_multiz(PK_k_z_currentstep=PK_k_z_current, 
-                                                   current_class_instance=CLASS_instance_current, 
+                                                   PK_properties_currentstep=CLASS_instance_current, 
                                                    z=val['redshift'],
                                                    currentparams=currentparams,
                                                    cosmoparams=cosmoparams_fixed)
@@ -968,7 +968,7 @@ for ii in np.arange(1,int(niterations+1)):
         # any of "chi2_func_*" works for pofk_interpolator_for_pscalc
         try:
             assert not(freqdep_paramstovary)
-            PK_k_z_current , CLASS_instance_current = chi2_func[key0].cp_params.pofk_from_class(currentparams=currentparams)
+            PK_k_z_current , CLASS_instance_current = chi2_func[key0].cp_params.get_pk_and_prop(currentparams=currentparams)
         except:
             assert freqdep_paramstovary
             
@@ -976,7 +976,7 @@ for ii in np.arange(1,int(niterations+1)):
         chi2new1 = {}
         for freqc,val in inputforhiraxoutput.items():
             chi2new1[freqc] = chi2_func[freqc].chi2_multiz(PK_k_z_currentstep=PK_k_z_current, 
-                                                           current_class_instance=CLASS_instance_current, 
+                                                           PK_properties_currentstep=CLASS_instance_current, 
                                                            z=val['redshift'],
                                                            currentparams=currentparams,
                                                            cosmoparams=cosmoparams_fixed)
@@ -986,7 +986,7 @@ for ii in np.arange(1,int(niterations+1)):
         #     chi2new1 = {}
         #     for freqc,val in inputforhiraxoutput.items():
         #         chi2new1[freqc] = chi2_func[freqc].chi2_multiz(PK_k_z_currentstep=PK_k_z_current, 
-        #                                                       current_class_instance=CLASS_instance_current, 
+        #                                                       PK_properties_currentstep=CLASS_instance_current, 
         #                                                       z=val[2],
         #                                                       currentparams=currentparams)
         # except:
@@ -994,7 +994,7 @@ for ii in np.arange(1,int(niterations+1)):
         #     chi2new1 = {}
         #     for freqc,val in inputforhiraxoutput.items():
         #         chi2new1[freqc] = chi2_func[freqc].chi2_multiz_p2vfreqdep(PK_k_z_currentstep=PK_k_z_current, 
-        #                                                                  current_class_instance=CLASS_instance_current, 
+        #                                                                  PK_properties_currentstep=CLASS_instance_current, 
         #                                                                  z=val[2],
         #                                                                  currentparams=currentparams,
         #                                                                  cosmoparams=cosmoparams_fixed)

@@ -5,6 +5,6 @@ hiraxmcmc.egg-info
 build
 dist
 .pytest_cache
-hiraxmcmc/inputfiles/*/
+hiraxmcmc/inputfiles/**/
 hiraxmcmc/core/output/
-hiraxmcmc/*/__pycache__/
+hiraxmcmc/**/__pycache__/
