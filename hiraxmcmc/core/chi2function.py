@@ -114,23 +114,23 @@ class Chi2Func:
         # PS 1D and corresponding properties
         self.pk_z_estimated, self.pspackage_properties = self.cp_sample.get_pk_and_prop(currentparams = self.params_fixed.cosmoparams_fixed)
         
-        if self.cp_sample.pspackage == 'camb':
-            
-            self.dA_fid = self.pspackage_properties.angular_diameter_distance(self.redshift)
-            self.hz_fid = self.pspackage_properties.h_of_z(self.redshift)
-            
-            self.f_growth_for_ps_estimated = self.pspackage_properties.get_redshift_evolution(q=0.215, z=self.redshift, vars=['growth'])[0,0]
-            self.q_perp_for_ps_estimated =  self.pspackage_properties.angular_diameter_distance(self.redshift) / self.dA_fid   * self.cosmoparams_fixed['h']/self.h_fiducial
-            self.q_par_for_ps_estimated =  self.hz_fid / self.pspackage_properties.h_of_z(self.redshift)              * self.cosmoparams_fixed['h']/self.h_fiducial
-            
-        elif self.cp_sample.pspackage == 'class':
+        try:
+            assert self.cp_sample.pspackage == 'class'
             self.dA_fid = self.pspackage_properties.angular_distance(self.redshift)
             self.hz_fid = self.pspackage_properties.Hubble(self.redshift)
             
             self.f_growth_for_ps_estimated = self.pspackage_properties.scale_independent_growth_factor_f(self.redshift)
             self.q_perp_for_ps_estimated =  self.pspackage_properties.angular_distance(self.redshift) / self.dA_fid   * self.cosmoparams_fixed['h']/self.h_fiducial
             self.q_par_for_ps_estimated =  self.hz_fid / self.pspackage_properties.Hubble(self.redshift)              * self.cosmoparams_fixed['h']/self.h_fiducial
+        except:
+            assert self.cp_sample.pspackage == 'camb'
+            self.dA_fid = self.pspackage_properties.angular_diameter_distance(self.redshift)
+            self.hz_fid = self.pspackage_properties.h_of_z(self.redshift)
             
+            self.f_growth_for_ps_estimated = self.pspackage_properties.get_redshift_evolution(q=0.215, z=self.redshift, vars=['growth'])[0,0]
+            self.q_perp_for_ps_estimated =  self.pspackage_properties.angular_diameter_distance(self.redshift) / self.dA_fid   * self.cosmoparams_fixed['h']/self.h_fiducial
+            self.q_par_for_ps_estimated =  self.hz_fid / self.pspackage_properties.h_of_z(self.redshift)              * self.cosmoparams_fixed['h']/self.h_fiducial
+        
         
         # PS 1D --> PS 2D
         self.ps_estimated = self.cp_sample.get_ps2d_from_pok(PK_k_zClass = self.pk_z_estimated,
