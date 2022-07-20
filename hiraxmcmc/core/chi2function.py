@@ -93,8 +93,14 @@ class Chi2Func:
         self.allparams_fixed = self.params_fixed.current_allparams_fixed
         self.cosmoparams_fixed = self.params_fixed.cosmoparams_fixed
         
-        
-        
+        try:
+            self.h_fiducial = self.cosmoparams_fixed['h']
+            H0 = self.h_fiducial * 100
+        except:
+            H0 = self.cosmoparams_fixed['H0']
+            self.h_fiducial = H0/100
+
+
         """ createPS2D instances """
         
         self.ps2d_from_Pofk = Ps2dFromPofk(inputforhiraxoutput = self.inputforhiraxoutput)
@@ -104,37 +110,30 @@ class Chi2Func:
         self.cp_params = CreatePs2d(inputforhiraxoutput = inputforhiraxoutput, pspackage='camb', pstype = 'param')
         
         # self.pk_z_estimated_class, self.pspackage_properties_class = self.cp_params.pofk_from_class(currentparams = self.params_fixed.cosmoparams_fixed)
-        self.pk_z_estimated_class, self.pspackage_properties_class = self.cp_params.pofk_from_camb(currentparams = self.params_fixed.cosmoparams_fixed)
+        # self.pk_z_estimated_class, self.pspackage_properties_class = self.cp_params.pofk_from_camb(currentparams = self.params_fixed.cosmoparams_fixed)
+        self.pk_z_estimated, self.pspackage_properties = self.cp_sample.get_pk_and_prop(currentparams = self.params_fixed.cosmoparams_fixed)
         
         if self.cp_sample.pspackage == 'camb':
-            self.pk_estimated_camb, self.pspackage_properties_camb = self.cp_sample.pofk_from_camb(currentparams = self.params_fixed.cosmoparams_fixed)
-            self.dA_fid = self.pspackage_properties_camb.angular_diameter_distance(self.redshift)
-            self.hz_fid = self.pspackage_properties_camb.h_of_z(self.redshift)
-            self.pk_estimated = self.pk_estimated_camb
+            # self.pk_estimated_camb, self.pspackage_properties_camb = self.cp_sample.pofk_from_camb(currentparams = self.params_fixed.cosmoparams_fixed)
+            self.dA_fid = self.pspackage_properties.angular_diameter_distance(self.redshift)
+            self.hz_fid = self.pspackage_properties.h_of_z(self.redshift)
+            # self.pk_estimated = self.pk_z_estimated
+            
+            self.f_growth_for_ps_estimated = self.pspackage_properties.get_redshift_evolution(q=0.215, z=self.redshift, vars=['growth'])[0,0]
+            self.q_perp_for_ps_estimated =  self.pspackage_properties.angular_diameter_distance(self.redshift) / self.dA_fid   * self.cosmoparams_fixed['h']/self.h_fiducial
+            self.q_par_for_ps_estimated =  self.hz_fid / self.pspackage_properties.h_of_z(self.redshift)              * self.cosmoparams_fixed['h']/self.h_fiducial
+            
         elif self.cp_sample.pspackage == 'class':
-            self.dA_fid = self.pspackage_properties_class.angular_distance(self.redshift)
-            self.hz_fid = self.pspackage_properties_class.Hubble(self.redshift)
-            self.pk_estimated = self.pk_z_estimated_class
-        
-        # self.h_fiducial = self.params_fixed.cosmoparams_fixed['H0']/100
-        try:
-            self.h_fiducial = self.cosmoparams_fixed['h']
-            H0 = self.h_fiducial * 100
-        except:
-            H0 = self.cosmoparams_fixed['H0']
-            self.h_fiducial = H0/100
+            self.dA_fid = self.pspackage_properties.angular_distance(self.redshift)
+            self.hz_fid = self.pspackage_properties.Hubble(self.redshift)
+            # self.pk_estimated = self.pk_z_estimated
             
+            self.f_growth_for_ps_estimated = self.pspackage_properties.scale_independent_growth_factor_f(self.redshift)
+            self.q_perp_for_ps_estimated =  self.pspackage_properties.angular_distance(self.redshift) / self.dA_fid   * self.cosmoparams_fixed['h']/self.h_fiducial
+            self.q_par_for_ps_estimated =  self.hz_fid / self.pspackage_properties.Hubble(self.redshift)              * self.cosmoparams_fixed['h']/self.h_fiducial
             
-# =============================================================================
-#         CHECK HERE MAN... what is happening?
-# =============================================================================
-        self.f_growth_for_ps_estimated = self.pspackage_properties_class.scale_independent_growth_factor_f(self.redshift)
         
-        self.q_perp_for_ps_estimated =  self.pspackage_properties_class.angular_distance(self.redshift) / self.dA_fid   * self.cosmoparams_fixed['h']/self.h_fiducial
-        self.q_par_for_ps_estimated =  self.hz_fid / self.pspackage_properties_class.Hubble(self.redshift)              * self.cosmoparams_fixed['h']/self.h_fiducial
-        
-        
-        self.ps_estimated = self.cp_sample.get_ps2d_from_pok(PK_k_zClass = self.pk_estimated,
+        self.ps_estimated = self.cp_sample.get_ps2d_from_pok(PK_k_zClass = self.pk_z_estimated,
                                                              q_perp_input = self.q_perp_for_ps_estimated, 
                                                              q_par_input = self.q_par_for_ps_estimated,
                                                              z=self.redshift,
@@ -144,7 +143,7 @@ class Chi2Func:
         
         
     
-    def chi2_multiz(self, PK_k_z_currentstep, current_class_instance, z, currentparams, cosmoparams):  # currentparams,
+    def chi2_multiz(self, PK_k_z_currentstep, PK_properties_currentstep, z, currentparams, cosmoparams):  # currentparams,
         
         freqdep_paramstovary = checkconditionforlist(list(currentparams.keys()), allelements_have_subpart='(z)')
         
@@ -165,14 +164,21 @@ class Chi2Func:
                 H0 = currentparamstemp['H0']
                 h = H0/100
             
-            
-            q_perp = current_class_instance.angular_distance(z) / self.dA_fid * self.h_fiducial/h
-            q_par = self.hz_fid / current_class_instance.Hubble(z)            * self.h_fiducial/h
-            # this second ratio is to remove the h-units of the k-values (so, it is only needed when the k values are in h/Mpc units)
-            # for example: kpar_obs[h/Mpc] = kpar_fid[h/Mpc]/ q_par * (h/h_fid) = kpar_fid[h/Mpc]/ (q_par * (h_fid/h))
-                # Then this h/h_fid ratio, when including in the q_par, becomes (h_fid/h)
-            
-            f_growth = current_class_instance.scale_independent_growth_factor_f(z)
+            if self.cp_params.pspackage == 'camb':
+                q_perp = PK_properties_currentstep.angular_diameter_distance(z) / self.dA_fid   * self.h_fiducial/h
+                q_par = self.hz_fid / PK_properties_currentstep.h_of_z(z)                       * self.h_fiducial/h
+                # this second ratio is to remove the h-units of the k-values (so, it is only needed when the k values are in h/Mpc units)
+                # for example: kpar_obs[h/Mpc] = kpar_fid[h/Mpc]/ q_par * (h/h_fid) = kpar_fid[h/Mpc]/ (q_par * (h_fid/h))
+                    # Then this h/h_fid ratio, when including in the q_par, becomes (h_fid/h)
+                f_growth = PK_properties_currentstep.get_redshift_evolution(q=0.215, z=z, vars=['growth'])[0,0]
+            elif self.cp_params.pspackage == 'class':
+                q_perp = PK_properties_currentstep.angular_distance(z) / self.dA_fid * self.h_fiducial/h
+                q_par = self.hz_fid / PK_properties_currentstep.Hubble(z)            * self.h_fiducial/h
+                # this second ratio is to remove the h-units of the k-values (so, it is only needed when the k values are in h/Mpc units)
+                # for example: kpar_obs[h/Mpc] = kpar_fid[h/Mpc]/ q_par * (h/h_fid) = kpar_fid[h/Mpc]/ (q_par * (h_fid/h))
+                    # Then this h/h_fid ratio, when including in the q_par, becomes (h_fid/h)
+                f_growth = PK_properties_currentstep.scale_independent_growth_factor_f(z)
+                
             currentparams_input_for_pscalc = currentparamstemp
         except:
             assert freqdep_paramstovary
@@ -220,70 +226,6 @@ class Chi2Func:
         
         return chi2
     
-    
-    # def chi2_multiz(self, PK_k_z_currentstep, current_class_instance, z, currentparams, cosmoparams=None):  # currentparams,
-        
-    #     q_perp = current_class_instance.angular_distance(z) / self.dA_fid   * (currentparams['H0']/100)/self.h_fiducial
-    #     q_par = self.hz_fid / current_class_instance.Hubble(z)              * (currentparams['H0']/100)/self.h_fiducial
-    #     f_growth = current_class_instance.scale_independent_growth_factor_f(z)
-        
-        
-    #     self.q_perp = q_perp
-    #     self.q_par = q_par
-        
-        
-        
-    #     self.fz = f_growth
-        
-    #     pscalc = self.cp_params.get_ps2d_from_pok(PK_k_zClass = PK_k_z_currentstep,
-    #                                               q_perp_input = q_perp,
-    #                                               q_par_input = q_par,
-    #                                               z=z,
-    #                                               currentparams_input = currentparams,
-    #                                               f_growth = f_growth)
-    #                                               # currentparams = currentparams,
-        
-    #     ps = (pscalc/self.ps_estimated - 1)
-        
-        
-    #     ps_masked_sens_chi2 = ps.flat[:][self.x_sens]
-        
-    #     chi2 = np.matmul(np.matmul(ps_masked_sens_chi2, la.inv(self.cov_masked_sens)), ps_masked_sens_chi2)
-        
-    #     return chi2
-        
-    
-    
-    
-    # def chi2_multiz_p2vfreqdep(self, PK_k_z_currentstep, current_class_instance, z, currentparams, cosmoparams):  # currentparams,
-        
-    #     q_perp = currentparams['dA(z)'][self.key_inputforhiraxoutput] / self.dA_fid       * (cosmoparams['H0']/100)/self.h_fiducial
-    #     q_par = self.hz_fid / currentparams['h(z)'][self.key_inputforhiraxoutput]         * (cosmoparams['H0']/100)/self.h_fiducial
-        
-        
-    #     self.q_perp = q_perp
-    #     self.q_par = q_par
-        
-    #     f_growth = currentparams['f(z)'][self.key_inputforhiraxoutput]
-        
-    #     self.fz = f_growth
-        
-    #     pscalc = self.cp_params.get_ps2d_from_pok(PK_k_zClass = PK_k_z_currentstep,
-    #                                               q_perp_input = q_perp,
-    #                                               q_par_input = q_par,
-    #                                               z=z,
-    #                                               currentparams_input = cosmoparams,
-    #                                               f_growth = f_growth)
-        
-        
-    #     ps = (pscalc/self.ps_estimated - 1)
-        
-        
-    #     ps_masked_sens_chi2 = ps.flat[:][self.x_sens]
-        
-    #     chi2 = np.matmul(np.matmul(ps_masked_sens_chi2, la.inv(self.cov_masked_sens)), ps_masked_sens_chi2)
-        
-    #     return chi2
         
     @property
     def kpar_limits(self):
@@ -305,38 +247,6 @@ class Chi2Func:
     @kcenter_limits.setter
     def kcenter_limits(self, newlimitstuple):
         self.kcenter_minlimit, self.kcenter_maxlimit = newlimitstuple
-    
-    # @property
-    # def ps_estimated(self):
-    #     return self.cp_camb_sample.get_ps2d_from_pok_camb(function_ps2d_bandfunc = self.get_ps2d_bandfunc,
-    #                                                       CLASS_instance = self.cp_class_param, 
-    #                                                       CAMB_sample_instance = self.cp_camb_sample,
-    #                                                       pk_interpolator_from_camb = self.cp_camb_sample.pofk_interpolator_from_camb())
-        
-    
-    
-    # @property
-    # def ps_estimated(self):
-    #     return self.cp_camb_sample.create_ps2d_from_camb(z=self.redshift)
-        
-    
-    # @property
-    # def ps_estimated_camb_sample(self):
-    #     return self.ps_estimated(z=self.redshift) 
-    
-    # @property
-    # def cp_class_param(self):
-    #     return CreatePs2d(inputforhiraxoutput = self.inputforhiraxoutput, pspackage='class', pstype= 'param')
-    
-    
-    # @property
-    # def cp_camb_param(self):
-    #     return CreatePs2d(inputforhiraxoutput = self.inputforhiraxoutput, pspackage='camb', pstype= 'param')
-    
-    # def ps_calc(self, current_params, z):
-    #     pscalc = self.cp_class_param.create_ps2d_from_class(currentparams = current_params, z=self.redshift)
-    #     return pscalc
-    
     
     def chi2(self, current_params, z, get_pscalc_out = False):
         
