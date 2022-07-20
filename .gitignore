@@ -7,4 +7,5 @@ dist
 .pytest_cache
 hiraxmcmc/inputfiles/**/
 hiraxmcmc/core/output/
+hiraxmcmc/scripts/output/
 hiraxmcmc/**/__pycache__/
