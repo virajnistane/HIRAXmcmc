@@ -216,12 +216,14 @@ class Chi2Func:
         self.q_par = q_par
         self.fz = f_growth
         
+        assert not(freqdep_paramstovary)
+        
         pscalc = self.cp_params.get_ps2d_from_pok(PK_k_zClass = PK_k_z_currentstep,
-                                                  q_perp_input = q_perp,
-                                                  q_par_input = q_par,
+                                                  q_perp_input = self.q_perp_for_ps_estimated,
+                                                  q_par_input = self.q_par_for_ps_estimated,
                                                   z=z,
                                                   currentparams_input = currentparams_input_for_pscalc,
-                                                  f_growth = f_growth)
+                                                  f_growth = self.f_growth_for_ps_estimated)
         
         ps = (pscalc/self.ps_estimated - 1)
         
