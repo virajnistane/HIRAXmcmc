@@ -559,12 +559,22 @@ class CreatePs2d:
                       'wa_fld': currentparamstemp['wa'],
                       })
         
-        self.pcl.set({'lensing':'no',
-                      'output':'mPk',
-                      'P_k_max_h/Mpc':20.0,
-                      'z_max_pk':5,
-                      'non linear':'none'
-                      })
+        try:
+            assert self.pstype == 'param'
+            self.pcl.set({'lensing':'no',
+                          'output':'mPk',
+                          'P_k_max_h/Mpc':0.01,
+                          'z_max_pk':5,
+                          'non linear':'none'
+                          })
+        except:
+            assert self.pstype == 'sample'
+            self.pcl.set({'lensing':'no',
+                          'output':'mPk',
+                          'P_k_max_h/Mpc':20,
+                          'z_max_pk':5,
+                          'non linear':'none'
+                          })
         
         # self.pcl.set(self.classprecisionsettings)
         
