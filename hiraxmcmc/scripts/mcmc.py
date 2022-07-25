@@ -775,7 +775,7 @@ chainf = Chains(currentrunindex= currentrunindex, totalParams_inclChi2=totalPara
 
 chainf_sca = Chains(currentrunindex= currentrunindex, totalParams_inclChi2=4,
                     rankmpi=rank_mpi, comm=comm, testfilekw=testfilekw, 
-                    parameterssavetxt='_qpar_qperp_f', write_out_paramsTrulyAccepted=False, mcmc_mainrun_dir_relpath=mcmc_mainrun_dir_relpath)
+                    parameterssavetxt='_qpar(z)_qperp(z)_f(z)', write_out_paramsTrulyAccepted=False, mcmc_mainrun_dir_relpath=mcmc_mainrun_dir_relpath)
 
 print('\n')
 
