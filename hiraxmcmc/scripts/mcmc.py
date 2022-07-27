@@ -775,7 +775,7 @@ chainf = Chains(currentrunindex= currentrunindex, totalParams_inclChi2=totalPara
 
 chainf_sca = Chains(currentrunindex= currentrunindex, totalParams_inclChi2=4,
                     rankmpi=rank_mpi, comm=comm, testfilekw=testfilekw, 
-                    parameterssavetxt='_qpar_qperp_f', write_out_paramsTrulyAccepted=False, mcmc_mainrun_dir_relpath=mcmc_mainrun_dir_relpath)
+                    parameterssavetxt='_qpar(z)_qperp(z)_f(z)', write_out_paramsTrulyAccepted=False, mcmc_mainrun_dir_relpath=mcmc_mainrun_dir_relpath)
 
 print('\n')
 
@@ -1288,7 +1288,7 @@ if (rank_mpi==0):
     
     # np.savetxt(os.path.join(mcmc_mainrun_dir_relpath, 'paramsAcceptedFinal_backup1.dat'),paramsAcceptedFinal.T)#.flatten('F'))
     np.savetxt(os.path.join(mcmc_mainrun_dir_relpath, '%s_paramsAcceptedFinal_cambcamb'%(currentrunindex)+parameterssavetxt+addsuffix+'%s.dat'%(testfilekw)),paramsAcceptedFinal.T)#.flatten('F'))
-    np.savetxt(os.path.join(mcmc_mainrun_dir_relpath, '%s_paramsAcceptedFinal_cambcamb'%(currentrunindex)+'_qpar_qperp_f'+addsuffix+'%s.dat'%(testfilekw)),scalingParamsAcceptedFinal.T)#.flatten('F'))
+    np.savetxt(os.path.join(mcmc_mainrun_dir_relpath, '%s_paramsAcceptedFinal_cambcamb'%(currentrunindex)+'_qpar(z)_qperp(z)_f(z)'+addsuffix+'%s.dat'%(testfilekw)),scalingParamsAcceptedFinal.T)#.flatten('F'))
 
 
 
