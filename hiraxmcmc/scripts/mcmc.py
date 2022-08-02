@@ -20,7 +20,7 @@ from scipy.constants import speed_of_light as cc
 from mpi4py import MPI
 import time
 from datetime import date
-
+from pygit2 import Repository
 
 import json
 
@@ -275,7 +275,7 @@ MCMCmodulespath = os.path.dirname(hiraxmcmc.__file__)
 
 if rank_mpi==0:
     print('MCMCmodulespath: ',MCMCmodulespath)
-
+    print('MCMCmodule - current git branch: ',Repository(MCMCmodulespath).head.shorthand)
 
 # if 'MacbookPro' not in os.uname()[1]:
 
@@ -316,6 +316,15 @@ if rank_mpi == 0:
     print('Params selected to vary: ',params_to_vary); sys.stdout.flush()
 
 
+
+extractScalingParams = 1
+
+if extractScalingParams:
+    try:
+        assert not(freqdep_paramstovary)
+    except:
+        assert freqdep_paramstovary
+        extractScalingParams = 0
 
 # =============================================================================
 # Load mmode sims output and corresponding parameters
@@ -475,7 +484,12 @@ totalParams = len(params_to_vary)
 totalParams_inclChi2 = totalParams + 1
 
 paramsAccepted = np.zeros((totalParams_inclChi2,niterations+1))         # chi2, H0, omk, oml, w0, wa
-scalingParamsAccepted = np.zeros((4,niterations+1))
+
+
+    
+
+if extractScalingParams:
+    scalingParamsAccepted = np.zeros((4,niterations+1))
 
 paramsTrulyAccepted = np.zeros((totalParams_inclChi2,niterations+1))    # chi2, H0, omk, oml, w0, wa
 
@@ -711,15 +725,17 @@ if rank_mpi==0:
 # =============================================================================
 
 paramsAccepted[0,0]         = chi2old
-scalingParamsAccepted[0,0]  = chi2old
+if extractScalingParams:
+    scalingParamsAccepted[0,0]  = chi2old
 paramsTrulyAccepted[0,0]    = chi2old
 
 for parcol, parname in enumerate(params_to_vary):
     paramsAccepted      [int(parcol+1)  : int(parcol+2), 0] = currentparams[parname]
     paramsTrulyAccepted [int(parcol+1)  : int(parcol+2), 0] = currentparams[parname]
 
-freqc = list(inputforhiraxoutput.keys())[0]
-scalingParamsAccepted[1:,0] = [chi2_func[freqc].q_par, chi2_func[freqc].q_perp, chi2_func[freqc].fz]
+if extractScalingParams:
+    freqc = list(inputforhiraxoutput.keys())[0]
+    scalingParamsAccepted[1:,0] = [chi2_func[freqc].q_par, chi2_func[freqc].q_perp, chi2_func[freqc].fz]
 
 # try:
 #     assert not(freqdep_paramstovary)
@@ -772,10 +788,10 @@ chainf = Chains(currentrunindex= currentrunindex, totalParams_inclChi2=totalPara
 
 # if rank_mpi == 0:
 #     chainf.remove_olderChainFiles_forThisRun()
-
-chainf_sca = Chains(currentrunindex= currentrunindex, totalParams_inclChi2=4,
-                    rankmpi=rank_mpi, comm=comm, testfilekw=testfilekw, 
-                    parameterssavetxt='_qpar(z)_qperp(z)_f(z)', write_out_paramsTrulyAccepted=False, mcmc_mainrun_dir_relpath=mcmc_mainrun_dir_relpath)
+if extractScalingParams:
+    chainf_sca = Chains(currentrunindex= currentrunindex, totalParams_inclChi2=4,
+                        rankmpi=rank_mpi, comm=comm, testfilekw=testfilekw, 
+                        parameterssavetxt='_qpar(z)_qperp(z)_f(z)', write_out_paramsTrulyAccepted=False, mcmc_mainrun_dir_relpath=mcmc_mainrun_dir_relpath)
 
 print('\n')
 
@@ -792,7 +808,10 @@ print('\n')
 
 chainf.write_chains(stepindex=0, paramsAcceptedarg=paramsAccepted, paramsTrulyAcceptedarg=paramsTrulyAccepted)
 
-chainf_sca.write_chains(stepindex=0, paramsAcceptedarg=scalingParamsAccepted, paramsTrulyAcceptedarg=scalingParamsAccepted)
+if extractScalingParams:
+    chainf_sca.write_chains(stepindex=0, 
+                            paramsAcceptedarg=scalingParamsAccepted, 
+                            paramsTrulyAcceptedarg=scalingParamsAccepted)
 
 # =============================================================================
 # thetacov update function
@@ -1029,15 +1048,24 @@ for ii in np.arange(1,int(niterations+1)):
             # paramsAccepted[:,ii] = [chi2new, currentparams['H0'], currentparams['Omk'], currentparams['Oml'], currentparams['w0'], currentparams['wa']]            
             
             paramsAccepted[0,ii]         = chi2new
-            scalingParamsAccepted[0,ii]  = chi2new
+            try:
+                assert extractScalingParams
+                scalingParamsAccepted[0,ii]  = chi2new
+            except:
+                assert not(extractScalingParams)
+
             paramsTrulyAccepted[0,ii]    = chi2new
             
             for parcol, parname in enumerate(params_to_vary):
                 paramsAccepted      [int(parcol+1)  : int(parcol+2), ii] = currentparams[parname]
                 paramsTrulyAccepted [int(parcol+1)  : int(parcol+2), ii] = currentparams[parname]
             
-            scalingParamsAccepted[1:,ii] = [chi2_func[freqc].q_par, chi2_func[freqc].q_perp, chi2_func[freqc].fz]
-            
+            try:
+                assert extractScalingParams
+                scalingParamsAccepted[1:,ii] = [chi2_func[freqc].q_par, chi2_func[freqc].q_perp, chi2_func[freqc].fz]
+            except:
+                assert not(extractScalingParams)
+                
             chi2old = chi2new
             print("Step:",ii,"\n χ2 =",chi2new,"@rank =",rank_mpi); sys.stdout.flush()
             
@@ -1060,7 +1088,11 @@ for ii in np.arange(1,int(niterations+1)):
             print("Step:",ii,"\n χ2 =",chi2new," <-- XXXXXX @rank =",rank_mpi); sys.stdout.flush()
  
             paramsAccepted[:,ii] = paramsAccepted[:,int(ii-1)]
-            scalingParamsAccepted[:,ii] = scalingParamsAccepted[:,int(ii-1)]
+            try:
+                assert extractScalingParams
+                scalingParamsAccepted[:,ii] = scalingParamsAccepted[:,int(ii-1)]
+            except:
+                assert not(extractScalingParams)
             
             if doExtractForML:
                 extractforml.accepted_or_rejected_param(accepted=0, currentstep=ii)
@@ -1077,7 +1109,11 @@ for ii in np.arange(1,int(niterations+1)):
             
         
         paramsAccepted[:,ii] = paramsAccepted[:,int(ii-1)]
-        scalingParamsAccepted[:,ii] = scalingParamsAccepted[:,int(ii-1)]
+        try:
+            assert extractScalingParams
+            scalingParamsAccepted[:,ii] = scalingParamsAccepted[:,int(ii-1)]
+        except:
+            assert not(extractScalingParams)
         
         print("Step:",ii,"\n chi2 calculation failed: exception @ rank =",rank_mpi); sys.stdout.flush()
         
@@ -1112,7 +1148,12 @@ for ii in np.arange(1,int(niterations+1)):
     
     
     chainf.write_chains(stepindex = ii, paramsAcceptedarg = paramsAccepted, paramsTrulyAcceptedarg = paramsTrulyAccepted)
-    chainf_sca.write_chains(stepindex=ii, paramsAcceptedarg=scalingParamsAccepted, paramsTrulyAcceptedarg=scalingParamsAccepted)
+    
+    try:
+        assert extractScalingParams
+        chainf_sca.write_chains(stepindex=ii, paramsAcceptedarg=scalingParamsAccepted, paramsTrulyAcceptedarg=scalingParamsAccepted)
+    except:
+        not(extractScalingParams)
     
     if doExtractForML and np.mod(ii,1000) == 0:
         extractforml.save_final_array_ps2d_all(extractforml.ps2darrall)
@@ -1202,14 +1243,17 @@ for ii in np.arange(1,int(niterations+1)):
 
 
 paramsAcceptedTempReshaped = None
-scalingParamsAcceptedTempReshaped = None
+if extractScalingParams:
+    scalingParamsAcceptedTempReshaped = None
 
 if rank_mpi==0:
     paramsAcceptedTempReshaped = np.empty([size_mpi,totalParams_inclChi2*np.shape(paramsAccepted)[-1]])
-    scalingParamsAcceptedTempReshaped = np.empty([size_mpi,4*np.shape(scalingParamsAccepted)[-1]])
+    if extractScalingParams:
+        scalingParamsAcceptedTempReshaped = np.empty([size_mpi,4*np.shape(scalingParamsAccepted)[-1]])
     
 paramsAcceptedReshaped = paramsAccepted.reshape(totalParams_inclChi2 * np.shape(paramsAccepted)[-1])
-scalingParamsAcceptedReshaped = scalingParamsAccepted.reshape(4 * np.shape(scalingParamsAccepted)[-1])
+if extractScalingParams:
+    scalingParamsAcceptedReshaped = scalingParamsAccepted.reshape(4 * np.shape(scalingParamsAccepted)[-1])
 
 
 
@@ -1223,7 +1267,8 @@ https://stackoverflow.com/questions/13305814/when-do-i-need-to-use-mpi-barrier
 
 
 comm.Gather(paramsAcceptedReshaped,paramsAcceptedTempReshaped,root=0)
-comm.Gather(scalingParamsAcceptedReshaped,scalingParamsAcceptedTempReshaped,root=0)
+if extractScalingParams:
+    comm.Gather(scalingParamsAcceptedReshaped,scalingParamsAcceptedTempReshaped,root=0)
 
 
 
@@ -1234,7 +1279,8 @@ if (rank_mpi==0):
     addsuffix = chainf.addsuffix
     
     paramsAcceptedTemp = paramsAcceptedTempReshaped.reshape(size_mpi,totalParams_inclChi2,np.shape(paramsAccepted)[-1])
-    scalingParamsAcceptedTemp = scalingParamsAcceptedTempReshaped.reshape(size_mpi,4,np.shape(scalingParamsAccepted)[-1])
+    if extractScalingParams:
+        scalingParamsAcceptedTemp = scalingParamsAcceptedTempReshaped.reshape(size_mpi,4,np.shape(scalingParamsAccepted)[-1])
     
     
     print('Gathering done, now saving ...')
@@ -1268,27 +1314,32 @@ if (rank_mpi==0):
     for newparcol, newparname in enumerate(params_to_vary):
         paracceptedFinal[newparname] = paramsAcceptedTemp[:,int(newparcol+1)  : int(newparcol+2),:].flatten()
     
-    for newparcol_sca, newparname_sca in enumerate(['qpar(z)','qperp(z)','f(z)']):
-        scalingparacceptedFinal[newparname_sca] = scalingParamsAcceptedTemp[:,int(newparcol_sca+1)  : int(newparcol_sca+2), :].flatten()
+    if extractScalingParams:
+        for newparcol_sca, newparname_sca in enumerate(['qpar(z)','qperp(z)','f(z)']):
+            scalingparacceptedFinal[newparname_sca] = scalingParamsAcceptedTemp[:,int(newparcol_sca+1)  : int(newparcol_sca+2), :].flatten()
     
     
     
     paramsAcceptedFinal = np.zeros((totalParams_inclChi2,len(chi2acceptedFinal)))
-    scalingParamsAcceptedFinal = np.zeros((4,len(chi2acceptedFinal)))
+    if extractScalingParams:
+        scalingParamsAcceptedFinal = np.zeros((4,len(chi2acceptedFinal)))
     
     paramsAcceptedFinal[0] = chi2acceptedFinal
-    scalingParamsAcceptedFinal[0] = chi2acceptedFinal
+    if extractScalingParams:
+        scalingParamsAcceptedFinal[0] = chi2acceptedFinal
     
     for newparcol, newparname in enumerate(params_to_vary):
         paramsAcceptedFinal[int(newparcol+1)] = paracceptedFinal[newparname]
-    for newparcol_sca, newparname_sca in enumerate(['qpar(z)','qperp(z)','f(z)']):
-        scalingParamsAcceptedFinal[int(newparcol_sca+1)] = scalingparacceptedFinal[newparname_sca]
+    if extractScalingParams:
+        for newparcol_sca, newparname_sca in enumerate(['qpar(z)','qperp(z)','f(z)']):
+            scalingParamsAcceptedFinal[int(newparcol_sca+1)] = scalingparacceptedFinal[newparname_sca]
     
     
     
     # np.savetxt(os.path.join(mcmc_mainrun_dir_relpath, 'paramsAcceptedFinal_backup1.dat'),paramsAcceptedFinal.T)#.flatten('F'))
     np.savetxt(os.path.join(mcmc_mainrun_dir_relpath, '%s_paramsAcceptedFinal_cambcamb'%(currentrunindex)+parameterssavetxt+addsuffix+'%s.dat'%(testfilekw)),paramsAcceptedFinal.T)#.flatten('F'))
-    np.savetxt(os.path.join(mcmc_mainrun_dir_relpath, '%s_paramsAcceptedFinal_cambcamb'%(currentrunindex)+'_qpar(z)_qperp(z)_f(z)'+addsuffix+'%s.dat'%(testfilekw)),scalingParamsAcceptedFinal.T)#.flatten('F'))
+    if extractScalingParams:
+        np.savetxt(os.path.join(mcmc_mainrun_dir_relpath, '%s_paramsAcceptedFinal_cambcamb'%(currentrunindex)+'_qpar(z)_qperp(z)_f(z)'+addsuffix+'%s.dat'%(testfilekw)),scalingParamsAcceptedFinal.T)#.flatten('F'))
 
 
 
