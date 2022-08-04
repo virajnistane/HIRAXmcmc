@@ -45,7 +45,7 @@ class Ps2dFromPofk:
         #   \|/
         #    V
         # self.h_fix = self.parameters_fixed.h(self.parameters_fixed.H0_fix)
-        self.h_fix = self.parameters_fixed._h_fix
+        self.h_fid = self.parameters_fixed.h_fid
         
         self.hirax_output = HiraxOutput(inputforhiraxoutput)    # inputforhiraxoutput = hiraxrundirname, psetype
         # |__
@@ -320,9 +320,9 @@ class CreatePs2d:
         
         # ====================================================================
         if pstype == 'sample':
-            self.OmMh2 = self.parameters_fixed.OmM_fix * self.parameters_fixed._h_fix**2 #self.parameters_fixed.Om_to_omh2(self.parameters_fixed.OmM_fix, self.parameters_fixed.H0_fix)
+            self.OmMh2 = self.parameters_fixed.OmM_fid * self.parameters_fixed.h_fid**2 #self.parameters_fixed.Om_to_omh2(self.parameters_fixed.OmM_fix, self.parameters_fixed.H0_fix)
         elif pstype == 'param':
-            self.OmGv = self.parameters_fixed.OmG_fix
+            self.OmGv = self.parameters_fixed.OmG_fid
         
         # self.findcambinifile = find_file('planck_2018.ini','~')
         # ====================================================================
@@ -537,10 +537,7 @@ class CreatePs2d:
             H0 = currentparamstemp['H0']
             h = H0/100
         
-        # H0v, Omkv, Omlv, w0v, wav = currentparams.values()
-        
-        # h = currentparamstemp['H0']/100
-        
+                
         if self.pstype == 'param':
             omch2 = (1 - currentparamstemp['Oml'] - currentparamstemp['Omk'] - self.OmGv) * h**2 - self.classpars['omega_b'] - self.cambpars.omnuh2
             # ombh2 = (1 - Omlv - Omkv - self.OmGv) * (H0v/100)**2 - self.cambpars.omch2 - self.cambpars.omnuh2
@@ -617,8 +614,102 @@ class CreatePs2d:
         else:
             return pk_k_z
     
-    
-    
+    def new_pofk_from_class(self,
+                            currentparams, #=  ParametersFixed().current_params_fixed,
+                            z = None, 
+                            output_CLASS_instance = True,
+                            k_hunit_override = None,
+                            hubble_units_override = None
+                            ):
+        
+        currentparamstemp = currentparams.copy()
+        for i in self.cosmoparams_fixed:
+            try:
+                assert i in currentparamstemp.keys()
+            except:
+                currentparamstemp[i] = self.cosmoparams_fixed[i]
+        
+        try:
+            h = currentparamstemp['h']
+            H0 = h * 100
+        except:
+            H0 = currentparamstemp['H0']
+            h = H0/100
+        
+        if self.pstype == 'param':
+            omch2 = (1 - self.parameters_fixed.ombh2_fid/h**2 
+                     - (currentparamstemp['Oml'] + currentparamstemp['Omk'])
+                     - self.parameters_fixed.Omr_fid) * h**2
+        elif self.pstype == 'sample':
+            omch2 = self.parameters_fixed.omch2_fid
+            
+        self.pcl.set({'h': currentparamstemp['h'],
+                      'omega_b': self.parameters_fixed.ombh2_fid,
+                      'omega_cdm': omch2,
+                      'Omega_k': currentparamstemp['Omk'],
+                      'Omega_Lambda': currentparamstemp['Oml'],
+                      'w0_fld': currentparamstemp['w0'],
+                      'wa_fld': currentparamstemp['wa'],
+                      })
+        
+        try:
+            assert self.pstype == 'param'
+            self.pcl.set({'lensing':'no',
+                          'output':'mPk',
+                          'P_k_max_h/Mpc':0.01,
+                          'z_max_pk':5,
+                          'non linear':'none'
+                          })
+        except:
+            assert self.pstype == 'sample'
+            self.pcl.set({'lensing':'no',
+                          'output':'mPk',
+                          'P_k_max_h/Mpc':20,
+                          'z_max_pk':5,
+                          'non linear':'none'
+                          })
+        
+        # self.pcl.set(self.classprecisionsettings)
+        
+        
+        self.pcl.compute()
+        
+        
+        PK = self.pcl.pk
+        
+        
+        try:
+            assert k_hunit_override != None
+            k_hunit_val = k_hunit_override
+        except:
+            assert k_hunit_override == None
+            k_hunit_val = True
+        
+        
+        try:
+            assert hubble_units_override != None
+            hubble_units_val = hubble_units_override
+        except:
+            assert hubble_units_override == None
+            hubble_units_val = False
+        
+            
+        if k_hunit_val == True and hubble_units_val==True:
+            pk_k_z = lambda k,zv: PK(k*h, zv) * h**3
+        elif k_hunit_val == True and hubble_units_val==False:
+            pk_k_z = lambda k,zv: PK(k*h, zv)
+        elif k_hunit_val == False and hubble_units_val==True:
+            pk_k_z = lambda k,zv: PK(k, zv) * h**3
+        elif k_hunit_val == False and hubble_units_val==False:
+            pk_k_z = lambda k,zv: PK(k, zv)
+        
+        
+        
+        if output_CLASS_instance:
+            return pk_k_z, self.pcl
+        else:
+            return pk_k_z
+        
     # =========================================================================
     # =========================================================================
     # =========================================================================
@@ -657,251 +748,6 @@ class CreatePs2d:
     
     
     
-    
-    # =========================================================================
-    # =========================================================================
-    # =========================================================================
-    
-    
-    # def create_ps2d_from_camb(self,
-    #                           currentparams =  ParametersFixed().current_params_fixed,
-    #                           z = None):     # redshift should be overwritten by self.redshift_from_hiraxoutput
-        
-        
-    #     if z == None:
-    #         zv = self.redshift_from_hiraxoutput
-    #     else:
-    #         zv = z
-            
-    #     H0v, Omkv, Omlv, w0v, wav = currentparams.values()
-        
-    #     if self.pstype == 'sample':
-    #         omch2v = self.OmMh2 - self.cambpars.ombh2 - self.cambpars.omnuh2
-    #         # ombh2v = self.OmMh2 - self.cambpars.omch2 - self.cambpars.omnuh2
-    #     elif self.pstype == 'param':
-    #         omch2v = (1 - Omlv - Omkv - self.OmGv)*(H0v/100)**2 - self.cambpars.ombh2 - self.cambpars.omnuh2 
-    #         # ombh2v = (1 - Omlv - Omkv - self.OmGv)*(H0v/100)**2 - self.cambpars.omch2 - self.cambpars.omnuh2 
-        
-    #     kmax = 1.0
-        
-    #     self.cambpars.set_cosmology(H0 = H0v , omk = Omkv, ombh2 = self.cambpars.ombh2, omch2 = omch2v)
-    
-    #     self.cambpars.NonLinear = model.NonLinear_both
-    #     self.cambpars.DarkEnergy.set_params(w = w0v , wa = wav)
-        
-    #     self.cambresults = camb.get_results(self.cambpars)
-        
-    #     PK = camb.get_matter_power_interpolator(self.cambpars, nonlinear=True, kmax=kmax, zmax=250)
-        
-        
-    #     psds = self.ps2d_from_Pofk.get_ps2d_bandfunc(PK, redshift= zv, pspackage=self.pspackage)
-        
-        
-        
-    #     return psds
-    
-    # def create_ps2d_from_class(self,
-    #                            currentparams , 
-    #                            z):
-    #     """
-        
-        
-    #     Parameters
-    #     ----------
-    #     currentparams : dict
-    #         dict object of the form 
-    #     z : float, optional
-    #         Redshift. The default is 1.5.
-
-    #     Returns
-    #     -------
-    #     psds : np.array
-    #         2d powerspectrum.
-
-    #     """
-    #     # t0 = time.time()
-    #     H0v, Omkv, Omlv, w0v, wav = currentparams.values()
-        
-    #     if self.pstype == 'param':
-    #         # ombh2 = (1 - Omlv - Omkv - self.OmGv) * (H0v/100)**2 - self.cambpars.omch2 - self.cambpars.omnuh2
-    #         omch2 = (1 - Omlv - Omkv - self.OmGv) * (H0v/100)**2 - self.cambpars.ombh2 - self.cambpars.omnuh2
-    #     elif self.pstype == 'sample':
-    #         # ombh2 = self.OmMh2 - self.cambpars.omch2 - self.cambpars.omnuh2
-    #         omch2 = self.OmMh2 - self.cambpars.ombh2 - self.cambpars.omnuh2
-        
-    #     self.pcl.set(dict(self.classpars))
-        
-    #     self.pcl.set({'H0': H0v, 
-    #                   'omega_b': self.cambpars.ombh2,
-    #                   'omega_cdm': omch2,
-    #                   'Omega_k': Omkv,
-    #                   'Omega_Lambda': Omlv,
-    #                   'w0_fld': w0v,
-    #                   'wa_fld': wav,
-    #                   })
-        
-    #     self.pcl.set({'lensing':'no',
-    #                   'output':'mPk',
-    #                   'P_k_max_h/Mpc':2.0,
-    #                   'z_max_pk':2.6
-    #                   # 'non linear':'hmcode'
-    #                   })
-        
-        
-    #     self.pcl.compute()
-        
-        
-    #     PK = self.pcl.pk
-        
-        
-        
-    #     psds = self.ps2d_from_Pofk.get_ps2d_bandfunc(PK, redshift= z, pspackage=self.pspackage)
-        
-    #     self.pcl.struct_cleanup()     
-    #     self.pcl.empty()
-    #     # THIS IS THE REASON I DON'T USE PofK FUNCTION IN ANOTHER FUNCTION TO GET PS2D
-        
-    #     # print(time.time()-t0)
-    
-    #     return psds 
-    
-    # =========================================================================
-    # =========================================================================
-    # =========================================================================
-    
-    # def get_ps2d_from_pok_camb(self,                                        # *^*^*^*^*^*^*^*^*^*^*^*^*
-    #                             PK_k_zClass,
-    #                             # currentparams,
-    #                             q_perp_input, q_par_input,
-    #                             z=None):
-        
-    #     # if z == None:
-    #     #     zv = self.redshift_from_hiraxoutput
-    #     # else:
-    #     #     zv = z
-        
-        
-    #     psds = self.ps2d_from_Pofk.get_ps2d_bandfunc(PK_k_zClass, 
-    #                                                  pspackage=self.pspackage, 
-    #                                                  q_perp=q_perp_input, 
-    #                                                  q_par=q_par_input) #, currentparams
-        
-    #     return psds
-        
-        
-    # def get_ps2d_from_pok_class(self,                                       # *^*^*^*^*^*^*^*^*^*^*^*^*
-    #                             PK_k_zClass,
-    #                             # currentparams,
-    #                             q_perp_input, q_par_input,
-    #                             z=None):
-        
-    #     # if z == None:
-    #     #     zv = self.redshift_from_hiraxoutput
-    #     # else:
-    #     #     zv = z
-        
-    #     psds = self.ps2d_from_Pofk.get_ps2d_bandfunc(PK_k_zClass, 
-    #                                                  pspackage=self.pspackage, 
-    #                                                  q_perp=q_perp_input, 
-    #                                                  q_par=q_par_input) #currentparams, 
-        
-    #     return psds
-    
-    #     # self.pcl.struct_cleanup()     |---> NOT DONE IN THIS FUNCTION!!!!
-    #     # self.pcl.empty()              /
-    
-        
-    
-    
-    # =========================================================================
-    # =========================================================================
-    # =========================================================================
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    # def get_ps2dDict_from_class_multz(self,
-    #                                   currentparams,
-    #                                   z_arr):
-        
-    #     H0v, Omkv, Omlv, w0v, wav = currentparams.values()
-        
-    #     if self.pstype == 'param':
-    #         # ombh2 = (1 - Omlv - Omkv - self.OmGv) * (H0v/100)**2 - self.cambpars.omch2 - self.cambpars.omnuh2
-    #         omch2 = (1 - Omlv - Omkv - self.OmGv) * (H0v/100)**2 - self.cambpars.ombh2 - self.cambpars.omnuh2
-    #     elif self.pstype == 'sample':
-    #         # ombh2 = self.OmMh2 - self.cambpars.omch2 - self.cambpars.omnuh2
-    #         omch2 = self.OmMh2 - self.cambpars.ombh2 - self.cambpars.omnuh2
-        
-    #     self.pcl.set(dict(self.classpars))
-        
-    #     self.pcl.set({'H0': H0v, 
-    #                   'omega_b': self.cambpars.ombh2,
-    #                   'omega_cdm': omch2,
-    #                   'Omega_k': Omkv,
-    #                   'Omega_Lambda': Omlv,
-    #                   'w0_fld': w0v,
-    #                   'wa_fld': wav,
-    #                   })
-        
-    #     self.pcl.set({'lensing':'no',
-    #                   'output':'mPk',
-    #                   'P_k_max_h/Mpc':2.0,
-    #                   'z_max_pk':2.6
-    #                   # 'non linear':'hmcode'
-    #                   })
-        
-        
-    #     self.pcl.compute()
-        
-        
-    #     PK = self.pcl.pk
-        
-        
-    #     psdsdict = {}
-        
-    #     for z in z_arr:
-    #         psdsdict[z] = self.ps2d_from_Pofk.get_ps2d_bandfunc(PK, redshift= z, pspackage=self.pspackage)
-            
-        
-    #     self.pcl.struct_cleanup()     
-    #     self.pcl.empty()
-        
-    #     # print(time.time()-t0)
-        
-    #     return psdsdict
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
