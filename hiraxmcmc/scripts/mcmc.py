@@ -668,8 +668,9 @@ chi2_func = {}
 for freqc,value_inputforhiraxoutput in inputforhiraxoutput.items():
     chi2_func[freqc] = Chi2Func(value_inputforhiraxoutput, INPUT)
     
-
-
+if rank_mpi == 0:
+    if INPUT['likelihood']['PS_cov']['override'] == 'yes':
+        print('\nUsing an external PS cov input at: %s\n'%(INPUT['likelihood']['PS_cov']['filename_fullpath']))
 
 
 key0 = list(inputforhiraxoutput.keys())[0]
