@@ -278,7 +278,7 @@ if rank_mpi==0:
     if os.getenv('WHEREAMI') == 'local':
         print('MCMCmodule - current git branch: ',Repository('/Users/Viraj.Nistane/Desktop/phdmywork/HIRAX/HIRAXmcmc/').head.shorthand)
     elif os.getenv('WHEREAMI') == 'cluster':
-        print('MCMCmodule - current git branch: ',Repository('~/HIRAXmcmc/').head.shorthand)
+        print('MCMCmodule - current git branch: ',Repository('/home/s/sievers/nistanev/HIRAXmcmc/').head.shorthand)
 
         
 # if 'MacbookPro' not in os.uname()[1]:
