@@ -49,7 +49,6 @@ class Chi2Func:
         except:
             if INPUT != None:
                 assert INPUT['likelihood']['PS_cov']['override'] == 'yes'
-            print('\nUsing an external PS cov input at: %s\n'%(INPUT['likelihood']['PS_cov']['filename_fullpath']))
             self.covhirax = np.loadtxt(os.path.join(INPUT['likelihood']['PS_cov']['filename_fullpath']))
             self.errs  =  np.sqrt(abs(np.diag(self.covhirax))).reshape(self.kpar_all['kpar_size'],self.kperp_all['kperp_size'])
         
