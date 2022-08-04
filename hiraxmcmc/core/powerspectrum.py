@@ -426,7 +426,8 @@ class CreatePs2d:
         
         if self.pstype == 'sample':
             # ombh2v = self.OmMh2 - self.cambpars.omch2 - self.cambpars.omnuh2
-            omch2v = self.OmMh2 - self.cambpars.ombh2 - self.cambpars.omnuh2
+            OmMh2 = self.parameters_fixed.OmM_fid * self.parameters_fixed.h_fid**2
+            omch2v = OmMh2 - self.cambpars.ombh2 - self.cambpars.omnuh2
         elif self.pstype == 'param':
             omch2v = (1 - currentparamstemp['Oml'] - currentparamstemp['Omk'] - self.OmGv) * h**2 - self.cambpars.ombh2 - self.cambpars.omnuh2 
             # ombh2v = (1 - Omlv - Omkv - self.OmGv)*(H0v/100)**2 - self.cambpars.omch2 - self.cambpars.omnuh2 
