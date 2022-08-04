@@ -216,7 +216,7 @@ class Chi2Func:
         self.q_par = q_par
         self.fz = f_growth
         
-        pscalc = self.cp_params.get_ps2d_from_pok(PK_k_zClass = PK_k_z_currentstep,
+        pscalc = self.cp_params.get_ps2d_from_pok(PK_k_zClass = self.pk_z_estimated,
                                                   q_perp_input = q_perp,
                                                   q_par_input = q_par,
                                                   z=z,
