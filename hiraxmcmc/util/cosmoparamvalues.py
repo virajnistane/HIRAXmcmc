@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from scipy.constants import speed_of_light as cc
+import numpy as np
 
 # =============================================================================
 # Fixed param values
@@ -13,97 +14,176 @@ class ParametersFixed:
     # within the class, then the values won't reinitialize each time the class 
     # object is generated
     
+    
+    # Gravitational constant G kg^-1 m^3 s^-2
+    _G = 6.6742e-11
+    # Stefan-Boltzmann (in W m^{-2} K^{-4})
+    _stefan_boltzmann = 5.6705e-8
+    # Radiation constant (in J m^{-3} K^{-4})
+    _a_rad = 4*_stefan_boltzmann / cc
+    # Boltzmann constant
+    _k_B = 1.3806503e-23
+    # CMB temperature
+    _T0 = 2.726
+    # Parsecs in m
+    _parsec_in_m = 3.08568025e16
+    # Parsecs in km
+    _parsec_in_km = 3.08568025e13
+    
     def __init__(self):
-        self._H0_fix = 67.80
-        self._h_fix = 0.678
-        self._Omk_fix = 0.0
-        self._Oml_fix = 0.684
-        self._w0_fix = -1.0
-        self._wa_fix = 0.0
         
-        self._hz_fix = {'400_500':0.0007339864092978513, 
-                        '500_600':0.0005577061879176558, 
-                        '600_700':0.0004498518311851779, 
-                        '700_800':0.000379575515395735 }
+        self._h = 0.6777
+        self._H0 = self._h * 100
         
-        self._Hz_fix = {'400_500':0.0007339864092978513 * cc/1e3, 
-                        '500_600':0.0005577061879176558 * cc/1e3, 
-                        '600_700':0.0004498518311851779 * cc/1e3, 
-                        '700_800':0.000379575515395735  * cc/1e3}
+        self._ombh2 = 0.022161
+        self._omch2 = 0.11889
         
-        self._qpar_fix = 1
+        self._Omb = self._ombh2/self._h**2
+        self._Omc = self._omch2/self._h**2
         
-        self._dA_fix = {'400_500':1751.0952983505435, 
-                        '500_600':1792.9837345626768, 
-                        '600_700':1755.9106803363068, 
-                        '700_800':1653.5773864998494}
+        self._Omk = 0.0
         
-        self._qperp_fix = 1
+        self._OmM = (self._ombh2 + self._omch2)/self._h**2
         
-        self._fz_fix = {'400_500':0.9604491314463909, 
-                        '500_600':0.9331817576718678, 
-                        '600_700':0.8974290025235386, 
-                        '700_800':0.8543701735721654}
+        # fixing Omega_gamma
+        rhoc = 3.0 * self._H0**2 * cc**2 / (8.0 * np.pi * self._G) / (1e6 * self._parsec_in_km)**2
+        rhorad = self._a_rad * self._T0**4
+        self._Omg = rhorad / rhoc
         
-        self._OmM_fix = 0.308
-    
-        # omch2_fix = 0.1201075
-        # ombh2_fix = 0.0223828
-    
-        self.OmG_fix = 1 - self._OmM_fix - self._Omk_fix - self._Oml_fix
+        # fixing Omega_nu
+        self.nnu = 3.046
+        rhonu = self.nnu * rhorad * 7.0 / 8.0 * (4.0 / 11.0)**(4.0 / 3.0)
+        self._Omnu = rhonu / rhoc
+        self._omnuh2 = self._Omnu * self._h**2
+        
+        # Adding Omega_gamma and Omega_nu
+        self._Omr = self._Omg + self._Omnu
+                
+        # Finally, evaluating Omega_Lambda from the other fixed parameters
+        self._Oml = 1 - self._Omk - self._OmM - self._Omr
+        
+        
+        self._w0 = -1.0
+        self._wa = 0.0
+        
+        self._hz = {'400_500':0.0007327671367151237, 
+                    '500_600':0.0005568269434413366, 
+                    '600_700':0.00044919410456275546,
+                    '700_800':0.0003790722414922298 }
+        
+        self._Hz = {}
+        for key,val in self._hz.items():
+            self._Hz[key] = val*cc/1e3
+        
+        self._qpar = 1
+        
+        self._dA = {'400_500':1753.15213884692, 
+                    '500_600':1794.9333333728566, 
+                    '600_700':1757.6610835352963,
+                    '700_800':1655.076107405521}
+        
+        self._qperp = 1
+        
+        self._fz = {'400_500':0.9628415413719139, 
+                    '500_600':0.9354237272393782, 
+                    '600_700':0.8994759926141193, 
+                    '700_800':0.8561943222181665}
+        
     
     ###### ###### ###### ######
     
     @property
-    def H0_fix(self):
-        return self._H0_fix
-    @H0_fix.setter
-    def H0_fix(self, H0_fix_new):
-        self._H0_fix = H0_fix_new
+    def H0_fid(self):
+        return self._H0
+    @H0_fid.setter
+    def H0_fid(self, H0_fid_new):
+        self._H0 = H0_fid_new
         
     @property
-    def h_fix(self):
-        return self._h_fix
-    @h_fix.setter
-    def h_fix(self, h_fix_new):
-        self._h_fix = h_fix_new
+    def h_fid(self):
+        return self._h
+    @h_fid.setter
+    def h_fid(self, h_fid_new):
+        self._h = h_fid_new
     
     @property
-    def Omk_fix(self):
-        return self._Omk_fix
-    @Omk_fix.setter
-    def Omk_fix(self, Omk_fix_new):
-        self._Omk_fix = Omk_fix_new
+    def Omk_fid(self):
+        return self._Omk
+    @Omk_fid.setter
+    def Omk_fid(self, Omk_fid_new):
+        self._Omk = Omk_fid_new
     
     @property
-    def Oml_fix(self):
-        return self._Oml_fix
-    @Oml_fix.setter
-    def Oml_fix(self, Oml_fix_new):
-        self._Oml_fix = Oml_fix_new
+    def Oml_fid(self):
+        return self._Oml
+    @Oml_fid.setter
+    def Oml_fid(self, Oml_fid_new):
+        self._Oml = Oml_fid_new
     
     @property
-    def w0_fix(self):
-        return self._w0_fix
-    @w0_fix.setter
-    def w0_fix(self, w0_fix_new):
-        self._w0_fix = w0_fix_new
+    def w0_fid(self):
+        return self._w0
+    @w0_fid.setter
+    def w0_fid(self, w0_fid_new):
+        self._w0 = w0_fid_new
     
     @property
-    def wa_fix(self):
-        return self._wa_fix
-    @wa_fix.setter
-    def wa_fix(self, wa_fix_new):
-        self._wa_fix = wa_fix_new
+    def wa_fid(self):
+        return self._wa
+    @wa_fid.setter
+    def wa_fid(self, wa_fid_new):
+        self._wa = wa_fid_new
     
     ###### ###### ###### ######
     
     @property
-    def OmM_fix(self):
-        return self._OmM_fix
-    @OmM_fix.setter
-    def OmM_fix(self, OmM_fix_new):
-        self._OmM_fix = OmM_fix_new
+    def omch2_fid(self):
+        return self._omch2
+    @omch2_fid.setter
+    def omch2_fid(self, omch2_fid_new):
+        self._omch2 = omch2_fid_new
+    
+    @property
+    def ombh2_fid(self):
+        return self._ombh2
+    @ombh2_fid.setter
+    def ombh2_fid(self, ombh2_fid_new):
+        self._ombh2 = ombh2_fid_new
+        
+    @property
+    def OmM_fid(self):
+        return self._OmM
+    @OmM_fid.setter
+    def OmM_fid(self, OmM_fid_new):
+        self._OmM = OmM_fid_new
+        
+    @property
+    def Omg_fid(self):
+        return self._Omg
+    @Omg_fid.setter
+    def Omg_fid(self, Omg_fid_new):
+        self._Omg = Omg_fid_new
+    
+    @property
+    def Omnu_fid(self):
+        return self._Omnu
+    @Omnu_fid.setter
+    def Omnu_fid(self, Omnu_fid_new):
+        self._Omnu = Omnu_fid_new
+        
+    @property
+    def omnuh2_fid(self):
+        return self._omnuh2
+    @omnuh2_fid.setter
+    def omnuh2_fid(self, omnuh2_fid_new):
+        self._omnuh2 = omnuh2_fid_new
+    
+    @property
+    def Omr_fid(self):
+        return self._Omr
+    @Omr_fid.setter
+    def Omr_fid(self, Omr_fid_new):
+        self._Omr = Omr_fid_new
     
     ###### ###### ###### ######
     
@@ -123,8 +203,8 @@ class ParametersFixed:
     
     @property
     def current_allparams_fixed(self):
-        return {'h':self._h_fix ,'Omk':self.Omk_fix, 'Oml':self.Oml_fix, 'w0':self.w0_fix, 'wa':self.wa_fix,
-                'h(z)':self._hz_fix, 'qpar(z)':self._qpar_fix, 'dA(z)':self._dA_fix, 'qperp(z)':self._qperp_fix, 'f(z)':self._fz_fix }
+        return {'h':self._h, 'Omk':self._Omk, 'Oml':self._Oml, 'w0':self._w0, 'wa':self._wa,
+                'h(z)':self._hz, 'qpar(z)':self._qpar, 'dA(z)':self._dA, 'qperp(z)':self._qperp, 'f(z)':self._fz}
     
     
     @property
