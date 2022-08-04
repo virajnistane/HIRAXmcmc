@@ -275,8 +275,12 @@ MCMCmodulespath = os.path.dirname(hiraxmcmc.__file__)
 
 if rank_mpi==0:
     print('MCMCmodulespath: ',MCMCmodulespath)
-    print('MCMCmodule - current git branch: ',Repository(MCMCmodulespath).head.shorthand)
+    if os.getenv('WHEREAMI') == 'local':
+        print('MCMCmodule - current git branch: ',Repository('/Users/Viraj.Nistane/Desktop/phdmywork/HIRAX/HIRAXmcmc/').head.shorthand)
+    elif os.getenv('WHEREAMI') == 'cluster':
+        print('MCMCmodule - current git branch: ',Repository('~/HIRAXmcmc/').head.shorthand)
 
+        
 # if 'MacbookPro' not in os.uname()[1]:
 
 #     if not(os.path.exists(os.path.join(os.getcwd(), '..',  mcmc_mainrun_dir ))):
