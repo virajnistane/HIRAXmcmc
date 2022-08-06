@@ -166,13 +166,12 @@ class Chi2Func:
             
             try:
                 assert self.cp_params.pspackage == 'class'
-                q_perp =  self.dA_fid/PK_properties_currentstep.angular_distance(z)  * self.h_fiducial/h
-                q_par = PK_properties_currentstep.Hubble(z)/self.hz_fid             * self.h_fiducial/h
+                q_perp = self.dA_fid/PK_properties_currentstep.angular_distance(z)  #* self.h_fiducial/h
+                q_par = PK_properties_currentstep.Hubble(z)/self.hz_fid             #* self.h_fiducial/h
                 # this second ratio is to remove the h-units of the k-values (so, it is only needed when the k values are in h/Mpc units)
                 # for example: kpar_obs[h/Mpc] = kpar_fid[h/Mpc]/ q_par * (h/h_fid) = kpar_fid[h/Mpc]/ (q_par * (h_fid/h))
                     # Then this h/h_fid ratio, when including in the q_par, becomes (h_fid/h)
                 f_growth = PK_properties_currentstep.scale_independent_growth_factor_f(z)
-                
             except:
                 assert self.cp_params.pspackage == 'camb'
                 raise ValueError("Hello! It seems you are using CAMB for generating \
