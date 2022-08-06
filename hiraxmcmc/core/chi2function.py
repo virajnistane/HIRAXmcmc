@@ -166,8 +166,8 @@ class Chi2Func:
             
             try:
                 assert self.cp_params.pspackage == 'class'
-                q_perp = PK_properties_currentstep.angular_distance(z) / self.dA_fid * self.h_fiducial/h
-                q_par = self.hz_fid / PK_properties_currentstep.Hubble(z)            * self.h_fiducial/h
+                q_perp =  self.dA_fid/PK_properties_currentstep.angular_distance(z)  * self.h_fiducial/h
+                q_par = PK_properties_currentstep.Hubble(z)/self.hz_fid             * self.h_fiducial/h
                 # this second ratio is to remove the h-units of the k-values (so, it is only needed when the k values are in h/Mpc units)
                 # for example: kpar_obs[h/Mpc] = kpar_fid[h/Mpc]/ q_par * (h/h_fid) = kpar_fid[h/Mpc]/ (q_par * (h_fid/h))
                     # Then this h/h_fid ratio, when including in the q_par, becomes (h_fid/h)
@@ -200,12 +200,12 @@ class Chi2Func:
             try:
                 q_par = currentparams['qpar(z)']                * self.h_fiducial/h
             except:
-                q_par = self.hz_fid / currentparams['h(z)']     * self.h_fiducial/h
+                q_par =  currentparams['h(z)']/self.hz_fid     * self.h_fiducial/h
                 
             try:
                 q_perp = currentparams['qperp(z)']              * self.h_fiducial/h
             except:
-                q_perp = currentparams['dA(z)'] / self.dA_fid   * self.h_fiducial/h
+                q_perp = self.dA_fid/currentparams['dA(z)']   * self.h_fiducial/h
                 
             
             f_growth = currentparams['f(z)']

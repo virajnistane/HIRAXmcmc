@@ -118,7 +118,7 @@ class Ps2dFromPofk:
         # h = currentparams['H0']/100
         
         
-        rescaling_factor = 1/(q_perp**2 * q_par)
+        rescaling_factor = (q_perp**2 * q_par)
         
         def P_kmu(k,mu):
             try:
@@ -136,12 +136,10 @@ class Ps2dFromPofk:
                     
             return pofk_final(k) * (bias + f_growth * mu**2)**2
         
-        """
-        Major change here!
-        """
         self.band_pk = [(lambda bandt: (lambda k, mu: 
                                         rescaling_factor 
-                                        * P_kmu(k, mu)
+                                        * P_kmu(self.k_fid(k, mu, q_par, q_perp), 
+                                                self.mu_fid(mu, q_par, q_perp))
                                         * bandt(k, mu)
                                         )
                          )
