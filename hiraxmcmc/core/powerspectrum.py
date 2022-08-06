@@ -63,20 +63,20 @@ class Ps2dFromPofk:
         self.redshift_from_hiraxoutput = self.hirax_output.redshift
         
         
-        def k_obs(k_fid, mu_fid, qpar, qperp):
-            return k_fid * (mu_fid**2/qpar**2 + (1-mu_fid**2)/qperp**2)**(0.5)
+        def k_obs(k, mu, qpar, qperp):
+            return k * (mu**2/qpar**2 + (1-mu**2)/qperp**2)**(0.5)
         self.k_obs = k_obs
         
-        def mu_obs(mu_fid, qpar, qperp):
-            return mu_fid/qpar * (mu_fid**2/qpar**2 + (1-mu_fid**2)/qperp**2)**(-0.5)
+        def mu_obs(mu, qpar, qperp):
+            return mu/qpar * (mu**2/qpar**2 + (1-mu**2)/qperp**2)**(-0.5)
         self.mu_obs = mu_obs
         
-        def k_fid(k_obs, mu_obs, qpar, qperp):
-            return k_obs * (mu_obs**2 * qpar**2 + (1-mu_obs**2) * qperp**2)**(0.5)
+        def k_fid(k, mu, qpar, qperp):
+            return k * (mu**2 * qpar**2 + (1-mu**2) * qperp**2)**(0.5)
         self.k_fid = k_fid
         
-        def mu_fid(mu_obs, qpar, qperp):
-            return mu_obs * qpar * (mu_obs**2 * qpar**2 + (1-mu_obs**2) * qperp**2)**(-0.5)
+        def mu_fid(mu, qpar, qperp):
+            return mu * qpar * (mu**2 * qpar**2 + (1-mu**2) * qperp**2)**(-0.5)
         self.mu_fid = mu_fid
         
         """
