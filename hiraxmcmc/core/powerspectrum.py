@@ -138,12 +138,11 @@ class Ps2dFromPofk:
         
         self.band_pk = [(lambda bandt: (lambda k, mu: 
                                         rescaling_factor 
-                                        * P_kmu(self.k_fid(k, mu, q_par, q_perp), 
+                                        * P_kmu(k, #self.k_fid(k, mu, q_par, q_perp), 
                                                 self.mu_fid(mu, q_par, q_perp))
                                         * bandt(k, mu)
                                         )
-                         )
-                        (band)
+                         )(band)
                         for band in self.band_func]
         
         
@@ -641,7 +640,7 @@ class CreatePs2d:
             assert self.pstype == 'param'
             self.pcl.set({'lensing':'no',
                           'output':'mPk',
-                          'P_k_max_h/Mpc':0.001,
+                          'P_k_max_h/Mpc':1e-4,
                           'z_max_pk':5,
                           'non linear':'none'
                           })
