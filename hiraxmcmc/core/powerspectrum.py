@@ -139,7 +139,7 @@ class Ps2dFromPofk:
         self.band_pk = [(lambda bandt: (lambda k, mu: 
                                         rescaling_factor 
                                         * P_kmu(k, #self.k_fid(k, mu, q_par, q_perp), 
-                                                self.mu_fid(mu, q_par, q_perp))
+                                                mu) #self.mu_fid(mu, q_par, q_perp))
                                         * bandt(k, mu)
                                         )
                          )(band)
