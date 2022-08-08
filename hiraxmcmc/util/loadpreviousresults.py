@@ -23,7 +23,9 @@ class LoadOlderResults:
     
     """
     
-    def __init__(self, currentrunindex, paramstovary, currentparams, ordered_params_list, priors, rankmpi, mcmc_mainrun_dir_relpath, override_filenamepart = None, testfilekw = ''):   # inputforhiraxoutput (not needed)
+    def __init__(self, currentrunindex, paramstovary, currentparams, ordered_params_list, 
+                 priors, rankmpi, mcmc_mainrun_dir_relpath, 
+                 override_filenamepart = None, testfilekw = ''):   # inputforhiraxoutput (not needed)
         self.p2v = paramstovary
         self.testfilekw = testfilekw
         self.rankmpi = rankmpi
