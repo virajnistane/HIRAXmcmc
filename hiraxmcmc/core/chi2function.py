@@ -111,7 +111,7 @@ class Chi2Func:
         
         
         
-        # PS 1D and corresponding properties
+        # PS 1D and corresponding properties (sample)
         self.pk_z_estimated, self.pspackage_properties = self.cp_sample.get_pk_and_prop(currentparams = self.params_fixed.cosmoparams_fixed)
         
         try:
@@ -134,6 +134,7 @@ class Chi2Func:
         
         # PS 1D --> PS 2D
         self.ps_estimated = self.cp_sample.get_ps2d_from_pok(PK_k_zClass = self.pk_z_estimated,
+                                                             pspackage_properties = self.pspackage_properties,
                                                              q_perp_input = self.q_perp_for_ps_estimated, 
                                                              q_par_input = self.q_par_for_ps_estimated,
                                                              z=self.redshift,
@@ -166,8 +167,8 @@ class Chi2Func:
             
             try:
                 assert self.cp_params.pspackage == 'class'
-                q_perp = PK_properties_currentstep.angular_distance(z) / self.dA_fid * self.h_fiducial/h
-                q_par = self.hz_fid / PK_properties_currentstep.Hubble(z)            * self.h_fiducial/h
+                q_perp = PK_properties_currentstep.angular_distance(z) / self.dA_fid #* self.h_fiducial/h
+                q_par = self.hz_fid / PK_properties_currentstep.Hubble(z)            #* self.h_fiducial/h
                 # this second ratio is to remove the h-units of the k-values (so, it is only needed when the k values are in h/Mpc units)
                 # for example: kpar_obs[h/Mpc] = kpar_fid[h/Mpc]/ q_par * (h/h_fid) = kpar_fid[h/Mpc]/ (q_par * (h_fid/h))
                     # Then this h/h_fid ratio, when including in the q_par, becomes (h_fid/h)
@@ -217,6 +218,7 @@ class Chi2Func:
         self.fz = f_growth
         
         pscalc = self.cp_params.get_ps2d_from_pok(PK_k_zClass = self.pk_z_estimated,
+                                                  pspackage_properties = PK_properties_currentstep,
                                                   q_perp_input = q_perp,
                                                   q_par_input = q_par,
                                                   z=z,
