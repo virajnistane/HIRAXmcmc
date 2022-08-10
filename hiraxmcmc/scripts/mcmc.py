@@ -1005,7 +1005,19 @@ for ii in np.arange(1,int(niterations+1)):
         # any of "chi2_func_*" works for pofk_interpolator_for_pscalc
         try:
             assert not(freqdep_paramstovary)
+            try:
+                assert ii >20
+            except:
+                assert ii <=20
+                if rank_mpi == 0:
+                    timertime0 = time.time()
             PK_k_z_current , CLASS_instance_current = chi2_func[key0].cp_params.get_pk_and_prop(currentparams=currentparams)
+            try:
+                assert ii >20
+            except:
+                assert ii <=20
+                if rank_mpi == 0:
+                    print("time for CLASS comp:",time.time()-timertime0)
         except:
             assert freqdep_paramstovary
             
