@@ -8,6 +8,8 @@ import numpy as np
 
 from configobj import ConfigObj
 
+from scipy.integrate import cumtrapz
+from scipy.interpolate import interp1d
 
 import hiraxmcmc
 from hiraxmcmc.util.basicfunctions import *
@@ -63,25 +65,24 @@ class Ps2dFromPofk:
         self.redshift_from_hiraxoutput = self.hirax_output.redshift
         
         
-        def k_obs(k_fid, mu_fid, qpar, qperp):
+        def k1(k_fid, mu_fid, qpar, qperp):
             return k_fid * (mu_fid**2/qpar**2 + (1-mu_fid**2)/qperp**2)**(0.5)
-        self.k_obs = k_obs
+        self.k1 = k1
         
-        def mu_obs(mu_fid, qpar, qperp):
+        def mu1(mu_fid, qpar, qperp):
             return mu_fid/qpar * (mu_fid**2/qpar**2 + (1-mu_fid**2)/qperp**2)**(-0.5)
-        self.mu_obs = mu_obs
-        
-        def k_fid(k_obs, mu_obs, qpar, qperp):
-            return k_obs * (mu_obs**2 * qpar**2 + (1-mu_obs**2) * qperp**2)**(0.5)
-        self.k_fid = k_fid
-        
-        def mu_fid(mu_obs, qpar, qperp):
-            return mu_obs * qpar * (mu_obs**2 * qpar**2 + (1-mu_obs**2) * qperp**2)**(-0.5)
-        self.mu_fid = mu_fid
+        self.mu1 = mu1
         
         """
         For band func method for 2D PS 
         """
+        def D_growth(f_growth_interpFun,z):
+            z1arr = np.arange(0,10)
+            yy1 = np.exp(- cumtrapz(np.array([f_growth_interpFun(i)/(1+i) for i in z1arr]), initial=0) )
+            tck = interp1d(z1arr, yy1, kind='cubic')
+            return tck(z)*1
+        
+        self.D_growth = D_growth
         
         # self.bounds = list(zip(self.kpa_al['kpar_start'], self.kpa_al['kpar_end'], self.kpe_al['kperp_start'], self.kpe_al['kperp_end']))
         def bandfunc_2d_cart(kpar_s, kpar_e, kperp_s, kperp_e):
@@ -113,7 +114,10 @@ class Ps2dFromPofk:
     """
     
     
-    def get_ps2d_bandfunc(self, PK_k_zClass, pspackage, q_perp, q_par, currentparams, f_growth, bias=1, PKinterp=None):  #, currentparams
+    def get_ps2d_bandfunc(self, PK_k_zClass, pspackage_properties, 
+                          pspackage, q_perp, q_par, 
+                          currentparams, f_growth, 
+                          bias=1, PKinterp=None):  #, currentparams
         
         # h = currentparams['H0']/100
         
@@ -124,17 +128,18 @@ class Ps2dFromPofk:
             try:
                 assert PKinterp == None
                 if pspackage == 'class':
-                    pofk_final = lambda k: PK_k_zClass(k,self.redshift_from_hiraxoutput)
+                    pofk_final = lambda k: PK_k_zClass(k,0)
                 elif pspackage == 'camb':
                     pofk_final = lambda k: PK_k_zClass(k)
             except:
                 print("PKinterp argument entered! Running exception")
                 if pspackage == 'class':
-                    pofk_final = lambda k: PKinterp(k, self.redshift_from_hiraxoutput)
+                    pofk_final = lambda k: PKinterp(k, 0)
                 elif pspackage == 'camb':
-                    pofk_final = lambda k: PKinterp.P(self.redshift_from_hiraxoutput , k)
+                    pofk_final = lambda k: PKinterp.P(0 , k)
                     
-            return pofk_final(k) * (bias + f_growth * mu**2)**2
+            return (pofk_final(k) * pspackage_properties.scale_independent_growth_factor(self.redshift_from_hiraxoutput)**2 #* self.D_growth(f_growth_interpFun, self.redshift_from_hiraxoutput)**2 
+                    * (bias + f_growth * mu**2)**2)
         
         """
         Major change here!
@@ -145,10 +150,8 @@ class Ps2dFromPofk:
                                         #                    qpar=q_par,qperp=q_perp),
                                         #         self.mu_obs(mu,
                                         #                     qpar=q_par,qperp=q_perp))
-                                        * P_kmu(self.k_fid(k,mu,
-                                                           qpar=q_par,qperp=q_perp), 
-                                                self.mu_fid(mu,
-                                                            qpar=q_par,qperp=q_perp))
+                                        * P_kmu(self.k1(k,mu,qpar=q_par,qperp=q_perp), 
+                                                self.mu1(mu,qpar=q_par,qperp=q_perp))
                                         * bandt(k, mu)
                                         # check if you need to enter kobs and muobs as bandt args
                                         )
@@ -637,6 +640,7 @@ class CreatePs2d:
                       'Omega_Lambda': currentparamstemp['Oml'],
                       'w0_fld': currentparamstemp['w0'],
                       'wa_fld': currentparamstemp['wa'],
+                      'sigma8': 0.824398
                       })
         
         try:
@@ -716,6 +720,7 @@ class CreatePs2d:
     
     def get_ps2d_from_pok(self,                                       # *^*^*^*^*^*^*^*^*^*^*^*^*
                           PK_k_zClass,
+                          pspackage_properties,
                           q_perp_input, q_par_input,
                           currentparams_input,
                           f_growth, 
@@ -728,6 +733,7 @@ class CreatePs2d:
         
         psds = self.ps2d_from_Pofk.get_ps2d_bandfunc(PK_k_zClass, 
                                                      pspackage=self.pspackage, 
+                                                     pspackage_properties=pspackage_properties,
                                                      q_perp = q_perp_input, 
                                                      q_par = q_par_input,
                                                      currentparams = currentparams_input,
