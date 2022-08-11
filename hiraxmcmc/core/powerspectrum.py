@@ -662,7 +662,7 @@ class CreatePs2d:
             assert self.pstype == 'param'
             self.pcl.set({'lensing':'no',
                           'output':'mPk',
-                          'P_k_max_h/Mpc':20,
+                          'P_k_max_h/Mpc':20,    # 1e-4 for cosmo_space for less compt time
                           'z_max_pk':5,
                           'non linear':'none'
                           })
