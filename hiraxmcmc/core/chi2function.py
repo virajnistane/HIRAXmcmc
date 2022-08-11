@@ -225,7 +225,7 @@ class Chi2Func:
             pkz_input_temp = PK_k_z_currentstep
             
         pscalc = self.cp_params.get_ps2d_from_pok(PK_k_zClass = pkz_input_temp,
-                                                  pspackage_properties = PK_properties_currentstep,
+                                                  pspackage_properties = self.pspackage_properties,
                                                   q_perp_input = q_perp,
                                                   q_par_input = q_par,
                                                   z=z,
