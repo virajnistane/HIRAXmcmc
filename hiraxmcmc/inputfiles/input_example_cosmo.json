@@ -23,8 +23,8 @@
             "do_override": "yes",
             "manual_input_variance": {
                 "h": 0.25,
-                "Omk": 0.002,
-                "Oml": 0.01,
+                "Omk": 0.1,
+                "Oml": 0.03,
                 "w0": 0.2,
                 "wa": 1.5
             }
