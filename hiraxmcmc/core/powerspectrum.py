@@ -640,7 +640,7 @@ class CreatePs2d:
                       'Omega_Lambda': currentparamstemp['Oml'],
                       'w0_fld': currentparamstemp['w0'],
                       'wa_fld': currentparamstemp['wa'],
-                      'sigma8': 0.824398
+                      # 'sigma8': 0.824398
                       })
         
         # self.pcl.set({'lensing':'no',
@@ -662,7 +662,7 @@ class CreatePs2d:
             assert self.pstype == 'param'
             self.pcl.set({'lensing':'no',
                           'output':'mPk',
-                          'P_k_max_h/Mpc':20,    # 1e-4 for cosmo_space for less compt time
+                          'P_k_max_h/Mpc':1e-4,    # 1e-4 for cosmo_space for less compt time
                           'z_max_pk':5,
                           'non linear':'none'
                           })
