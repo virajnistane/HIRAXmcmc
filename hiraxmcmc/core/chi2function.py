@@ -180,12 +180,12 @@ class Chi2Func:
                                  signal for varying parameters. It is recommended to \
                                      use CLASS code instead. If you insist on using \
                                          CAMB, please comment out this line from the code.")
-                q_perp = PK_properties_currentstep.angular_diameter_distance(z) / self.dA_fid   * self.h_fiducial/h
-                q_par = self.hz_fid / PK_properties_currentstep.h_of_z(z)                       * self.h_fiducial/h
-                # this second ratio is to remove the h-units of the k-values (so, it is only needed when the k values are in h/Mpc units)
-                # for example: kpar_obs[h/Mpc] = kpar_fid[h/Mpc]/ q_par * (h/h_fid) = kpar_fid[h/Mpc]/ (q_par * (h_fid/h))
-                    # Then this h/h_fid ratio, when including in the q_par, becomes (h_fid/h)
-                f_growth = PK_properties_currentstep.get_redshift_evolution(q=0.215, z=z, vars=['growth'])[0,0]
+                # q_perp = PK_properties_currentstep.angular_diameter_distance(z) / self.dA_fid   * self.h_fiducial/h
+                # q_par = self.hz_fid / PK_properties_currentstep.h_of_z(z)                       * self.h_fiducial/h
+                # # this second ratio is to remove the h-units of the k-values (so, it is only needed when the k values are in h/Mpc units)
+                # # for example: kpar_obs[h/Mpc] = kpar_fid[h/Mpc]/ q_par * (h/h_fid) = kpar_fid[h/Mpc]/ (q_par * (h_fid/h))
+                #     # Then this h/h_fid ratio, when including in the q_par, becomes (h_fid/h)
+                # f_growth = PK_properties_currentstep.get_redshift_evolution(q=0.215, z=z, vars=['growth'])[0,0]
                 
             currentparams_input_for_pscalc = currentparamstemp
         except:
