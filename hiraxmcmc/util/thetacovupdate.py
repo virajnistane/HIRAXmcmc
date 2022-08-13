@@ -256,7 +256,7 @@ class ThetaCovUpdate:
         
         # if self.rankmpi == 0:
         #     print('sync achieved, transferring data to root'); sys.stdout.flush()
-            
+        
         # self.comm.Reduce(onlyParamsAcceptedTemp_part, onlyParamsAccepted_part, op=MPI.SUM, root=0)
         
         

@@ -128,7 +128,7 @@ class Ps2dFromPofk:
             try:
                 assert PKinterp == None
                 if pspackage == 'class':
-                    pofk_final = lambda k: PK_k_zClass(k,0)
+                    pofk_final = lambda k: PK_k_zClass(k,self.redshift_from_hiraxoutput)
                 elif pspackage == 'camb':
                     pofk_final = lambda k: PK_k_zClass(k)
             except:
@@ -138,7 +138,7 @@ class Ps2dFromPofk:
                 elif pspackage == 'camb':
                     pofk_final = lambda k: PKinterp.P(0 , k)
                     
-            return (pofk_final(k) * pspackage_properties.scale_independent_growth_factor(self.redshift_from_hiraxoutput)**2 #* self.D_growth(f_growth_interpFun, self.redshift_from_hiraxoutput)**2 
+            return (pofk_final(k) #* pspackage_properties.scale_independent_growth_factor(self.redshift_from_hiraxoutput)**2 
                     * (bias + f_growth * mu**2)**2)
         
         """
