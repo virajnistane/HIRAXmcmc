@@ -134,12 +134,12 @@ class Chi2Func:
         
         # PS 1D --> PS 2D
         self.ps_estimated = self.cp_sample.get_ps2d_from_pok(PK_k_zClass = self.pk_z_estimated,
-                                                             pspackage_properties = self.pspackage_properties,
                                                              q_perp_input = self.q_perp_for_ps_estimated, 
                                                              q_par_input = self.q_par_for_ps_estimated,
                                                              z=self.redshift,
                                                              currentparams_input = self.params_fixed.cosmoparams_fixed,
-                                                             f_growth = self.f_growth_for_ps_estimated)
+                                                             f_growth = self.f_growth_for_ps_estimated,
+                                                             D_growth = self.pspackage_properties.scale_independent_growth_factor(self.redshift))
         
         
     
