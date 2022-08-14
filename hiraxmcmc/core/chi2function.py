@@ -222,14 +222,16 @@ class Chi2Func:
         except:
             assert freqdep_paramstovary
             pkz_input_temp = PK_k_z_currentstep
-            
+        
+        D_growth_here = self.pspackage_properties.scale_independent_growth_factor(z)
+        
         pscalc = self.cp_params.get_ps2d_from_pok(PK_k_zClass = pkz_input_temp,
                                                   q_perp_input = q_perp,
                                                   q_par_input = q_par,
                                                   z=z,
                                                   currentparams_input = currentparams_input_for_pscalc,
                                                   f_growth = f_growth,
-                                                  D_growth = self.pspackage_properties.scale_independent_growth_factor(z))
+                                                  D_growth_z = D_growth_here)
         
         ps = (pscalc/self.ps_estimated - 1)
         
