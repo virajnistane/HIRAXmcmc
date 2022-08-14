@@ -229,7 +229,7 @@ class Chi2Func:
                                                   z=z,
                                                   currentparams_input = currentparams_input_for_pscalc,
                                                   f_growth = f_growth,
-                                                  D_growth = PK_properties_currentstep.scale_independent_growth_factor(z))
+                                                  D_growth = self.pspackage_properties.scale_independent_growth_factor(z))
         
         ps = (pscalc/self.ps_estimated - 1)
         
