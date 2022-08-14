@@ -128,7 +128,7 @@ class Ps2dFromPofk:
             try:
                 assert PKinterp == None
                 if pspackage == 'class':
-                    pofk_final = lambda k: PK_k_zClass(k,self.redshift_from_hiraxoutput)
+                    pofk_final = lambda k: PK_k_zClass(k,0) # PK_k_zClass(k,self.redshift_from_hiraxoutput)
                 elif pspackage == 'camb':
                     pofk_final = lambda k: PK_k_zClass(k)
             except:
@@ -138,7 +138,7 @@ class Ps2dFromPofk:
                 elif pspackage == 'camb':
                     pofk_final = lambda k: PKinterp.P(0 , k)
                     
-            return (pofk_final(k) #* pspackage_properties.scale_independent_growth_factor(self.redshift_from_hiraxoutput)**2 
+            return (pofk_final(k) * (pspackage_properties.scale_independent_growth_factor(self.redshift_from_hiraxoutput))**2 
                     * (bias + f_growth * mu**2)**2)
         
         """
@@ -146,14 +146,9 @@ class Ps2dFromPofk:
         """
         self.band_pk = [(lambda bandt: (lambda k, mu: 
                                         rescaling_factor 
-                                        # * P_kmu(self.k_obs(k,mu,
-                                        #                    qpar=q_par,qperp=q_perp),
-                                        #         self.mu_obs(mu,
-                                        #                     qpar=q_par,qperp=q_perp))
                                         * P_kmu(self.k1(k,mu,qpar=q_par,qperp=q_perp), 
                                                 self.mu1(mu,qpar=q_par,qperp=q_perp))
                                         * bandt(k, mu)
-                                        # check if you need to enter kobs and muobs as bandt args
                                         )
                          )
                         (band)
