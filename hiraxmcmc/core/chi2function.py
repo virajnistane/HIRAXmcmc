@@ -139,7 +139,7 @@ class Chi2Func:
                                                              z=self.redshift,
                                                              currentparams_input = self.params_fixed.cosmoparams_fixed,
                                                              f_growth = self.f_growth_for_ps_estimated,
-                                                             D_growth = self.pspackage_properties.scale_independent_growth_factor(self.redshift))
+                                                             D_growth_z = self.pspackage_properties.scale_independent_growth_factor(self.redshift))
         
         
     
