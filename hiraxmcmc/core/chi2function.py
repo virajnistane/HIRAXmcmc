@@ -140,7 +140,6 @@ class Chi2Func:
                                                              z=self.redshift,
                                                              currentparams_input = self.params_fixed.cosmoparams_fixed,
                                                              f_growth = self.f_growth_for_ps_estimated)
-                                                             # currentparams = self.params_fixed.current_params_fixed
         
         
     
@@ -225,12 +224,12 @@ class Chi2Func:
             pkz_input_temp = PK_k_z_currentstep
             
         pscalc = self.cp_params.get_ps2d_from_pok(PK_k_zClass = pkz_input_temp,
-                                                  pspackage_properties = self.pspackage_properties,
                                                   q_perp_input = q_perp,
                                                   q_par_input = q_par,
                                                   z=z,
                                                   currentparams_input = currentparams_input_for_pscalc,
-                                                  f_growth = f_growth)
+                                                  f_growth = f_growth,
+                                                  D_growth = PK_properties_currentstep.scale_independent_growth_factor(z))
         
         ps = (pscalc/self.ps_estimated - 1)
         

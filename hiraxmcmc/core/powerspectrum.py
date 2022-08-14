@@ -76,13 +76,13 @@ class Ps2dFromPofk:
         """
         For band func method for 2D PS 
         """
-        def D_growth(f_growth_interpFun,z):
+        def D_growth_fun(f_growth_interpFun,z):
             z1arr = np.arange(0,10)
             yy1 = np.exp(- cumtrapz(np.array([f_growth_interpFun(i)/(1+i) for i in z1arr]), initial=0) )
             tck = interp1d(z1arr, yy1, kind='cubic')
             return tck(z)*1
         
-        self.D_growth = D_growth
+        self.D_growth_fun = D_growth_fun
         
         # self.bounds = list(zip(self.kpa_al['kpar_start'], self.kpa_al['kpar_end'], self.kpe_al['kperp_start'], self.kpe_al['kperp_end']))
         def bandfunc_2d_cart(kpar_s, kpar_e, kperp_s, kperp_e):
@@ -114,9 +114,9 @@ class Ps2dFromPofk:
     """
     
     
-    def get_ps2d_bandfunc(self, PK_k_zClass, pspackage_properties, 
+    def get_ps2d_bandfunc(self, PK_k_zClass, 
                           pspackage, q_perp, q_par, 
-                          currentparams, f_growth, 
+                          currentparams, f_growth, D_growth,
                           bias=1, PKinterp=None):  #, currentparams
         
         # h = currentparams['H0']/100
@@ -138,7 +138,7 @@ class Ps2dFromPofk:
                 elif pspackage == 'camb':
                     pofk_final = lambda k: PKinterp.P(0 , k)
                     
-            return (pofk_final(k) * (pspackage_properties.scale_independent_growth_factor(self.redshift_from_hiraxoutput))**2 
+            return (pofk_final(k) * D_growth**2 
                     * (bias + f_growth * mu**2)**2)
         
         """
@@ -722,10 +722,10 @@ class CreatePs2d:
     
     def get_ps2d_from_pok(self,                                       # *^*^*^*^*^*^*^*^*^*^*^*^*
                           PK_k_zClass,
-                          pspackage_properties,
                           q_perp_input, q_par_input,
                           currentparams_input,
                           f_growth, 
+                          D_growth,
                           z=None):                          # currentparams,
         
         # if z == None:
@@ -734,12 +734,12 @@ class CreatePs2d:
         #     zv = z
         
         psds = self.ps2d_from_Pofk.get_ps2d_bandfunc(PK_k_zClass, 
-                                                     pspackage=self.pspackage, 
-                                                     pspackage_properties=pspackage_properties,
+                                                     pspackage=self.pspackage,
                                                      q_perp = q_perp_input, 
                                                      q_par = q_par_input,
                                                      currentparams = currentparams_input,
-                                                     f_growth = f_growth) #currentparams, 
+                                                     f_growth = f_growth,
+                                                     D_growth = D_growth) #currentparams, 
         
         return psds
     
