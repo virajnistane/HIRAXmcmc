@@ -116,7 +116,7 @@ class Ps2dFromPofk:
     
     def get_ps2d_bandfunc(self, PK_k_zClass, 
                           pspackage, q_perp, q_par, 
-                          currentparams, f_growth, D_growth,
+                          currentparams, f_growth, D_growth_z,
                           bias=1, PKinterp=None):  #, currentparams
         
         # h = currentparams['H0']/100
@@ -138,7 +138,7 @@ class Ps2dFromPofk:
                 elif pspackage == 'camb':
                     pofk_final = lambda k: PKinterp.P(0 , k)
                     
-            return (pofk_final(k) * D_growth**2 
+            return (pofk_final(k) * D_growth_z**2 
                     * (bias + f_growth * mu**2)**2)
         
         """
@@ -725,7 +725,7 @@ class CreatePs2d:
                           q_perp_input, q_par_input,
                           currentparams_input,
                           f_growth, 
-                          D_growth,
+                          D_growth_z,
                           z=None):                          # currentparams,
         
         # if z == None:
@@ -739,7 +739,7 @@ class CreatePs2d:
                                                      q_par = q_par_input,
                                                      currentparams = currentparams_input,
                                                      f_growth = f_growth,
-                                                     D_growth = D_growth) #currentparams, 
+                                                     D_growth_z = D_growth_z) #currentparams, 
         
         return psds
     
