@@ -361,6 +361,154 @@ class CreatePs2d:
     # =========================================================================
     
     
+    def new_pofk_from_class(self,
+                            currentparams, #=  ParametersFixed().current_params_fixed,
+                            z = None, 
+                            output_CLASS_instance = True,
+                            k_hunit_override = None,
+                            hubble_units_override = None
+                            ):
+        
+        currentparamstemp = currentparams.copy()
+        for i in self.cosmoparams_fixed:
+            try:
+                assert i in currentparamstemp.keys()
+            except:
+                currentparamstemp[i] = self.cosmoparams_fixed[i]
+        
+        try:
+            h = currentparamstemp['h']
+            H0 = h * 100
+        except:
+            H0 = currentparamstemp['H0']
+            h = H0/100
+        
+        if self.pstype == 'param':
+            omch2 = (1 - self.parameters_fixed.ombh2_fid/h**2 
+                     - (currentparamstemp['Oml'] + currentparamstemp['Omk'])
+                     - self.parameters_fixed.Omr_fid) * h**2
+        elif self.pstype == 'sample':
+            omch2 = self.parameters_fixed.omch2_fid
+            
+        self.pcl.set({'h': currentparamstemp['h'],
+                      'omega_b': self.parameters_fixed.ombh2_fid,
+                      'omega_cdm': omch2,
+                      'Omega_k': currentparamstemp['Omk'],
+                      'Omega_Lambda': currentparamstemp['Oml'],
+                      'w0_fld': currentparamstemp['w0'],
+                      'wa_fld': currentparamstemp['wa'],
+                      # 'sigma8': 0.824398
+                      })
+        
+        # self.pcl.set({'lensing':'no',
+        #               'output':'mPk',
+        #               'P_k_max_h/Mpc':20,
+        #               'z_max_pk':5,
+        #               'non linear':'none'
+        #               })
+        
+        try:
+            assert self.pstype == 'sample'
+            self.pcl.set({'lensing':'no',
+                          'output':'mPk',
+                          'P_k_max_h/Mpc':20,
+                          'z_max_pk':5,
+                          'non linear':'none'
+                          })
+        except:
+            assert self.pstype == 'param'
+            self.pcl.set({'lensing':'no',
+                          'output':'mPk',
+                          'P_k_max_h/Mpc':20,    # 1e-4 for cosmo_space for less compt time
+                          'z_max_pk':5,
+                          'non linear':'none'
+                          })
+        
+        # self.pcl.set(self.classprecisionsettings)
+        
+        
+        self.pcl.compute()
+        
+        
+        PK = self.pcl.pk
+        
+        
+        try:
+            assert k_hunit_override != None
+            k_hunit_val = k_hunit_override
+        except:
+            assert k_hunit_override == None
+            k_hunit_val = True
+        
+        
+        try:
+            assert hubble_units_override != None
+            hubble_units_val = hubble_units_override
+        except:
+            assert hubble_units_override == None
+            hubble_units_val = False
+        
+            
+        if k_hunit_val == True and hubble_units_val==True:
+            pk_k_z = lambda k,zv: PK(k*h, zv) * h**3
+        elif k_hunit_val == True and hubble_units_val==False:
+            pk_k_z = lambda k,zv: PK(k*h, zv)
+        elif k_hunit_val == False and hubble_units_val==True:
+            pk_k_z = lambda k,zv: PK(k, zv) * h**3
+        elif k_hunit_val == False and hubble_units_val==False:
+            pk_k_z = lambda k,zv: PK(k, zv)
+        
+        
+        
+        if output_CLASS_instance:
+            return pk_k_z, self.pcl
+        else:
+            return pk_k_z
+        
+    # =========================================================================
+    # =========================================================================
+    # =========================================================================
+    
+    @property
+    def get_pk_and_prop(self):
+        if self.pspackage == 'class':
+            # return self.pofk_from_class
+            return self.new_pofk_from_class
+        elif self.pspackage == 'camb':
+            return self.pofk_from_camb
+            
+        
+    # =========================================================================
+    # =========================================================================
+    # =========================================================================
+    
+    def get_ps2d_from_pok(self,                                       # *^*^*^*^*^*^*^*^*^*^*^*^*
+                          PK_k_zClass,
+                          q_perp_input, q_par_input,
+                          currentparams_input,
+                          f_growth, 
+                          D_growth_z,
+                          z=None):                          # currentparams,
+        
+        # if z == None:
+        #     zv = self.redshift_from_hiraxoutput
+        # else:
+        #     zv = z
+        
+        psds = self.ps2d_from_Pofk.get_ps2d_bandfunc(PK_k_zClass, 
+                                                     pspackage=self.pspackage,
+                                                     q_perp = q_perp_input, 
+                                                     q_par = q_par_input,
+                                                     currentparams = currentparams_input,
+                                                     f_growth = f_growth,
+                                                     D_growth_z = D_growth_z) #currentparams, 
+        
+        return psds
+    
+    # =============================================================================
+    #     Old definitions of p_of_k
+    # =============================================================================
+    
     def pofk_from_camb(self, 
                        currentparams =  ParametersFixed().cosmoparams_fixed,
                        z = None,
@@ -598,151 +746,6 @@ class CreatePs2d:
             return pk_k_z, self.pcl
         else:
             return pk_k_z
-    
-    def new_pofk_from_class(self,
-                            currentparams, #=  ParametersFixed().current_params_fixed,
-                            z = None, 
-                            output_CLASS_instance = True,
-                            k_hunit_override = None,
-                            hubble_units_override = None
-                            ):
-        
-        currentparamstemp = currentparams.copy()
-        for i in self.cosmoparams_fixed:
-            try:
-                assert i in currentparamstemp.keys()
-            except:
-                currentparamstemp[i] = self.cosmoparams_fixed[i]
-        
-        try:
-            h = currentparamstemp['h']
-            H0 = h * 100
-        except:
-            H0 = currentparamstemp['H0']
-            h = H0/100
-        
-        if self.pstype == 'param':
-            omch2 = (1 - self.parameters_fixed.ombh2_fid/h**2 
-                     - (currentparamstemp['Oml'] + currentparamstemp['Omk'])
-                     - self.parameters_fixed.Omr_fid) * h**2
-        elif self.pstype == 'sample':
-            omch2 = self.parameters_fixed.omch2_fid
-            
-        self.pcl.set({'h': currentparamstemp['h'],
-                      'omega_b': self.parameters_fixed.ombh2_fid,
-                      'omega_cdm': omch2,
-                      'Omega_k': currentparamstemp['Omk'],
-                      'Omega_Lambda': currentparamstemp['Oml'],
-                      'w0_fld': currentparamstemp['w0'],
-                      'wa_fld': currentparamstemp['wa'],
-                      # 'sigma8': 0.824398
-                      })
-        
-        # self.pcl.set({'lensing':'no',
-        #               'output':'mPk',
-        #               'P_k_max_h/Mpc':20,
-        #               'z_max_pk':5,
-        #               'non linear':'none'
-        #               })
-        
-        try:
-            assert self.pstype == 'sample'
-            self.pcl.set({'lensing':'no',
-                          'output':'mPk',
-                          'P_k_max_h/Mpc':20,
-                          'z_max_pk':5,
-                          'non linear':'none'
-                          })
-        except:
-            assert self.pstype == 'param'
-            self.pcl.set({'lensing':'no',
-                          'output':'mPk',
-                          'P_k_max_h/Mpc':1e-4,    # 1e-4 for cosmo_space for less compt time
-                          'z_max_pk':5,
-                          'non linear':'none'
-                          })
-        
-        # self.pcl.set(self.classprecisionsettings)
-        
-        
-        self.pcl.compute()
-        
-        
-        PK = self.pcl.pk
-        
-        
-        try:
-            assert k_hunit_override != None
-            k_hunit_val = k_hunit_override
-        except:
-            assert k_hunit_override == None
-            k_hunit_val = True
-        
-        
-        try:
-            assert hubble_units_override != None
-            hubble_units_val = hubble_units_override
-        except:
-            assert hubble_units_override == None
-            hubble_units_val = False
-        
-            
-        if k_hunit_val == True and hubble_units_val==True:
-            pk_k_z = lambda k,zv: PK(k*h, zv) * h**3
-        elif k_hunit_val == True and hubble_units_val==False:
-            pk_k_z = lambda k,zv: PK(k*h, zv)
-        elif k_hunit_val == False and hubble_units_val==True:
-            pk_k_z = lambda k,zv: PK(k, zv) * h**3
-        elif k_hunit_val == False and hubble_units_val==False:
-            pk_k_z = lambda k,zv: PK(k, zv)
-        
-        
-        
-        if output_CLASS_instance:
-            return pk_k_z, self.pcl
-        else:
-            return pk_k_z
-        
-    # =========================================================================
-    # =========================================================================
-    # =========================================================================
-    
-    @property
-    def get_pk_and_prop(self):
-        if self.pspackage == 'class':
-            # return self.pofk_from_class
-            return self.new_pofk_from_class
-        elif self.pspackage == 'camb':
-            return self.pofk_from_camb
-            
-        
-    # =========================================================================
-    # =========================================================================
-    # =========================================================================
-    
-    def get_ps2d_from_pok(self,                                       # *^*^*^*^*^*^*^*^*^*^*^*^*
-                          PK_k_zClass,
-                          q_perp_input, q_par_input,
-                          currentparams_input,
-                          f_growth, 
-                          D_growth_z,
-                          z=None):                          # currentparams,
-        
-        # if z == None:
-        #     zv = self.redshift_from_hiraxoutput
-        # else:
-        #     zv = z
-        
-        psds = self.ps2d_from_Pofk.get_ps2d_bandfunc(PK_k_zClass, 
-                                                     pspackage=self.pspackage,
-                                                     q_perp = q_perp_input, 
-                                                     q_par = q_par_input,
-                                                     currentparams = currentparams_input,
-                                                     f_growth = f_growth,
-                                                     D_growth_z = D_growth_z) #currentparams, 
-        
-        return psds
-    
     
     
 
