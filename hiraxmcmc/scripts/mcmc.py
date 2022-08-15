@@ -436,11 +436,6 @@ currentparams = params_fixed.current_params_to_vary_fixed(params_to_vary, toggle
 extract_ps2d = False
 
 
-# priors = {'H0':[50,90],
-#           'Omk':[-0.2,0.2],
-#           'Oml':[0.5,0.9],
-#           'w0':[-3,1],
-#           'wa':[-5,5]}
 
 priors = {}
 for pp in params_to_vary:
