@@ -68,6 +68,8 @@ class LoadOlderResults:
         self.prevRunLastSuffix_forChains = find_last_suffix(filenamepartToSearchFor='0_allparams_cc',dirnameToSearchIn=os.path.join(mcmc_mainrun_dir_relpath,'chains/run%s'%(self.prevrunindex)))
         self.prevRunLastSuffix_forFinal = find_last_suffix(filenamepartToSearchFor='%s_paramsAcceptedFinal_cambcamb'%(self.prevrunindex),dirnameToSearchIn=mcmc_mainrun_dir_relpath, filetype='final_allparams')
     
+        self.addsuffix_topassinchainfunc = None
+        
     """ Make text combinations of params possibly used in previous run """
     # comb_parameterssavetxt_prev = []
     # for i1, j1 in enumerate(ordered_params_list):
@@ -187,6 +189,7 @@ class LoadOlderResults:
         # self.thetacovauto = np.cov([H0prev, omkprev, omlprev, w0prev, waprev])
         self.thetacovauto = np.cov(prev_params_val)
         
+        self.addsuffix_topassinchainfunc = self.prevRunLastSuffix_forFinal
         
         try:
             ###### from corresponding chains
@@ -205,7 +208,7 @@ class LoadOlderResults:
                           ' <-- FROM -- ', 
                           'chains/run%s'%(self.prevrunindex)
                           ); sys.stdout.flush()
-        
+            
             
             
             # 2. Find the number of such files present.
@@ -362,9 +365,11 @@ class LoadOlderResults:
         for pi, pv in enumerate(self.p2v):
             self.currentparams[pv] = chains[self.rankmpi, int(pi+1), -1]
         
+        self.addsuffix_topassinchainfunc = self.prevRunLastSuffix_forChains
         
         if self.rankmpi == 0:
             print("Final data file ISN'T available for the previous run, so loading both thetacov and initial params from the previous chains"); sys.stdout.flush()
+        
         
     
     def firstrunparams(self,thetacov0):

@@ -46,7 +46,6 @@ class Ps2dFromPofk:
         #    |
         #   \|/
         #    V
-        # self.h_fix = self.parameters_fixed.h(self.parameters_fixed.H0_fix)
         self.h_fid = self.parameters_fixed.h_fid
         
         self.hirax_output = HiraxOutput(inputforhiraxoutput)    # inputforhiraxoutput = hiraxrundirname, psetype
@@ -73,16 +72,16 @@ class Ps2dFromPofk:
             return mu_fid/qpar * (mu_fid**2/qpar**2 + (1-mu_fid**2)/qperp**2)**(-0.5)
         self.mu1 = mu1
         
-        """
-        For band func method for 2D PS 
-        """
-        def D_growth_fun(f_growth_interpFun,z):
-            z1arr = np.arange(0,10)
-            yy1 = np.exp(- cumtrapz(np.array([f_growth_interpFun(i)/(1+i) for i in z1arr]), initial=0) )
-            tck = interp1d(z1arr, yy1, kind='cubic')
-            return tck(z)*1
+        # """
+        # For band func method for 2D PS 
+        # """
+        # def D_growth_fun(f_growth_interpFun,z):
+        #     z1arr = np.arange(0,10)
+        #     yy1 = np.exp(- cumtrapz(np.array([f_growth_interpFun(i)/(1+i) for i in z1arr]), initial=0) )
+        #     tck = interp1d(z1arr, yy1, kind='cubic')
+        #     return tck(z)*1
         
-        self.D_growth_fun = D_growth_fun
+        # self.D_growth_fun = D_growth_fun
         
         # self.bounds = list(zip(self.kpa_al['kpar_start'], self.kpa_al['kpar_end'], self.kpe_al['kperp_start'], self.kpe_al['kperp_end']))
         def bandfunc_2d_cart(kpar_s, kpar_e, kperp_s, kperp_e):
@@ -151,12 +150,6 @@ class Ps2dFromPofk:
                          )
                         (band)
                         for band in self.band_func]
-        
-        
-        
-        
-        
-        # print('i am here')
         
         psds1 = []
         iii = 0
@@ -314,14 +307,7 @@ class CreatePs2d:
         self.cosmoparams_fixed = self.parameters_fixed.cosmoparams_fixed
         self.inputforhiraxoutput = inputforhiraxoutput
         
-        # ====================================================================
-        # if pstype == 'sample':
-        #     self.OmMh2 = self.parameters_fixed.OmM_fid * self.parameters_fixed.h_fid**2 #self.parameters_fixed.Om_to_omh2(self.parameters_fixed.OmM_fix, self.parameters_fixed.H0_fix)
-        # elif pstype == 'param':
-        #     self.OmGv = self.parameters_fixed.OmG_fid
         
-        # self.findcambinifile = find_file('planck_2018.ini','~')
-        # ====================================================================
         if pspackage == 'camb':
             self.cambpars = camb.read_ini(os.path.join(self.modulelocation, 'planckfiles', 'planck_2018.ini'))
         elif pspackage == 'class':
@@ -391,38 +377,22 @@ class CreatePs2d:
         self.pcl.set({'h': currentparamstemp['h'],
                       'omega_b': self.parameters_fixed.ombh2_fid,
                       'omega_cdm': omch2,
-                      # 'Omega_g': self.parameters_fixed.Omg_fid,
                       'Omega_k': currentparamstemp['Omk'],
-                      #'Omega_Lambda': currentparamstemp['Oml'],
                       'Omega_fld': currentparamstemp['Oml'],
                       'w0_fld': currentparamstemp['w0'],
                       'wa_fld': currentparamstemp['wa'],
-                      # 'sigma8': 0.824398
+                      'sigma8': 0.8211752725010274
                       })
         
-        # self.pcl.set({'lensing':'no',
-        #               'output':'mPk',
-        #               'P_k_max_h/Mpc':20,
-        #               'z_max_pk':5,
-        #               'non linear':'none'
-        #               })
         
-        try:
-            assert self.pstype == 'sample'
-            self.pcl.set({'lensing':'no',
-                          'output':'mPk',
-                          'P_k_max_h/Mpc':20,
-                          'z_max_pk':5,
-                          'non linear':'none'
-                          })
-        except:
-            assert self.pstype == 'param'
-            self.pcl.set({'lensing':'no',
-                          'output':'mPk',
-                          'P_k_max_h/Mpc':1e-4,    # 1e-4 for cosmo_space for less compt time
-                          'z_max_pk':5,
-                          'non linear':'none'
-                          })
+        self.pcl.set({'lensing':'no',
+                      'output':'mPk',
+                      'P_k_max_h/Mpc':10,
+                      'z_max_pk':5,
+                      'non linear':'none'
+                      })
+        
+        
         
         # self.pcl.set(self.classprecisionsettings)
         
@@ -504,9 +474,19 @@ class CreatePs2d:
         
         return psds
     
-    # =============================================================================
+    # =========================================================================
+    # =========================================================================
+    # =========================================================================
+    # =========================================================================
+    # =========================================================================
+    # =========================================================================
+    # =========================================================================
+    # =========================================================================
+    # =========================================================================
+    
+    # =========================================================================
     #     Old definitions of p_of_k
-    # =============================================================================
+    # =========================================================================
     
     def pofk_from_camb(self, 
                        currentparams =  ParametersFixed().cosmoparams_fixed,

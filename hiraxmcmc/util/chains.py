@@ -11,7 +11,7 @@ from hiraxmcmc.util.basicfunctions import *
 
 class Chains:
     
-    def __init__(self, currentrunindex, totalParams_inclChi2, rankmpi, comm, testfilekw, parameterssavetxt, mcmc_mainrun_dir_relpath, write_out_paramsTrulyAccepted = False, deletePrevChainFiles=False):
+    def __init__(self, currentrunindex, totalParams_inclChi2, rankmpi, comm, testfilekw, parameterssavetxt, mcmc_mainrun_dir_relpath, addsuffix_fromLoadOldRes, write_out_paramsTrulyAccepted = False, deletePrevChainFiles=False):
         
         self.columnsInFile = totalParams_inclChi2
         self.currentrunindex = currentrunindex
@@ -37,10 +37,13 @@ class Chains:
                 addsuffix = find_last_suffix(filenamepartToSearchFor='0_allparams_cc%s'%(parameterssavetxt),dirnameToSearchIn=os.path.join(mcmc_mainrun_dir_relpath,'chains/run%s'%(int(currentrunindex))))
                 # self.addsuffix = addsuffix
             else:
-                prevSuffix = find_last_suffix(filenamepartToSearchFor='0_allparams_cc%s'%(parameterssavetxt),dirnameToSearchIn=os.path.join(mcmc_mainrun_dir_relpath,'chains/run%s'%(int(currentrunindex))))
-                xx = prevSuffix.split('_')[1]
-                addsuffix = '_' + '%02d'%(int(xx)+1)
-                # self.addsuffix = addsuffix
+                if addsuffix_fromLoadOldRes == None:
+                    prevSuffix = find_last_suffix(filenamepartToSearchFor='0_allparams_cc%s'%(parameterssavetxt),dirnameToSearchIn=os.path.join(mcmc_mainrun_dir_relpath,'chains/run%s'%(int(currentrunindex))))
+                    xx = prevSuffix.split('_')[1]
+                    addsuffix = '_' + '%02d'%(int(xx)+1)
+                    # self.addsuffix = addsuffix
+                elif addsuffix_fromLoadOldRes != None:
+                    addsuffix = addsuffix_fromLoadOldRes
         else:
             addsuffix = None
         

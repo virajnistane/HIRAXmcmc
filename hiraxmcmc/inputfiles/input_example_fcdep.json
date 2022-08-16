@@ -22,27 +22,22 @@
         "thetacov0": {
             "do_override": "no",
             "manual_input_variance": {
-                "H0": 0.8,
-                "Omk": 0.1,
-                "Oml": 0.03,
-                "w0": 1,
-                "wa": 1.5
+                "h": 0.06,
+                "Omk": 0.04,
+                "Oml": 0.02,
+                "w0": 0.01,
+                "wa": 0.6
             }
-        }
+        },
+        "burnin_for_run2": 10000
     },
     "likelihood": {
         "PS_cov": {
             "override": "no",
-            "filename_fullpath": ""
+            "filename_fullpath": "/scratch/s/sievers/nistanev/mcmc22/fc_400_500_PScov.dat"
         }
     },
     "PARAMS": {
-        "H0": {
-            "prior": [
-                50,
-                90
-            ]
-        },
         "h": {
             "prior": [
                 0.5,
@@ -108,5 +103,9 @@
             ],
             "freqdep": true
         }
+    },
+    "output": {
+        "write_out_truly_accepted_chains": true,
+        "extract_scaling_parameters_in_cosmo_case": true
     }
 }

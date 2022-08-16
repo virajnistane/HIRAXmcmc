@@ -99,8 +99,7 @@ class Chi2Func:
         except:
             H0 = self.cosmoparams_fixed['H0']
             self.h_fiducial = H0/100
-
-
+        
         """ createPS2D instances """
         
         self.ps2d_from_Pofk = Ps2dFromPofk(inputforhiraxoutput = self.inputforhiraxoutput)
@@ -166,8 +165,8 @@ class Chi2Func:
             
             try:
                 assert self.cp_params.pspackage == 'class'
-                q_perp = PK_properties_currentstep.angular_distance(z) / self.dA_fid #* self.h_fiducial/h
-                q_par = self.hz_fid / PK_properties_currentstep.Hubble(z)            #* self.h_fiducial/h
+                q_perp = PK_properties_currentstep.angular_distance(z) / self.dA_fid * self.h_fiducial/h
+                q_par = self.hz_fid / PK_properties_currentstep.Hubble(z)            * self.h_fiducial/h
                 # this second ratio is to remove the h-units of the k-values (so, it is only needed when the k values are in h/Mpc units)
                 # for example: kpar_obs[h/Mpc] = kpar_fid[h/Mpc]/ q_par * (h/h_fid) = kpar_fid[h/Mpc]/ (q_par * (h_fid/h))
                     # Then this h/h_fid ratio, when including in the q_par, becomes (h_fid/h)
@@ -216,16 +215,16 @@ class Chi2Func:
         self.q_par = q_par
         self.fz = f_growth
         
-        try:
-            assert not(freqdep_paramstovary)
-            pkz_input_temp = self.pk_z_estimated
-        except:
-            assert freqdep_paramstovary
-            pkz_input_temp = PK_k_z_currentstep
+        # try:
+        #     assert not(freqdep_paramstovary)
+        #     pkz_input_temp = self.pk_z_estimated
+        # except:
+        #     assert freqdep_paramstovary
+        #     pkz_input_temp = PK_k_z_currentstep
         
-        D_growth_here = self.pspackage_properties.scale_independent_growth_factor(z)
+        D_growth_here = PK_properties_currentstep.scale_independent_growth_factor(z)
         
-        pscalc = self.cp_params.get_ps2d_from_pok(PK_k_zClass = pkz_input_temp,
+        pscalc = self.cp_params.get_ps2d_from_pok(PK_k_zClass = PK_k_z_currentstep,
                                                   q_perp_input = q_perp,
                                                   q_par_input = q_par,
                                                   z=z,

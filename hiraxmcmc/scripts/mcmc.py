@@ -122,15 +122,15 @@ except:
         #                   'thetacovold_until': 10000,
         #                   'TRFold_until': 16000,
         #                   'thetacov0': {'do_override': 'no',
-        #                                 'manual_input_variance': {'H0': 0.8,
-        #                                                           'Omk': 0.1,
-        #                                                           'Oml': 0.03,
-        #                                                           'w0': 1,
-        #                                                           'wa': 1.5}}},
+        #                                 'manual_input_variance': {'h': 0.06,
+        #                                                           'Omk': 0.04,
+        #                                                           'Oml': 0.02,
+        #                                                           'w0': 0.01,
+        #                                                           'wa': 0.6}},
+        #                   'burnin_for_run2': 10000},
         #           'likelihood': {'PS_cov': {'override': 'no', 
-        #                                     'filename_fullpath': ''}},
-        #           'PARAMS': {'H0': {'prior': [50, 90]},
-        #                       'h': {'prior': [0.5, 0.9]},
+        #                                     'filename_fullpath': '/scratch/s/sievers/nistanev/mcmc22/fc_400_500_PScov.dat'}},
+        #           'PARAMS': {'h': {'prior': [0.5, 0.9]},
         #                       'Omk': {'prior': [-0.2, 0.2]},
         #                       'Oml': {'prior': [0.5, 0.9]},
         #                       'w0': {'prior': [-2, 0]},
@@ -139,7 +139,9 @@ except:
         #                       'h(z)': {'prior': [0.0001, 0.001], 'freqdep': True},
         #                       'qperp(z)': {'prior': [0.3, 1.7], 'freqdep': True},
         #                       'dA(z)': {'prior': [800, 3000], 'freqdep': True},
-        #                       'f(z)': {'prior': [0.2, 1.2], 'freqdep': True}}}
+        #                       'f(z)': {'prior': [0.2, 1.2], 'freqdep': True}},
+        #           'output': {'write_out_truly_accepted_chains': True,
+        #                       'extract_scaling_parameters_in_cosmo_case': True}}
         
         INPUT = {'current_run_index': 1,
                   'params_to_vary': ['h', 'Omk', 'Oml'],
@@ -152,15 +154,15 @@ except:
                           'thetacovold_until': 4000,
                           'TRFold_until': 6000,
                           'thetacov0': {'do_override': 'yes',
-                                        'manual_input_variance': {'h': 0.25,
-                                                                  'Omk': 0.1,
-                                                                  'Oml': 0.03,
-                                                                  'w0': 1,
-                                                                  'wa': 1.5}}},
+                                        'manual_input_variance': {'h': 0.06,
+                                                                  'Omk': 0.04,
+                                                                  'Oml': 0.02,
+                                                                  'w0': 0.01,
+                                                                  'wa': 0.6}},
+                          'burnin_for_run2': 4000},
                   'likelihood': {'PS_cov': {'override': 'no', 
-                                            'filename_fullpath': ''}},
-                  'PARAMS': {'H0': {'prior': [50, 90]},
-                              'h': {'prior': [0.5, 0.9]},
+                                            'filename_fullpath': '/scratch/s/sievers/nistanev/mcmc22/fc_400_500_PScov.dat'}},
+                  'PARAMS': {'h': {'prior': [0.5, 0.9]},
                               'Omk': {'prior': [-0.2, 0.2]},
                               'Oml': {'prior': [0.5, 0.9]},
                               'w0': {'prior': [-2, 0]},
@@ -169,7 +171,9 @@ except:
                               'h(z)': {'prior': [0.0001, 0.001], 'freqdep': True},
                               'qperp(z)': {'prior': [0.3, 1.7], 'freqdep': True},
                               'dA(z)': {'prior': [800, 3000], 'freqdep': True},
-                              'f(z)': {'prior': [0.2, 1.2], 'freqdep': True}}}
+                              'f(z)': {'prior': [0.2, 1.2], 'freqdep': True}},
+                  'output': {'write_out_truly_accepted_chains': True,
+                              'extract_scaling_parameters_in_cosmo_case': True}}
         
         
         
@@ -191,11 +195,12 @@ except:
                              'thetacovold_until': 40,
                              'TRFold_until': 60,
                              'thetacov0': {'do_override': 'yes',
-                                           'manual_input_variance': {'h': 0.25,
-                                                                     'Omk': 0.1,
-                                                                     'Oml': 0.03,
-                                                                     'w0': 1,
-                                                                     'wa': 1.5}}}
+                                           'manual_input_variance': {'h': 0.06,
+                                                                     'Omk': 0.04,
+                                                                     'Oml': 0.02,
+                                                                     'w0': 0.01,
+                                                                     'wa': 0.6}},
+                             'burnin_for_run2': 40}
             with open('../inputfiles/input_example_cosmo_local.json','w') as f:
                 json.dump(INPUT, f, indent=4)
             raise ValueError
@@ -324,7 +329,7 @@ if rank_mpi == 0:
 
 
 
-extractScalingParams = 1
+extractScalingParams = INPUT['output']['extract_scaling_parameters_in_cosmo_case']
 
 if extractScalingParams:
     try:
@@ -592,7 +597,7 @@ load_old_res = LoadOlderResults(currentrunindex, params_to_vary, currentparams, 
 
 load_old_res.check_parameterssavetxt_prev()
 
-burnin_length_for_each_chain_input = 4000
+burnin_length_for_each_chain_input = INPUT['mcmc']['burnin_for_run2']
 
 try:
     try:
@@ -602,7 +607,8 @@ try:
             load_old_res.load_allparams_file_and_chains(totalParams_inclChi2)
     except:
         load_old_res.load_allParams_chains_only(totalParams_inclChi2)
-        
+    
+    
     # load_old_res.load_allParams_chains_only(totalParams_inclChi2)
 except:
     assert int(currentrunindex) == 1
@@ -610,7 +616,7 @@ except:
     if rank_mpi == 0:
         print("First run parameters loaded, check the files if you think this is an error.")
 
-
+addsuffix_topassinchainfunc_fromLoadOldRes = load_old_res.addsuffix_topassinchainfunc
 
 
 
@@ -788,7 +794,11 @@ Chains are saved for all params together for each chain (rank_mpi) separately in
 
 chainf = Chains(currentrunindex= currentrunindex, totalParams_inclChi2=totalParams_inclChi2,
                 rankmpi=rank_mpi, comm=comm, testfilekw=testfilekw, 
-                parameterssavetxt=parameterssavetxt, write_out_paramsTrulyAccepted=True, mcmc_mainrun_dir_relpath=mcmc_mainrun_dir_relpath)
+                parameterssavetxt=parameterssavetxt, 
+                addsuffix_fromLoadOldRes = addsuffix_topassinchainfunc_fromLoadOldRes,
+                write_out_paramsTrulyAccepted=INPUT['output']['write_out_truly_accepted_chains'], 
+                mcmc_mainrun_dir_relpath=mcmc_mainrun_dir_relpath)
+
 # chainf = Chains(totalParams_inclChi2, sys.argv, rank_mpi, testfilekw, parameterssavetxt, write_out_paramsTrulyAccepted=True)
 
 # if rank_mpi == 0:
@@ -796,7 +806,9 @@ chainf = Chains(currentrunindex= currentrunindex, totalParams_inclChi2=totalPara
 if extractScalingParams:
     chainf_sca = Chains(currentrunindex= currentrunindex, totalParams_inclChi2=4,
                         rankmpi=rank_mpi, comm=comm, testfilekw=testfilekw, 
-                        parameterssavetxt='_qpar(z)_qperp(z)_f(z)', write_out_paramsTrulyAccepted=False, mcmc_mainrun_dir_relpath=mcmc_mainrun_dir_relpath)
+                        parameterssavetxt='_qpar(z)_qperp(z)_f(z)', 
+                        addsuffix_fromLoadOldRes = addsuffix_topassinchainfunc_fromLoadOldRes,
+                        write_out_paramsTrulyAccepted=False, mcmc_mainrun_dir_relpath=mcmc_mainrun_dir_relpath)
 
 print('\n')
 
@@ -1025,25 +1037,6 @@ for ii in np.arange(1,int(niterations+1)):
                                                            currentparams=currentparams,
                                                            cosmoparams=cosmoparams_fixed)
         
-        # try:
-        #     assert not(freqdep_paramstovary)
-        #     chi2new1 = {}
-        #     for freqc,val in inputforhiraxoutput.items():
-        #         chi2new1[freqc] = chi2_func[freqc].chi2_multiz(PK_k_z_currentstep=PK_k_z_current, 
-        #                                                       PK_properties_currentstep=CLASS_instance_current, 
-        #                                                       z=val[2],
-        #                                                       currentparams=currentparams)
-        # except:
-        #     assert freqdep_paramstovary
-        #     chi2new1 = {}
-        #     for freqc,val in inputforhiraxoutput.items():
-        #         chi2new1[freqc] = chi2_func[freqc].chi2_multiz_p2vfreqdep(PK_k_z_currentstep=PK_k_z_current, 
-        #                                                                  PK_properties_currentstep=CLASS_instance_current, 
-        #                                                                  z=val[2],
-        #                                                                  currentparams=currentparams,
-        #                                                                  cosmoparams=cosmoparams_fixed)
-        
-        
         
         chi2new = np.sum(list(chi2new1.values()))
         
@@ -1170,7 +1163,7 @@ for ii in np.arange(1,int(niterations+1)):
         assert extractScalingParams
         chainf_sca.write_chains(stepindex=ii, paramsAcceptedarg=scalingParamsAccepted, paramsTrulyAcceptedarg=scalingParamsAccepted)
     except:
-        not(extractScalingParams)
+        assert not(extractScalingParams)
     
     if doExtractForML and np.mod(ii,1000) == 0:
         extractforml.save_final_array_ps2d_all(extractforml.ps2darrall)
