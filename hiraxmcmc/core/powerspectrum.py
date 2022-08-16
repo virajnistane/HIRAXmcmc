@@ -391,7 +391,7 @@ class CreatePs2d:
         self.pcl.set({'h': currentparamstemp['h'],
                       'omega_b': self.parameters_fixed.ombh2_fid,
                       'omega_cdm': omch2,
-                      'Omega_g': self.parameters_fixed.Omg_fid,
+                      # 'Omega_g': self.parameters_fixed.Omg_fid,
                       'Omega_k': currentparamstemp['Omk'],
                       'Omega_Lambda': currentparamstemp['Oml'],
                       # 'Omega_fld': currentparamstemp['Oml'],
