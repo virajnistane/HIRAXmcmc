@@ -83,7 +83,7 @@ if rank_mpi == 0:
 # IIIIIIIIIIII   N      N    P             UUUU          T
 # =============================================================================
 
-input_override = 0
+input_override = 1
 
 try:
     assert not(input_override)
@@ -125,7 +125,7 @@ except:
         #                                 'manual_input_variance': {'H0': 0.8,
         #                                                           'Omk': 0.1,
         #                                                           'Oml': 0.03,
-        #                                                           'w0': 0.2,
+        #                                                           'w0': 1,
         #                                                           'wa': 1.5}}},
         #           'likelihood': {'PS_cov': {'override': 'no', 
         #                                     'filename_fullpath': ''}},
@@ -133,8 +133,8 @@ except:
         #                       'h': {'prior': [0.5, 0.9]},
         #                       'Omk': {'prior': [-0.2, 0.2]},
         #                       'Oml': {'prior': [0.5, 0.9]},
-        #                       'w0': {'prior': [-3, 1]},
-        #                       'wa': {'prior': [-5, 5]},
+        #                       'w0': {'prior': [-2, 0]},
+        #                       'wa': {'prior': [-1, 1]},
         #                       'qpar(z)': {'prior': [0.3, 1.7], 'freqdep': True},
         #                       'h(z)': {'prior': [0.0001, 0.001], 'freqdep': True},
         #                       'qperp(z)': {'prior': [0.3, 1.7], 'freqdep': True},
@@ -155,7 +155,7 @@ except:
                                         'manual_input_variance': {'h': 0.25,
                                                                   'Omk': 0.1,
                                                                   'Oml': 0.03,
-                                                                  'w0': 0.2,
+                                                                  'w0': 1,
                                                                   'wa': 1.5}}},
                   'likelihood': {'PS_cov': {'override': 'no', 
                                             'filename_fullpath': ''}},
@@ -163,8 +163,8 @@ except:
                               'h': {'prior': [0.5, 0.9]},
                               'Omk': {'prior': [-0.2, 0.2]},
                               'Oml': {'prior': [0.5, 0.9]},
-                              'w0': {'prior': [-3, 1]},
-                              'wa': {'prior': [-5, 5]},
+                              'w0': {'prior': [-2, 0]},
+                              'wa': {'prior': [-1, 1]},
                               'qpar(z)': {'prior': [0.3, 1.7], 'freqdep': True},
                               'h(z)': {'prior': [0.0001, 0.001], 'freqdep': True},
                               'qperp(z)': {'prior': [0.3, 1.7], 'freqdep': True},
@@ -184,7 +184,7 @@ except:
                 json.dump(INPUT, f, indent=4)
             raise ValueError
             
-        if 0:
+        if 1:
             INPUT['mcmc'] = {'nsteps': 200,
                              'do_update_thetacov': 'yes',
                              'dothetacovupdateafterevery': 10,
@@ -194,7 +194,7 @@ except:
                                            'manual_input_variance': {'h': 0.25,
                                                                      'Omk': 0.1,
                                                                      'Oml': 0.03,
-                                                                     'w0': 0.2,
+                                                                     'w0': 1,
                                                                      'wa': 1.5}}}
             with open('../inputfiles/input_example_cosmo_local.json','w') as f:
                 json.dump(INPUT, f, indent=4)
