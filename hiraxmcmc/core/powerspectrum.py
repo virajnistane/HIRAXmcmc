@@ -393,8 +393,8 @@ class CreatePs2d:
                       'omega_cdm': omch2,
                       # 'Omega_g': self.parameters_fixed.Omg_fid,
                       'Omega_k': currentparamstemp['Omk'],
-                      'Omega_Lambda': currentparamstemp['Oml'],
-                      # 'Omega_fld': currentparamstemp['Oml'],
+                      #'Omega_Lambda': currentparamstemp['Oml'],
+                      'Omega_fld': currentparamstemp['Oml'],
                       'w0_fld': currentparamstemp['w0'],
                       'wa_fld': currentparamstemp['wa'],
                       # 'sigma8': 0.824398
