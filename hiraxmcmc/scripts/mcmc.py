@@ -83,7 +83,7 @@ if rank_mpi == 0:
 # IIIIIIIIIIII   N      N    P             UUUU          T
 # =============================================================================
 
-input_override = 1
+input_override = 0
 
 try:
     assert not(input_override)
@@ -184,7 +184,7 @@ except:
                 json.dump(INPUT, f, indent=4)
             raise ValueError
             
-        if 1:
+        if 0:
             INPUT['mcmc'] = {'nsteps': 200,
                              'do_update_thetacov': 'yes',
                              'dothetacovupdateafterevery': 10,
