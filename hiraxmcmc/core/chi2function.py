@@ -198,14 +198,14 @@ class Chi2Func:
                 h = H0/100
             
             try:
-                q_par = currentparams['qpar(z)']                * self.h_fiducial/h
+                q_par = currentparams['qpar(z)']                #* self.h_fiducial/h
             except:
-                q_par = self.hz_fid / currentparams['h(z)']     * self.h_fiducial/h
+                q_par = self.hz_fid / currentparams['h(z)']     #* self.h_fiducial/h
                 
             try:
-                q_perp = currentparams['qperp(z)']              * self.h_fiducial/h
+                q_perp = currentparams['qperp(z)']              #* self.h_fiducial/h
             except:
-                q_perp = currentparams['dA(z)'] / self.dA_fid   * self.h_fiducial/h
+                q_perp = currentparams['dA(z)'] / self.dA_fid   #* self.h_fiducial/h
                 
             
             f_growth = currentparams['f(z)']
