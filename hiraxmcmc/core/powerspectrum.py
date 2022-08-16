@@ -382,9 +382,9 @@ class CreatePs2d:
             h = H0/100
         
         if self.pstype == 'param':
-            omch2 = (1 - self.parameters_fixed.ombh2_fid/h**2 
-                     - (currentparamstemp['Oml'] + currentparamstemp['Omk'])
-                     - self.parameters_fixed.Omr_fid) * h**2
+            OmM = 1 - (currentparamstemp['Oml'] + currentparamstemp['Omk'] 
+                       + self.parameters_fixed.Omr_fid)
+            omch2 = OmM * h**2 - self.parameters_fixed.ombh2_fid
         elif self.pstype == 'sample':
             omch2 = self.parameters_fixed.omch2_fid
             
@@ -393,7 +393,8 @@ class CreatePs2d:
                       'omega_cdm': omch2,
                       'Omega_g': self.parameters_fixed.Omg_fid,
                       'Omega_k': currentparamstemp['Omk'],
-                      'Omega_Lambda': currentparamstemp['Oml'],
+                      #'Omega_Lambda': currentparamstemp['Oml'],
+                      'Omega_fld': currentparamstemp['Oml'],
                       'w0_fld': currentparamstemp['w0'],
                       'wa_fld': currentparamstemp['wa'],
                       # 'sigma8': 0.824398
@@ -418,7 +419,7 @@ class CreatePs2d:
             assert self.pstype == 'param'
             self.pcl.set({'lensing':'no',
                           'output':'mPk',
-                          'P_k_max_h/Mpc':1e-4,    # 1e-4 for cosmo_space for less compt time
+                          'P_k_max_h/Mpc':20,    # 1e-4 for cosmo_space for less compt time
                           'z_max_pk':5,
                           'non linear':'none'
                           })
@@ -471,7 +472,6 @@ class CreatePs2d:
     @property
     def get_pk_and_prop(self):
         if self.pspackage == 'class':
-            # return self.pofk_from_class
             return self.new_pofk_from_class
         elif self.pspackage == 'camb':
             return self.pofk_from_camb
