@@ -382,9 +382,10 @@ class CreatePs2d:
             h = H0/100
         
         if self.pstype == 'param':
-            OmM = 1 - (currentparamstemp['Oml'] + currentparamstemp['Omk'] 
-                       + self.parameters_fixed.Omr_fid)
-            omch2 = OmM * h**2 - self.parameters_fixed.ombh2_fid
+            # OmM = 1 - (currentparamstemp['Oml'] + currentparamstemp['Omk'] 
+                       # + self.parameters_fixed.Omr_fid)
+            omch2 = (1 - (currentparamstemp['Oml'] + currentparamstemp['Omk'] 
+                       + self.parameters_fixed.Omr_fid)) * h**2 - self.parameters_fixed.ombh2_fid
         elif self.pstype == 'sample':
             omch2 = self.parameters_fixed.omch2_fid
             
