@@ -971,11 +971,12 @@ time.sleep(5)
 #                                \  /
 #                                 \/
 
+def u():
+    return np.random.uniform(0,1)
 
 for ii in np.arange(1,int(niterations+1)):
     
-    def u():
-        return np.random.uniform(0,1)
+    
         
     # if ii == 1:
     #     if not(freqdep_paramstovary):
@@ -1012,19 +1013,11 @@ for ii in np.arange(1,int(niterations+1)):
         # any of "chi2_func_*" works for pofk_interpolator_for_pscalc
         try:
             assert not(freqdep_paramstovary)
-            # try:
-            #     assert ii >20
-            # except:
-            #     assert ii <=20
-            #     if rank_mpi == 0:
-            #         timertime0 = time.time()
+            # if rank_mpi == 0:
+            #     timertime0 = time.time()
             PK_k_z_current , CLASS_instance_current = chi2_func[key0].cp_params.get_pk_and_prop(currentparams=currentparams)
-            # try:
-            #     assert ii >20
-            # except:
-            #     assert ii <=20
-            #     if rank_mpi == 0:
-            #         print("time for CLASS comp:",time.time()-timertime0)
+            # if rank_mpi == 0:
+            #     print("time for CLASS comp:",time.time()-timertime0)
         except:
             assert freqdep_paramstovary
             
@@ -1053,9 +1046,8 @@ for ii in np.arange(1,int(niterations+1)):
         
         
         
-        
-        if chi2new < chi2old or np.exp(-0.5*(chi2new-chi2old)) > u():          # MAIN SELECTION LINE
-            # paramsAccepted[:,ii] = [chi2new, currentparams['H0'], currentparams['Omk'], currentparams['Oml'], currentparams['w0'], currentparams['wa']]            
+        # MAIN SELECTION LINE
+        if chi2new < chi2old or np.exp(-0.5*(chi2new-chi2old)) > u():          
             
             paramsAccepted[0,ii]         = chi2new
             try:
@@ -1080,17 +1072,10 @@ for ii in np.arange(1,int(niterations+1)):
             print("Step:",ii,"\n χ2 =",chi2new,"@rank =",rank_mpi); sys.stdout.flush()
             
             
-            # paramsTrulyAccepted[:,ii] = [chi2new, currentparams['H0'], currentparams['Omk'], currentparams['Oml'], currentparams['w0'], currentparams['wa']]
-            
-            
-            # paramsTrulyAccepted[0,ii]     = chi2new
-            # paramsTrulyAccepted[1:5,ii]   = list(  list(currentparams.values())[0].values()  )
-            # paramsTrulyAccepted[5:9,ii]   = list(  list(currentparams.values())[1].values()  )
-            # paramsTrulyAccepted[9:13,ii]  = list(  list(currentparams.values())[2].values()  )
-            
             
             # if rank_mpi==0:
             #     ps2darr[int(nonZeroElementsLen + ii - 1)] = pscalcnew
+            
             if doExtractForML:
                 extractforml.accepted_or_rejected_param(accepted=1, currentstep=ii)
             
@@ -1134,22 +1119,11 @@ for ii in np.arange(1,int(niterations+1)):
     # =============================================================================
     
     thetanew = paramsAccepted[1:,ii]
-    
-    # currentparams['H0'], currentparams['Omk'], currentparams['Oml'], currentparams['w0'], currentparams['wa'] = mvn(thetanew, thetacov)
-    
+        
     newpoint_temp = mvn(thetanew , thetacov)
     
     for i, j in enumerate(params_to_vary):
         currentparams[j] = newpoint_temp[i]
-    
-
-    # try:
-    #     assert not(freqdep_paramstovary)
-    #     currentparams['H0'], currentparams['Omk'], currentparams['Oml'], currentparams['w0'], currentparams['wa'] = mvn(thetanew, thetacov)
-    # except:
-    #     assert freqdep_paramstovary
-    #     for fc_i, fc_j in enumerate(inputforhiraxoutput.keys()):
-    #         currentparams['h(z)'], currentparams['dA(z)'], currentparams['f(z)'] = mvn(thetanew[fc_i::], thetacov)
     
     
     

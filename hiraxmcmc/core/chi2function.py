@@ -136,13 +136,14 @@ class Chi2Func:
                                                              q_perp_input = self.q_perp_for_ps_estimated, 
                                                              q_par_input = self.q_par_for_ps_estimated,
                                                              z=self.redshift,
-                                                             currentparams_input = self.params_fixed.cosmoparams_fixed,
-                                                             f_growth = self.f_growth_for_ps_estimated,
-                                                             D_growth_z = self.pspackage_properties.scale_independent_growth_factor(self.redshift))
+                                                             f_growth = self.f_growth_for_ps_estimated
+                                                             # currentparams_input = self.params_fixed.cosmoparams_fixed,
+                                                             # D_growth_z = self.pspackage_properties.scale_independent_growth_factor(self.redshift)
+                                                             )
         
         
     
-    def chi2_multiz(self, PK_k_z_currentstep, PK_properties_currentstep, z, currentparams, cosmoparams):  # currentparams,
+    def chi2_multiz(self, PK_k_z_currentstep, PK_properties_currentstep, z, currentparams, cosmoparams):  
         
         freqdep_paramstovary = checkconditionforlist(list(currentparams.keys()), allelements_have_subpart='(z)')
         
@@ -222,15 +223,16 @@ class Chi2Func:
         #     assert freqdep_paramstovary
         #     pkz_input_temp = PK_k_z_currentstep
         
-        D_growth_here = PK_properties_currentstep.scale_independent_growth_factor(z)
+        # D_growth_here = PK_properties_currentstep.scale_independent_growth_factor(z)
         
         pscalc = self.cp_params.get_ps2d_from_pok(PK_k_zClass = PK_k_z_currentstep,
                                                   q_perp_input = q_perp,
                                                   q_par_input = q_par,
                                                   z=z,
-                                                  currentparams_input = currentparams_input_for_pscalc,
-                                                  f_growth = f_growth,
-                                                  D_growth_z = D_growth_here)
+                                                  f_growth = f_growth
+                                                  # currentparams_input = currentparams_input_for_pscalc,
+                                                  # D_growth_z = D_growth_here
+                                                  )
         
         ps = (pscalc/self.ps_estimated - 1)
         

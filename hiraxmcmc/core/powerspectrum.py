@@ -46,7 +46,7 @@ class Ps2dFromPofk:
         #    |
         #   \|/
         #    V
-        self.h_fid = self.parameters_fixed.h_fid
+        # self.h_fid = self.parameters_fixed.h_fid
         
         self.hirax_output = HiraxOutput(inputforhiraxoutput)    # inputforhiraxoutput = hiraxrundirname, psetype
         # |__
@@ -115,7 +115,7 @@ class Ps2dFromPofk:
     
     def get_ps2d_bandfunc(self, PK_k_zClass, 
                           pspackage, q_perp, q_par, 
-                          currentparams, f_growth, D_growth_z,
+                          f_growth, #currentparams, D_growth_z,
                           bias=1, PKinterp=None):  #, currentparams
         
         # h = currentparams['H0']/100
@@ -126,18 +126,20 @@ class Ps2dFromPofk:
         def P_kmu(k,mu):
             try:
                 assert PKinterp == None
-                if pspackage == 'class':
-                    pofk_final = lambda k: PK_k_zClass(k,0) # PK_k_zClass(k,self.redshift_from_hiraxoutput)
-                elif pspackage == 'camb':
-                    pofk_final = lambda k: PK_k_zClass(k)
+                assert pspackage == 'class'
+                pofk_final = lambda k: PK_k_zClass(k,self.redshift_from_hiraxoutput)
+                # elif pspackage == 'camb':
+                #     pofk_final = lambda k: PK_k_zClass(k)
             except:
                 print("PKinterp argument entered! Running exception")
-                if pspackage == 'class':
-                    pofk_final = lambda k: PKinterp(k, 0)
-                elif pspackage == 'camb':
-                    pofk_final = lambda k: PKinterp.P(0 , k)
+                assert pspackage == 'class'
+                pofk_final = lambda k: PKinterp(k, 0)
+                # elif pspackage == 'camb':
+                #     pofk_final = lambda k: PKinterp.P(0 , k)
+                
+                # THIS CASE NEEDS TO BE CHECHKED AT SOME POINT 
                     
-            return (pofk_final(k) * D_growth_z**2 
+            return (pofk_final(k) #* D_growth_z**2 
                     * (bias + f_growth * mu**2)**2)
         
         
@@ -381,14 +383,14 @@ class CreatePs2d:
                       'Omega_fld': currentparamstemp['Oml'],
                       'w0_fld': currentparamstemp['w0'],
                       'wa_fld': currentparamstemp['wa'],
-                      # 'sigma8': 0.8211752725010274
+                      'sigma8': 0.8211752725010274
                       })
         
         
         self.pcl.set({'lensing':'no',
                       'output':'mPk',
-                      'P_k_max_h/Mpc':10,
-                      'z_max_pk':5,
+                      'P_k_max_h/Mpc':2,
+                      'z_max_pk':3.5,
                       'non linear':'none'
                       })
         
@@ -454,9 +456,9 @@ class CreatePs2d:
     def get_ps2d_from_pok(self,                                       # *^*^*^*^*^*^*^*^*^*^*^*^*
                           PK_k_zClass,
                           q_perp_input, q_par_input,
-                          currentparams_input,
                           f_growth, 
-                          D_growth_z,
+                          # currentparams_input,
+                          # D_growth_z,
                           z=None):                          # currentparams,
         
         # if z == None:
@@ -468,9 +470,10 @@ class CreatePs2d:
                                                      pspackage=self.pspackage,
                                                      q_perp = q_perp_input, 
                                                      q_par = q_par_input,
-                                                     currentparams = currentparams_input,
-                                                     f_growth = f_growth,
-                                                     D_growth_z = D_growth_z) #currentparams, 
+                                                     f_growth = f_growth
+                                                     # currentparams = currentparams_input,
+                                                     # D_growth_z = D_growth_z
+                                                     ) #currentparams, 
         
         return psds
     
