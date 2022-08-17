@@ -162,7 +162,29 @@ class ThetaCovUpdate:
         elif self.do_update_thetacov in ['no','false','0']:
             self.thetacovUpdate = self.thetacovNoUpdate
     
-    
+        def covfuninput(onlyParamsAccepted_together_input, 
+                        lasthowmany_for_cov=None, 
+                        startingfrom_for_cov=None):
+            if lasthowmany_for_cov == None and startingfrom_for_cov == None:
+                lasthowmany_for_cov = onlyParamsAccepted_together_input.shape[-1]
+            
+                
+            if startingfrom_for_cov != None:
+                lasthowmany_for_cov = int(onlyParamsAccepted_together_input.shape[-1] - startingfrom_for_cov)
+                covfuninputarr = np.zeros((onlyParamsAccepted_together_input.shape[1], 
+                                           int(onlyParamsAccepted_together_input.shape[0]*lasthowmany_for_cov)))
+                for i in np.arange(np.shape(onlyParamsAccepted_together_input)[1]):
+                    covfuninputarr[i] = onlyParamsAccepted_together_input[:,i,startingfrom_for_cov:].flatten()
+                return covfuninputarr
+            else:
+                covfuninputarr = np.zeros((onlyParamsAccepted_together_input.shape[1], 
+                                           int(onlyParamsAccepted_together_input.shape[0]*lasthowmany_for_cov)))
+                for i in np.arange(np.shape(onlyParamsAccepted_together_input)[1]):
+                    covfuninputarr[i] = onlyParamsAccepted_together_input[:,i,-lasthowmany_for_cov:].flatten()
+                return covfuninputarr
+            
+        self.covfuninput = covfuninput
+        
     def thetacovYesUpdate(self, thetacovold, thetacov_reductionfactor, currentstep, paramsAccepted_excdChi2_CurrentFullArray, paramsTrulyAccepted_excdChi2_CurrentFullArray):
         """
         
@@ -291,26 +313,7 @@ class ThetaCovUpdate:
         thetacov_reductionfactor = AR_TRF(acceptance_rate, previous_accept_rate)[0]
         print("thetacov_reductionfactor updated to: ",thetacov_reductionfactor); sys.stdout.flush()
         
-        def covfuninput(onlyParamsAccepted_together_input, 
-                        lasthowmany_for_cov=None, 
-                        startingfrom_for_cov=None):
-            if lasthowmany_for_cov == None and startingfrom_for_cov == None:
-                lasthowmany_for_cov = onlyParamsAccepted_together_input.shape[-1]
-            
-                
-            if startingfrom_for_cov != None:
-                lasthowmany_for_cov = int(onlyParamsAccepted_together_input.shape[-1] - startingfrom_for_cov)
-                covfuninputarr = np.zeros((onlyParamsAccepted_together_input.shape[1], 
-                                           int(onlyParamsAccepted_together_input.shape[0]*lasthowmany_for_cov)))
-                for i in np.arange(np.shape(onlyParamsAccepted_together_input)[1]):
-                    covfuninputarr[i] = onlyParamsAccepted_together_input[:,i,startingfrom_for_cov:].flatten()
-                return covfuninputarr
-            else:
-                covfuninputarr = np.zeros((onlyParamsAccepted_together_input.shape[1], 
-                                           int(onlyParamsAccepted_together_input.shape[0]*lasthowmany_for_cov)))
-                for i in np.arange(np.shape(onlyParamsAccepted_together_input)[1]):
-                    covfuninputarr[i] = onlyParamsAccepted_together_input[:,i,-lasthowmany_for_cov:].flatten()
-                return covfuninputarr
+        
         
         
         if self.rankmpi == 0:
@@ -328,22 +331,22 @@ class ThetaCovUpdate:
                     # thetacov sample is calculated as below (not over all the previous samples)
                         
                         # if currentstep <= 4001:
-                        #     thetacov_part = np.cov(covfuninput(onlyParamsAccepted_together, lasthowmany_for_cov=999))
+                        #     thetacov_part = np.cov(self.covfuninput(onlyParamsAccepted_together, lasthowmany_for_cov=999))
                         # elif 4002 <= currentstep <= 6001:
-                        #     thetacov_part = np.cov(covfuninput(onlyParamsAccepted_together, lasthowmany_for_cov=2000))
+                        #     thetacov_part = np.cov(self.covfuninput(onlyParamsAccepted_together, lasthowmany_for_cov=2000))
                         # else: 
-                        #     thetacov_part = np.cov(covfuninput(onlyParamsAccepted_together, startingfrom_for_cov=6000))
+                        #     thetacov_part = np.cov(self.covfuninput(onlyParamsAccepted_together, startingfrom_for_cov=6000))
                             
                         if currentstep <= int(self.thetacovold_until + 1):
-                            thetacov_part = np.cov(covfuninput(onlyParamsAccepted_together, lasthowmany_for_cov=999))
+                            thetacov_part = np.cov(self.covfuninput(onlyParamsAccepted_together, lasthowmany_for_cov=999))
                         elif int(self.thetacovold_until  + 2) <= currentstep <= int(self.thetacovold_until*3/2 + 1):
-                            thetacov_part = np.cov(covfuninput(onlyParamsAccepted_together, lasthowmany_for_cov=2000))
+                            thetacov_part = np.cov(self.covfuninput(onlyParamsAccepted_together, lasthowmany_for_cov=2000))
                         else: 
-                            thetacov_part = np.cov(covfuninput(onlyParamsAccepted_together, startingfrom_for_cov=int(self.thetacovold_until*5/4+1)))
+                            thetacov_part = np.cov(self.covfuninput(onlyParamsAccepted_together, startingfrom_for_cov=int(self.thetacovold_until*5/4+1)))
                     else:
                     # if it is not the first run, thetacov sample is calculated 
                     # over the entire previous sample
-                        thetacov_part = np.cov(covfuninput(onlyParamsAccepted_together))
+                        thetacov_part = np.cov(self.covfuninput(onlyParamsAccepted_together))
                     
                     thetacov = thetacov_part * thetacov_reductionfactor
                     

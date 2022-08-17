@@ -139,18 +139,16 @@ class Ps2dFromPofk:
                 
                 # THIS CASE NEEDS TO BE CHECHKED AT SOME POINT 
                     
-            return (pofk_final(k) #* D_growth_z**2 
-                    * (bias + f_growth * mu**2)**2)
+            return (pofk_final(k) * (bias + f_growth * mu**2)**2) #* D_growth_z**2 
         
         
-        self.band_pk = [(lambda bandt: (lambda k, mu: 
-                                        rescaling_factor 
-                                        * P_kmu(self.k1(k,mu,qpar=q_par,qperp=q_perp), 
-                                                self.mu1(mu,qpar=q_par,qperp=q_perp))
-                                        * bandt(k, mu)
-                                        )
-                         )
-                        (band)
+        self.band_pk = [(lambda bandt: 
+                         (lambda k, mu: 
+                          rescaling_factor 
+                          * P_kmu(self.k1(k,mu,qpar=q_par,qperp=q_perp), 
+                                  self.mu1(mu,qpar=q_par,qperp=q_perp))
+                          * bandt(k, mu))
+                             )(band) 
                         for band in self.band_func]
         
         psds1 = []
@@ -350,9 +348,11 @@ class CreatePs2d:
     def new_pofk_from_class(self,
                             currentparams, #=  ParametersFixed().current_params_fixed,
                             z = None, 
-                            output_CLASS_instance = True,
-                            k_hunit_override = None,
-                            hubble_units_override = None
+                            k_hunit_val = True,
+                            hubble_units_val = False,
+                            output_CLASS_instance = True
+                            # k_hunit_override = None,
+                            # hubble_units_override = None
                             ):
         
         currentparamstemp = currentparams.copy()
@@ -369,11 +369,13 @@ class CreatePs2d:
             H0 = currentparamstemp['H0']
             h = H0/100
         
-        if self.pstype == 'param':
+        try:
+            assert self.pstype == 'param'
             OmM = 1 - (currentparamstemp['Oml'] + currentparamstemp['Omk'] 
                        + self.parameters_fixed.Omr_fid)
             omch2 = OmM * h**2 - self.parameters_fixed.ombh2_fid
-        elif self.pstype == 'sample':
+        except:
+            assert self.pstype == 'sample'
             omch2 = self.parameters_fixed.omch2_fid
             
         self.pcl.set({'h': currentparamstemp['h'],
@@ -394,48 +396,44 @@ class CreatePs2d:
                       'non linear':'none'
                       })
         
-        
-        
         # self.pcl.set(self.classprecisionsettings)
-        
-        
+         
         self.pcl.compute()
-        
         
         PK = self.pcl.pk
         
         
+        # try:
+        #     assert k_hunit_override == None
+        #     k_hunit_val = True
+        # except:
+        #     assert k_hunit_override != None
+        #     k_hunit_val = k_hunit_override
+        # try:
+        #     assert hubble_units_override == None
+        #     hubble_units_val = False
+        # except:
+        #     assert hubble_units_override != None
+        #     hubble_units_val = hubble_units_override
+        
         try:
-            assert k_hunit_override != None
-            k_hunit_val = k_hunit_override
-        except:
-            assert k_hunit_override == None
-            k_hunit_val = True
-        
-        
-        try:
-            assert hubble_units_override != None
-            hubble_units_val = hubble_units_override
-        except:
-            assert hubble_units_override == None
-            hubble_units_val = False
-        
-            
-        if k_hunit_val == True and hubble_units_val==True:
-            pk_k_z = lambda k,zv: PK(k*h, zv) * h**3
-        elif k_hunit_val == True and hubble_units_val==False:
+            assert ((k_hunit_val == True) and (hubble_units_val==False))
             pk_k_z = lambda k,zv: PK(k*h, zv)
-        elif k_hunit_val == False and hubble_units_val==True:
-            pk_k_z = lambda k,zv: PK(k, zv) * h**3
-        elif k_hunit_val == False and hubble_units_val==False:
-            pk_k_z = lambda k,zv: PK(k, zv)
+        except:
+            if k_hunit_val == True and hubble_units_val==True:
+                pk_k_z = lambda k,zv: PK(k*h, zv) * h**3
+            elif k_hunit_val == False and hubble_units_val==True:
+                pk_k_z = lambda k,zv: PK(k, zv) * h**3
+            elif k_hunit_val == False and hubble_units_val==False:
+                pk_k_z = lambda k,zv: PK(k, zv)
         
+        return pk_k_z, self.pcl
         
-        
-        if output_CLASS_instance:
-            return pk_k_z, self.pcl
-        else:
-            return pk_k_z
+        # try:
+        #     assert output_CLASS_instance
+        #     return pk_k_z, self.pcl
+        # except:
+        #     return pk_k_z
         
     # =========================================================================
     # =========================================================================
@@ -443,10 +441,12 @@ class CreatePs2d:
     
     @property
     def get_pk_and_prop(self):
-        if self.pspackage == 'class':
-            return self.new_pofk_from_class
-        elif self.pspackage == 'camb':
-            return self.pofk_from_camb
+        assert self.pspackage == 'class'
+        return self.new_pofk_from_class
+        # if self.pspackage == 'class':
+        #     return self.new_pofk_from_class
+        # elif self.pspackage == 'camb':
+        #     return self.pofk_from_camb
             
         
     # =========================================================================
@@ -470,10 +470,10 @@ class CreatePs2d:
                                                      pspackage=self.pspackage,
                                                      q_perp = q_perp_input, 
                                                      q_par = q_par_input,
-                                                     f_growth = f_growth
+                                                     f_growth = f_growth)
                                                      # currentparams = currentparams_input,
                                                      # D_growth_z = D_growth_z
-                                                     ) #currentparams, 
+                                                     #) #currentparams, 
         
         return psds
     
