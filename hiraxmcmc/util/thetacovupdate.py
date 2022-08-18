@@ -310,6 +310,7 @@ class ThetaCovUpdate:
             print("\n Last 5 H0 values gathered:\n %s\n"%(onlyParamsAccepted_together[:,0,-5:]))
         
         previous_accept_rate = self.acceptance_rate
+        
         self.acceptance_rate = acceptance_rate
         
         
