@@ -34,7 +34,7 @@
     "likelihood": {
         "PS_cov": {
             "override": "no",
-            "filename_fullpath": "/scratch/s/sievers/nistanev/mcmc22/fc_400_500_PScov.dat"
+            "files_dirfullpath": "/scratch/s/sievers/nistanev/mcmc22/PScov_override_files"
         }
     },
     "PARAMS": {
