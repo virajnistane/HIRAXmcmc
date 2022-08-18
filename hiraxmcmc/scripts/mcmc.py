@@ -129,7 +129,7 @@ except:
         #                                                           'wa': 0.6}},
         #                   'burnin_for_run2': 10000},
         #           'likelihood': {'PS_cov': {'override': 'no', 
-        #                                     'filename_fullpath': '/scratch/s/sievers/nistanev/mcmc22/fc_400_500_PScov.dat'}},
+        #                                     'files_dirfullpath': '/scratch/s/sievers/nistanev/mcmc22/PScov_override_files'}},
         #           'PARAMS': {'h': {'prior': [0.4, 1]},
         #                       'Omk': {'prior': [-2, 2]},
         #                       'Oml': {'prior': [0.5, 0.9]},
@@ -161,7 +161,7 @@ except:
                                                                   'wa': 0.6}},
                           'burnin_for_run2': 4000},
                   'likelihood': {'PS_cov': {'override': 'no', 
-                                            'filename_fullpath': '/scratch/s/sievers/nistanev/mcmc22/fc_400_500_PScov.dat'}},
+                                            'files_dirfullpath': '/scratch/s/sievers/nistanev/mcmc22/PScov_override_files'}},
                   'PARAMS': {'h': {'prior': [0.4, 1]},
                               'Omk': {'prior': [-2, 2]},
                               'Oml': {'prior': [0.5, 0.9]},
@@ -671,7 +671,7 @@ for freqc,value_inputforhiraxoutput in inputforhiraxoutput.items():
     
 if rank_mpi == 0:
     if INPUT['likelihood']['PS_cov']['override'] == 'yes':
-        print('\nUsing an external PS cov input at: %s\n'%(INPUT['likelihood']['PS_cov']['filename_fullpath']))
+        print('\nUsing an external PS cov input in: %s\n'%(INPUT['likelihood']['PS_cov']['files_dirfullpath']))
 
 
 

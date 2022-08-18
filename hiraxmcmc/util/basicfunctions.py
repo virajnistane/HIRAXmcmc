@@ -9,8 +9,32 @@ from scipy.constants import c as speedoflight
 
 
 
-def freq2z(freq):       # freq in MHz
-    return (speedoflight/freq/1e6)/0.21 - 1
+def freq2lambda(freq):
+    # convert freq in MHz to wavelength in cm
+    return speedoflight/(freq*1e6) * 100
+def lambda2freq(lambda1):
+    # convert wavelength in cm to freq in MHz
+    return speedoflight/(lambda1*0.01)*1e-6
+def z2freq(z):
+    # convert 21cm redshift to freq in MHz
+    return lambda2freq(21)/(1+z)
+def z2lambda(z):
+    # convert 21cm redshift to wavelength in cm
+    return (1+z) * 21
+def freq2z(freq):
+    # convert 21cm freq in MHz to redshift
+    return lambda2freq(21)/freq - 1
+def lambda2z(lambda1):
+    # convert 21cm wavelength (in cm) to redshift
+    return lambda1/21 - 1
+
+def find_freqchannel_for_redshift(z, fc_all = ['400_500', '500_600', '600_700', '700_800']):
+    for i in fc_all:
+        if float(i.split('_')[0]) <= z2freq(z) <= float(i.split('_')[1]):
+            return i
+
+# def freq2z(freq):       # freq in MHz
+#     return (speedoflight/freq/1e6)/0.21 - 1
 
 # =============================================================================
 # Prior limiting function

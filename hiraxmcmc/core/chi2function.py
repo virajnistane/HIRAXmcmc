@@ -40,6 +40,7 @@ class Chi2Func:
         self.kperp      =   self.kperp_all['kperp']
         self.kcenter    =   self.kc_all['kcenter']
         
+        self.redshift = self.hirax_output.redshift
         
         try:
             if INPUT != None:
@@ -49,8 +50,12 @@ class Chi2Func:
         except:
             if INPUT != None:
                 assert INPUT['likelihood']['PS_cov']['override'] == 'yes'
-            self.covhirax = np.loadtxt(os.path.join(INPUT['likelihood']['PS_cov']['filename_fullpath']))
+            cov_override_file = find_files_containing(find_freqchannel_for_redshift(self.redshift) ,
+                                                      INPUT['likelihood']['PS_cov']['files_dirfullpath'])[0]
+            self.covhirax = np.loadtxt(os.path.join(INPUT['likelihood']['PS_cov']['files_dirfullpath'],
+                                                    cov_override_file))
             self.errs  =  np.sqrt(abs(np.diag(self.covhirax))).reshape(self.kpar_all['kpar_size'],self.kperp_all['kperp_size'])
+        
         
         self.kparstart = self.kpar_all['kpar_bands'][:-1]
         self.kparend = self.kpar_all['kpar_bands'][1:]
@@ -59,7 +64,7 @@ class Chi2Func:
         
         self.psrel_estimatedfromhirax = self.hirax_output.ps_relative_estimated_from_hirax
         
-        self.redshift = self.hirax_output.redshift
+        
         
         # print("Inside the chi2_function instance, hiraxrundirname is ",hirax_output.hiraxrundir_name)
         
