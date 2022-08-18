@@ -185,6 +185,27 @@ class ThetaCovUpdate:
             
         self.covfuninput = covfuninput
         
+        def AR_TRF(currentstep_ii, 
+                   acceptance_rate, previous_accept_rate, 
+                   thetacov_reductionfactor_old):
+            tck = interp1d(self.accRate_vs_TRF[:,0],self.accRate_vs_TRF[:,1])
+            
+            ar = random.choices([acceptance_rate, np.random.uniform(acceptance_rate,previous_accept_rate)], weights=[0.5,0.5])[0]
+            
+            new_TRF = tck(np.array([ar]))
+            
+            # if int(self.currentrunindex) < 10:
+            #     if new_TRF >= thetacov_reductionfactor:
+            #         return new_TRF
+            #     else:
+            #         return thetacov_reductionfactor
+            if int(self.currentrunindex) == 1 and currentstep_ii<int(self.TRFold_until):   #4000
+                return [thetacov_reductionfactor_old]
+            else:
+                return new_TRF
+        
+        self.AR_TRF = AR_TRF
+        
     def thetacovYesUpdate(self, thetacovold, thetacov_reductionfactor, currentstep, paramsAccepted_excdChi2_CurrentFullArray, paramsTrulyAccepted_excdChi2_CurrentFullArray):
         """
         
@@ -291,26 +312,11 @@ class ThetaCovUpdate:
         previous_accept_rate = self.acceptance_rate
         self.acceptance_rate = acceptance_rate
         
-        def AR_TRF(acceptance_rate, previous_accept_rate):
-            tck = interp1d(self.accRate_vs_TRF[:,0],self.accRate_vs_TRF[:,1])
-            
-            ar = random.choices([acceptance_rate, np.random.uniform(acceptance_rate,previous_accept_rate)], weights=[0.5,0.5])[0]
-            
-            new_TRF = tck(np.array([ar]))
-            
-            # if int(self.currentrunindex) < 10:
-            #     if new_TRF >= thetacov_reductionfactor:
-            #         return new_TRF
-            #     else:
-            #         return thetacov_reductionfactor
-            if int(self.currentrunindex) == 1 and currentstep<int(self.TRFold_until):   #4000
-                return [thetacov_reductionfactor]
-            else:
-                return new_TRF
+        
         
         
         print("\nAcceptance rate until now at rank %s = %s = %.1f%%"%(self.rankmpi,acceptance_rate,acceptance_rate*100)); sys.stdout.flush()
-        thetacov_reductionfactor = AR_TRF(acceptance_rate, previous_accept_rate)[0]
+        thetacov_reductionfactor = self.AR_TRF(currentstep, acceptance_rate, previous_accept_rate, thetacov_reductionfactor)[0]
         print("thetacov_reductionfactor updated to: ",thetacov_reductionfactor); sys.stdout.flush()
         
         
@@ -320,6 +326,7 @@ class ThetaCovUpdate:
             # if it is the first run and the currentstep is less than 4000, thetacov does not change
             if int(self.currentrunindex) == 1 and currentstep<int(self.thetacovold_until):
                 thetacov = thetacovold
+                print('I am here')
             # if it is the first run and the currentstep is greater than 4000,
             # OR
             # if it is not the first run, 
