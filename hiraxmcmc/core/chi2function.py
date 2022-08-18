@@ -136,10 +136,10 @@ class Chi2Func:
                                                              q_perp_input = self.q_perp_for_ps_estimated, 
                                                              q_par_input = self.q_par_for_ps_estimated,
                                                              z=self.redshift,
-                                                             f_growth = self.f_growth_for_ps_estimated
+                                                             f_growth = self.f_growth_for_ps_estimated)
                                                              # currentparams_input = self.params_fixed.cosmoparams_fixed,
                                                              # D_growth_z = self.pspackage_properties.scale_independent_growth_factor(self.redshift)
-                                                             )
+                                                             # )
         
         
     
@@ -229,10 +229,10 @@ class Chi2Func:
                                                   q_perp_input = q_perp,
                                                   q_par_input = q_par,
                                                   z=z,
-                                                  f_growth = f_growth
+                                                  f_growth = f_growth)
                                                   # currentparams_input = currentparams_input_for_pscalc,
                                                   # D_growth_z = D_growth_here
-                                                  )
+                                                  # )
         
         ps = (pscalc/self.ps_estimated - 1)
         
