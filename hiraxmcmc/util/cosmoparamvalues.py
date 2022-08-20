@@ -56,8 +56,8 @@ class ParametersFixed:
         self._Omnu = rhonu / rhoc
         self._omnuh2 = self._Omnu * self._h**2
         
-        # Adding Omega_gamma and Omega_nu
-        self._Omr = self._Omg + self._Omnu
+        # Adding Omega_gamma and Omega_nu, temporarily set to 0 for simplicity
+        self._Omr = 0# self._Omg + self._Omnu
                 
         # Finally, evaluating Omega_Lambda from the other fixed parameters
         self._Oml = 1 - self._Omk - self._OmM - self._Omr
@@ -66,9 +66,9 @@ class ParametersFixed:
         self._w0 = -1.0
         self._wa = 0.0
         
-        self._hz = {'400_500':0.0007327671367151237, 
+        self._hz = {'400_500':0.0007327671367151243, 
                     '500_600':0.0005568269434413366, 
-                    '600_700':0.00044919410456275546,
+                    '600_700':0.0004491941045627553,
                     '700_800':0.0003790722414922297}
         
         self._Hz = {}
@@ -77,17 +77,17 @@ class ParametersFixed:
         
         self._qpar = 1
         
-        self._dA = {'400_500':1753.1521388469291, 
-                    '500_600':1794.933333372865, 
-                    '600_700':1757.6610835353022,
-                    '700_800':1655.0761074055265}
+        self._dA = {'400_500':1753.152138846927, 
+                    '500_600':1794.9333333728628, 
+                    '600_700':1757.6610835353,
+                    '700_800':1655.0761074055235}
         
         self._qperp = 1
         
-        self._fz = {'400_500':0.962841541371914, 
-                    '500_600':0.935423727239377, 
-                    '600_700':0.8994759926141175, 
-                    '700_800':0.8561943222181659}
+        self._fz = {'400_500':0.9628415413719129, 
+                    '500_600':0.9354237272393772, 
+                    '600_700':0.8994759926141177, 
+                    '700_800':0.8561943222181662}
         
     
     ###### ###### ###### ######
