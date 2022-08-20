@@ -371,8 +371,8 @@ class CreatePs2d:
         
         try:
             assert self.pstype == 'param'
-            OmM = 1 - (currentparamstemp['Oml'] + currentparamstemp['Omk'] 
-                       + self.parameters_fixed.Omr_fid)
+            OmM = 1 - (currentparamstemp['Oml'] + currentparamstemp['Omk']) 
+                       #+ self.parameters_fixed.Omr_fid)
             omch2 = OmM * h**2 - self.parameters_fixed.ombh2_fid
         except:
             assert self.pstype == 'sample'
@@ -385,7 +385,7 @@ class CreatePs2d:
                       'Omega_fld': currentparamstemp['Oml'],
                       'w0_fld': currentparamstemp['w0'],
                       'wa_fld': currentparamstemp['wa'],
-                      'sigma8': 0.8211752725010274
+                      # 'sigma8': 0.8211752725010274
                       })
         
         
