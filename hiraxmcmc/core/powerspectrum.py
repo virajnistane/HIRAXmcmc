@@ -386,8 +386,8 @@ class CreatePs2d:
                       'w0_fld': currentparamstemp['w0'],
                       'wa_fld': currentparamstemp['wa'],
                       'Omega_Lambda': 0,
-                      'Omega_scf': 0
-                      # 'sigma8': 0.8211752725010274
+                      'Omega_scf': 0,
+                      'sigma8': 0.8211752725010274
                       })
         
         
