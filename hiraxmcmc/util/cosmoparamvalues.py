@@ -57,7 +57,7 @@ class ParametersFixed:
         self._omnuh2 = self._Omnu * self._h**2
         
         # Adding Omega_gamma and Omega_nu, temporarily set to 0 for simplicity
-        self._Omr = 0# self._Omg + self._Omnu
+        self._Omr = self._Omg + self._Omnu
                 
         # Finally, evaluating Omega_Lambda from the other fixed parameters
         self._Oml = 1 - self._Omk - self._OmM - self._Omr
@@ -142,6 +142,13 @@ class ParametersFixed:
     @omch2_fid.setter
     def omch2_fid(self, omch2_fid_new):
         self._omch2 = omch2_fid_new
+        
+    @property
+    def Omc_fid(self):
+        return self._Omc
+    @Omc_fid.setter
+    def Omc_fid(self, Omc_fid_new):
+        self._Omc = Omc_fid_new
     
     @property
     def ombh2_fid(self):
@@ -149,6 +156,13 @@ class ParametersFixed:
     @ombh2_fid.setter
     def ombh2_fid(self, ombh2_fid_new):
         self._ombh2 = ombh2_fid_new
+        
+    @property
+    def Omb_fid(self):
+        return self._Omb
+    @Omb_fid.setter
+    def Omb_fid(self, Omb_fid_new):
+        self._Omb = Omb_fid_new
         
     @property
     def OmM_fid(self):

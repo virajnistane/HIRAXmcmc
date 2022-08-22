@@ -371,22 +371,24 @@ class CreatePs2d:
         
         try:
             assert self.pstype == 'param'
-            OmM = 1 - (currentparamstemp['Oml'] + currentparamstemp['Omk']) 
-                       #+ self.parameters_fixed.Omr_fid)
-            omch2 = OmM * h**2 - self.parameters_fixed.ombh2_fid
+            OmM = 1 - (currentparamstemp['Oml'] 
+                       + currentparamstemp['Omk'] 
+                       + self.parameters_fixed.Omr_fid)
+            Omc = OmM - self.parameters_fixed.Omb_fid
         except:
             assert self.pstype == 'sample'
-            omch2 = self.parameters_fixed.omch2_fid
+            Omc = self.parameters_fixed.Omc_fid
             
         self.pcl.set({'h': currentparamstemp['h'],
-                      'omega_b': self.parameters_fixed.ombh2_fid,
-                      'omega_cdm': omch2,
+                      'Omega_b': self.parameters_fixed.Omb_fid,
+                      'Omega_cdm': Omc,
                       'Omega_k': currentparamstemp['Omk'],
                       # 'Omega_fld': currentparamstemp['Oml'],
-                      'w0_fld': currentparamstemp['w0'],
-                      'wa_fld': currentparamstemp['wa'],
                       'Omega_Lambda': 0,
                       'Omega_scf': 0,
+                      'fluid_equation_of_state': 'CLP',
+                      'w0_fld': currentparamstemp['w0'],
+                      'wa_fld': currentparamstemp['wa'],
                       'sigma8': 0.8211752725010274
                       })
         
