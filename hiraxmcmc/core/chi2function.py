@@ -171,8 +171,8 @@ class Chi2Func:
             
             try:
                 assert self.cp_params.pspackage == 'class'
-                q_perp = PK_properties_currentstep.angular_distance(z) / self.dA_fid * self.h_fiducial/h
-                q_par = self.hz_fid / PK_properties_currentstep.Hubble(z)            * self.h_fiducial/h
+                q_perp = PK_properties_currentstep.angular_distance(z) / self.dA_fid * h/self.h_fiducial
+                q_par = self.hz_fid / PK_properties_currentstep.Hubble(z)            * h/self.h_fiducial
                 # this second ratio is to remove the h-units of the k-values (so, it is only needed when the k values are in h/Mpc units)
                 # for example: kpar_obs[h/Mpc] = kpar_fid[h/Mpc]/ q_par * (h/h_fid) = kpar_fid[h/Mpc]/ (q_par * (h_fid/h))
                     # Then this h/h_fid ratio, when including in the q_par, becomes (h_fid/h)

@@ -422,16 +422,16 @@ class CreatePs2d:
         
         try:
             assert ((k_hunit_val == True) and (hubble_units_val==False))
-            pk_k_z = lambda k,zv: PK(k*h, zv)
+            pk_kh_z = lambda kh,zv: PK(kh*h, zv)
         except:
             if k_hunit_val == True and hubble_units_val==True:
-                pk_k_z = lambda k,zv: PK(k*h, zv) * h**3
+                pk_kh_z = lambda kh,zv: PK(kh*h, zv) * h**3
             elif k_hunit_val == False and hubble_units_val==True:
-                pk_k_z = lambda k,zv: PK(k, zv) * h**3
+                pk_kh_z = lambda kh,zv: PK(kh, zv) * h**3
             elif k_hunit_val == False and hubble_units_val==False:
-                pk_k_z = lambda k,zv: PK(k, zv)
+                pk_kh_z = lambda kh,zv: PK(kh, zv)
         
-        return pk_k_z, self.pcl
+        return pk_kh_z, self.pcl
         
         # try:
         #     assert output_CLASS_instance
