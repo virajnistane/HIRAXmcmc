@@ -479,6 +479,12 @@ totalParams_inclChi2 = totalParams (H0, Omk, Oml, w0, wa) + 1 (chi2)
 
 ######### NUMBER OF PARAMETERS ###########
 
+
+if numfc > 1:
+    extractScalingParams = 0 
+
+
+
 totalParams = len(params_to_vary)
 
 # try:

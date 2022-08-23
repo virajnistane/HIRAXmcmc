@@ -401,7 +401,7 @@ class CreatePs2d:
                       })
         
         # self.pcl.set(self.classprecisionsettings)
-         
+        
         self.pcl.compute()
         
         PK = self.pcl.pk
@@ -422,7 +422,7 @@ class CreatePs2d:
         
         try:
             assert ((k_hunit_val == True) and (hubble_units_val==False))
-            pk_kh_z = lambda kh,zv: PK(kh*h, zv)
+            pk_kh_z = lambda kh,zv: PK(kh*h , zv)
         except:
             if k_hunit_val == True and hubble_units_val==True:
                 pk_kh_z = lambda kh,zv: PK(kh*h, zv) * h**3
