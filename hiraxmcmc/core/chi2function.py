@@ -135,13 +135,15 @@ class Chi2Func:
             self.q_perp_for_ps_estimated =  self.pspackage_properties.angular_diameter_distance(self.redshift) / self.dA_fid   * self.cosmoparams_fixed['h']/self.h_fiducial
             self.q_par_for_ps_estimated =  self.hz_fid / self.pspackage_properties.h_of_z(self.redshift)              * self.cosmoparams_fixed['h']/self.h_fiducial
         
+        self.powerspectra_rescaling_factor_ps_estimated = 1/ (self.q_perp_for_ps_estimated**2 * self.q_par_for_ps_estimated)
         
         # PS 1D --> PS 2D
         self.ps_estimated = self.cp_sample.get_ps2d_from_pok(PK_k_zClass = self.pk_z_estimated,
                                                              q_perp_input = self.q_perp_for_ps_estimated, 
                                                              q_par_input = self.q_par_for_ps_estimated,
                                                              z=self.redshift,
-                                                             f_growth = self.f_growth_for_ps_estimated)
+                                                             f_growth = self.f_growth_for_ps_estimated,
+                                                             powerspectra_rescaling_factor = self.powerspectra_rescaling_factor_ps_estimated)
                                                              # currentparams_input = self.params_fixed.cosmoparams_fixed,
                                                              # D_growth_z = self.pspackage_properties.scale_independent_growth_factor(self.redshift)
                                                              # )
