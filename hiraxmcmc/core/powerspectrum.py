@@ -375,16 +375,15 @@ class CreatePs2d:
             OmM = 1 - (currentparamstemp['Oml'] 
                        + currentparamstemp['Omk'] 
                        + self.parameters_fixed.Omr_fid)
-            # Omc = OmM - self.parameters_fixed.Omb_fid
+            Omc = OmM - self.parameters_fixed.Omb_fid
         except:
             assert self.pstype == 'sample'
-            # Omc = self.parameters_fixed.Omc_fid
-            OmM = self.parameters_fixed.OmM_fid
+            Omc = self.parameters_fixed.Omc_fid
+            # OmM = self.parameters_fixed.OmM_fid
             
         self.pcl.set({'h': currentparamstemp['h'],
-                      'Omega_m': OmM,
-                      # 'Omega_b': self.parameters_fixed.Omb_fid,
-                      # 'Omega_cdm': Omc,
+                      'Omega_b': self.parameters_fixed.Omb_fid,
+                      'Omega_cdm': Omc,
                       'Omega_k': currentparamstemp['Omk'],
                       # 'Omega_fld': currentparamstemp['Oml'],
                       'Omega_Lambda': 0,
