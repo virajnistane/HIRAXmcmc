@@ -173,6 +173,8 @@ class Chi2Func:
                 assert self.cp_params.pspackage == 'class'
                 q_perp = PK_properties_currentstep.angular_distance(z) / self.dA_fid * h/self.h_fiducial
                 q_par = self.hz_fid / PK_properties_currentstep.Hubble(z)            * h/self.h_fiducial
+                
+                powerspectra_rescaling_factor = 1/(q_perp**2 * q_par) * (h/self.h_fiducial)**3
                 # this second ratio is to remove the h-units of the k-values (so, it is only needed when the k values are in h/Mpc units)
                 # for example: kpar_obs[h/Mpc] = kpar_fid[h/Mpc]/ q_par * (h/h_fid) = kpar_fid[h/Mpc]/ (q_par * (h_fid/h))
                     # Then this h/h_fid ratio, when including in the q_par, becomes (h_fid/h)
@@ -212,6 +214,7 @@ class Chi2Func:
             except:
                 q_perp = currentparams['dA(z)'] / self.dA_fid   #* self.h_fiducial/h
                 
+            powerspectra_rescaling_factor = 1/(q_perp**2 * q_par)
             
             f_growth = currentparams['f(z)']
             currentparams_input_for_pscalc = cosmoparams
@@ -234,10 +237,11 @@ class Chi2Func:
                                                   q_perp_input = q_perp,
                                                   q_par_input = q_par,
                                                   z=z,
-                                                  f_growth = f_growth)
+                                                  f_growth = f_growth,
+                                                  # D_growth_z = D_growth_here,
+                                                  powerspectra_rescaling_factor = powerspectra_rescaling_factor
+                                                  )
                                                   # currentparams_input = currentparams_input_for_pscalc,
-                                                  # D_growth_z = D_growth_here
-                                                  # )
         
         ps = (pscalc/self.ps_estimated - 1)
         

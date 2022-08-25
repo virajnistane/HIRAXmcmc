@@ -115,40 +115,41 @@ class Ps2dFromPofk:
     
     def get_ps2d_bandfunc(self, PK_k_zClass, 
                           pspackage, q_perp, q_par, 
-                          f_growth, #currentparams, D_growth_z,
+                          f_growth, #D_growth_z,
+                          powerspectra_rescaling_factor,
                           bias=1, PKinterp=None):  #, currentparams
         
         # h = currentparams['H0']/100
         
         
-        rescaling_factor = 1/(q_perp**2 * q_par)
+        # rescaling_factor = powerspectra_rescaling_factor
         
         def P_kmu(k,mu):
             try:
                 assert PKinterp == None
                 assert pspackage == 'class'
-                pofk_final = lambda k: PK_k_zClass(k,self.redshift_from_hiraxoutput)
+                pofk_final = lambda k: PK_k_zClass(k, self.redshift_from_hiraxoutput) #* D_growth_z**2
                 # elif pspackage == 'camb':
                 #     pofk_final = lambda k: PK_k_zClass(k)
             except:
                 print("PKinterp argument entered! Running exception")
                 assert pspackage == 'class'
-                pofk_final = lambda k: PKinterp(k, 0)
+                pofk_final = lambda k: PKinterp(k, 0) * D_growth_z**2
                 # elif pspackage == 'camb':
                 #     pofk_final = lambda k: PKinterp.P(0 , k)
                 
                 # THIS CASE NEEDS TO BE CHECHKED AT SOME POINT 
                     
-            return (pofk_final(k) * (bias + f_growth * mu**2)**2) #* D_growth_z**2 
+            return (pofk_final(k) * (bias + f_growth * mu**2)**2)
         
         
         self.band_pk = [(lambda bandt: 
                          (lambda k, mu: 
-                          rescaling_factor 
+                          powerspectra_rescaling_factor 
                           * P_kmu(self.k1(k,mu,qpar=q_par,qperp=q_perp), 
                                   self.mu1(mu,qpar=q_par,qperp=q_perp))
                           * bandt(k, mu))
-                             )(band) 
+                             )(band)
                         for band in self.band_func]
         
         psds1 = []
@@ -374,14 +375,16 @@ class CreatePs2d:
             OmM = 1 - (currentparamstemp['Oml'] 
                        + currentparamstemp['Omk'] 
                        + self.parameters_fixed.Omr_fid)
-            Omc = OmM - self.parameters_fixed.Omb_fid
+            # Omc = OmM - self.parameters_fixed.Omb_fid
         except:
             assert self.pstype == 'sample'
-            Omc = self.parameters_fixed.Omc_fid
+            # Omc = self.parameters_fixed.Omc_fid
+            OmM = self.parameters_fixed.OmM_fid
             
         self.pcl.set({'h': currentparamstemp['h'],
-                      'Omega_b': self.parameters_fixed.Omb_fid,
-                      'Omega_cdm': Omc,
+                      'Omega_m': OmM,
+                      # 'Omega_b': self.parameters_fixed.Omb_fid,
+                      # 'Omega_cdm': Omc,
                       'Omega_k': currentparamstemp['Omk'],
                       # 'Omega_fld': currentparamstemp['Oml'],
                       'Omega_Lambda': 0,
@@ -461,8 +464,9 @@ class CreatePs2d:
                           PK_k_zClass,
                           q_perp_input, q_par_input,
                           f_growth, 
-                          # currentparams_input,
                           # D_growth_z,
+                          powerspectra_rescaling_factor,
+                          # currentparams_input,
                           z=None):                          # currentparams,
         
         # if z == None:
@@ -474,9 +478,10 @@ class CreatePs2d:
                                                      pspackage=self.pspackage,
                                                      q_perp = q_perp_input, 
                                                      q_par = q_par_input,
-                                                     f_growth = f_growth)
+                                                     f_growth = f_growth,
+                                                     # D_growth_z = D_growth_z,
+                                                     powerspectra_rescaling_factor = powerspectra_rescaling_factor)
                                                      # currentparams = currentparams_input,
-                                                     # D_growth_z = D_growth_z
                                                      #) #currentparams, 
         
         return psds
