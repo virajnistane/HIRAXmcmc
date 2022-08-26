@@ -45,8 +45,11 @@ class ParametersFixed:
         
         self._OmM = (self._ombh2 + self._omch2)/self._h**2
         
-        # fixing Omega_gamma
+        
         rhoc = 3.0 * self._H0**2 * cc**2 / (8.0 * np.pi * self._G) / (1e6 * self._parsec_in_km)**2
+        
+        
+        # fixing Omega_gamma
         rhorad = self._a_rad * self._T0**4
         self._Omg = rhorad / rhoc
         

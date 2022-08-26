@@ -309,9 +309,8 @@ class CreatePs2d:
         self.inputforhiraxoutput = inputforhiraxoutput
         
         
-        if pspackage == 'camb':
-            self.cambpars = camb.read_ini(os.path.join(self.modulelocation, 'planckfiles', 'planck_2018.ini'))
-        elif pspackage == 'class':
+        try:
+            assert pspackage == 'class'
             # self.cambpars = camb.read_ini(os.path.join(self.modulelocation,'planckfiles', 'planck_2018.ini'))
             # self.classpars = ConfigObj(os.path.join(self.modulelocation, 'planckfiles', 'base_2018_plikHM_TTTEEE_lowl_lowE_lensing.ini'))
             # for key1, value1 in self.classpars.items():
@@ -322,6 +321,10 @@ class CreatePs2d:
             #     except:
             #         pass
             self.pcl = Class()
+        except:
+            assert pspackage == 'camb'
+            self.cambpars = camb.read_ini(os.path.join(self.modulelocation, 'planckfiles', 'planck_2018.ini'))
+        
         
         self.ps2d_from_Pofk = Ps2dFromPofk(inputforhiraxoutput = self.inputforhiraxoutput)
         
@@ -379,19 +382,22 @@ class CreatePs2d:
         except:
             assert self.pstype == 'sample'
             Omc = self.parameters_fixed.Omc_fid
-            # OmM = self.parameters_fixed.OmM_fid
+            OmM = self.parameters_fixed.OmM_fid
             
         self.pcl.set({'h': currentparamstemp['h'],
                       'Omega_b': self.parameters_fixed.Omb_fid,
                       'Omega_cdm': Omc,
+                      # 'Omega_m': OmM,
                       'Omega_k': currentparamstemp['Omk'],
                       # 'Omega_fld': currentparamstemp['Oml'],
                       'Omega_Lambda': 0,
                       'Omega_scf': 0,
+                      'Omega_g': self.parameters_fixed.Omg_fid,
+                      'N_ur': self.parameters_fixed.nnu,
                       'fluid_equation_of_state': 'CLP',
                       'w0_fld': currentparamstemp['w0'],
                       'wa_fld': currentparamstemp['wa'],
-                      'sigma8': 0.8211752725010274
+                      'sigma8': 0.8211752725010274,
                       })
         
         
