@@ -7,7 +7,7 @@ import h5py as hh
 
 import hiraxmcmc
 from hiraxmcmc.util.basicfunctions import *
-
+from hiraxmcmc.util.cosmoparamvalues import ParametersFixed
 
 # =============================================================================
 # HIRAX cov matrix and k-params
@@ -18,7 +18,7 @@ class HiraxOutput:
     
     def __init__(self, inputforhiraxoutput):
         
-        
+
         
         self.modulelocation = os.path.dirname(hiraxmcmc.__file__)
         self.hiraxrundir_name = inputforhiraxoutput['result_dir_name']
@@ -27,6 +27,8 @@ class HiraxOutput:
         self.psetype = inputforhiraxoutput['estimator_type']
         self.klmode = inputforhiraxoutput['klmode']
         self.uname = os.uname()[1]
+        self.parameters_fixed = ParametersFixed()
+        self.h = self.parameters_fixed.h_fid
         
         self.psfileload = hh.File(
             os.path.join(
@@ -48,6 +50,11 @@ class HiraxOutput:
         return f"HiraxOutput({self.hiraxrundir_name!r}, {self.psetype!r}, {self.redshift!r}, {self.klmode!r})"
     
     
+    
+    ##### 
+    # !!!!!!!!!!!!!!!!!!!!!!!!!
+    # If h-units are to be removed, confirm the h-dependence of the covariance matrix from m-mode
+    #####
     @property
     def covhirax(self):
         self.cinv = self.psfileload['C_inv'][:];
@@ -58,7 +65,7 @@ class HiraxOutput:
             M = np.diag(self.cinv.T.reshape(int(self.cinv.shape[0]*self.cinv.shape[1]),int(self.cinv.shape[2]*self.cinv.shape[3])).sum(axis=1)** -1)
             covhirax = np.matmul(M, np.matmul(self.cinv.T.reshape(int(self.cinv.shape[0]*self.cinv.shape[1]),int(self.cinv.shape[2]*self.cinv.shape[3])), M.T))
         # return 0.05**2 * np.identity(len(covhirax)) # 
-        return covhirax
+        return covhirax / self.h**3
     
     # @property
     # def covhirax(self):
@@ -75,13 +82,13 @@ class HiraxOutput:
 
         f2 = self.fisherfileload
         
-        kpar = f2['kpar_center'][:];
-        kpar_bands = f2['kpar_bands'][:];
-        kpar_size = len(kpar_bands)-1;
+        kpar = f2['kpar_center'][:]             * self.h
+        kpar_bands = f2['kpar_bands'][:]        * self.h
+        kpar_size = len(kpar_bands)-1
         self.kpar_size = kpar_size
         
-        kperp = f2['kperp_center'][:];
-        kperp_bands = f2['kperp_bands'][:];
+        kperp = f2['kperp_center'][:]           * self.h
+        kperp_bands = f2['kperp_bands'][:]      * self.h
         kperp_size = len(kperp_bands)-1;   
         self.kperp_size = kperp_size
         

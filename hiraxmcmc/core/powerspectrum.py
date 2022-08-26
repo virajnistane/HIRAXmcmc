@@ -352,7 +352,7 @@ class CreatePs2d:
     def new_pofk_from_class(self,
                             currentparams, #=  ParametersFixed().current_params_fixed,
                             z = None, 
-                            k_hunit_val = True,
+                            k_hunit_val = False,
                             hubble_units_val = False,
                             output_CLASS_instance = True
                             # k_hunit_override = None,
@@ -429,17 +429,24 @@ class CreatePs2d:
         #     hubble_units_val = hubble_units_override
         
         try:
-            assert ((k_hunit_val == True) and (hubble_units_val==False))
-            pk_kh_z = lambda kh,zv: PK(kh*h , zv)
+            assert k_hunit_val == False
+            pk_k_z = lambda kv,zv: PK(kv , zv)
         except:
-            if k_hunit_val == True and hubble_units_val==True:
-                pk_kh_z = lambda kh,zv: PK(kh*h, zv) * h**3
-            elif k_hunit_val == False and hubble_units_val==True:
-                pk_kh_z = lambda kh,zv: PK(kh, zv) * h**3
-            elif k_hunit_val == False and hubble_units_val==False:
-                pk_kh_z = lambda kh,zv: PK(kh, zv)
+            raise ValueError("Please turn off the flag 'k_hunit_val = True' \
+                             in the function arguments")
         
-        return pk_kh_z, self.pcl
+        # try:
+        #     assert ((k_hunit_val == True) and (hubble_units_val==False))
+        #     pk_kh_z = lambda kh,zv: PK(kh*h , zv)
+        # except:
+        #     if k_hunit_val == True and hubble_units_val==True:
+        #         pk_kh_z = lambda kh,zv: PK(kh*h, zv) * h**3
+        #     elif k_hunit_val == False and hubble_units_val==True:
+        #         pk_kh_z = lambda kh,zv: PK(kh, zv) * h**3
+        #     elif k_hunit_val == False and hubble_units_val==False:
+        #         pk_kh_z = lambda kh,zv: PK(kh, zv)
+        
+        return pk_k_z, self.pcl
         
         # try:
         #     assert output_CLASS_instance

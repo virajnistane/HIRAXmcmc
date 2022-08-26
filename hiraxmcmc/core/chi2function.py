@@ -74,7 +74,7 @@ class Chi2Func:
         
         self.kperp_limits_hunits =  {'l':self.kperpstart[2], 'u':self.kperpend[6]}  # {'l':0.025, 'u':0.1}
         self.kpar_limits_hunits =    {'l':self.kparstart[4], 'u':self.kparend[12]} # {'l':0.025, 'u':0.25}
-        self.kcenter_limits_hunits = {'l':0.05, 'u':0.15}
+        self.kcenter_limits_hunits = {'l':0.05 * self.hirax_output.h, 'u':0.15 * self.hirax_output.h}
         
         
         
@@ -173,10 +173,10 @@ class Chi2Func:
             
             try:
                 assert self.cp_params.pspackage == 'class'
-                q_perp = PK_properties_currentstep.angular_distance(z) / self.dA_fid * h/self.h_fiducial
-                q_par = self.hz_fid / PK_properties_currentstep.Hubble(z)            * h/self.h_fiducial
+                q_perp = PK_properties_currentstep.angular_distance(z) / self.dA_fid # * h/self.h_fiducial
+                q_par = self.hz_fid / PK_properties_currentstep.Hubble(z)            # * h/self.h_fiducial
                 
-                powerspectra_rescaling_factor = 1/(q_perp**2 * q_par) * (h/self.h_fiducial)**3
+                powerspectra_rescaling_factor = 1/(q_perp**2 * q_par) # * (h/self.h_fiducial)**3
                 # this second ratio is to remove the h-units of the k-values (so, it is only needed when the k values are in h/Mpc units)
                 # for example: kpar_obs[h/Mpc] = kpar_fid[h/Mpc]/ q_par * (h/h_fid) = kpar_fid[h/Mpc]/ (q_par * (h_fid/h))
                     # Then this h/h_fid ratio, when including in the q_par, becomes (h_fid/h)
