@@ -52,7 +52,6 @@ class HiraxOutput:
     
     
     ##### 
-    # !!!!!!!!!!!!!!!!!!!!!!!!!
     # If h-units are to be removed, confirm the h-dependence of the covariance matrix from m-mode
     #####
     @property
@@ -144,7 +143,7 @@ class HiraxOutput:
         
         errs = np.sqrt(abs(np.diag(self.covhirax))).reshape(kpar_params['kpar_size'],kperp_params['kperp_size'])
         
-        return errs
+        return errs / self.h**3
         
     
     # def k_space_parameters_al(self):
