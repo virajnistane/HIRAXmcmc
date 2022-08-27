@@ -64,7 +64,8 @@ class HiraxOutput:
             M = np.diag(self.cinv.T.reshape(int(self.cinv.shape[0]*self.cinv.shape[1]),int(self.cinv.shape[2]*self.cinv.shape[3])).sum(axis=1)** -1)
             covhirax = np.matmul(M, np.matmul(self.cinv.T.reshape(int(self.cinv.shape[0]*self.cinv.shape[1]),int(self.cinv.shape[2]*self.cinv.shape[3])), M.T))
         # return 0.05**2 * np.identity(len(covhirax)) # 
-        return covhirax / self.h**3
+        covhirax1 = covhirax / self.h**3
+        return covhirax1
     
     # @property
     # def covhirax(self):
@@ -81,13 +82,13 @@ class HiraxOutput:
 
         f2 = self.fisherfileload
         
-        kpar = f2['kpar_center'][:]             * self.h
-        kpar_bands = f2['kpar_bands'][:]        * self.h
+        kpar = f2['kpar_center'][:]  * self.h
+        kpar_bands = f2['kpar_bands'][:]  * self.h
         kpar_size = len(kpar_bands)-1
         self.kpar_size = kpar_size
         
-        kperp = f2['kperp_center'][:]           * self.h
-        kperp_bands = f2['kperp_bands'][:]      * self.h
+        kperp = f2['kperp_center'][:] * self.h
+        kperp_bands = f2['kperp_bands'][:] * self.h
         kperp_size = len(kperp_bands)-1;   
         self.kperp_size = kperp_size
         
@@ -143,7 +144,9 @@ class HiraxOutput:
         
         errs = np.sqrt(abs(np.diag(self.covhirax))).reshape(kpar_params['kpar_size'],kperp_params['kperp_size'])
         
-        return errs / self.h**3
+        errs1 = errs / self.h**3
+        
+        return errs1 
         
     
     # def k_space_parameters_al(self):
