@@ -672,6 +672,9 @@ if len(params_to_vary) > len(load_old_res.prev_params_varied):
         currentparams[newparthistime] = np.random.uniform( priors[newparthistime][0] , priors[newparthistime][1] )
 
 
+time.sleep(5)
+
+
 chi2_func = {}
 for freqc,value_inputforhiraxoutput in inputforhiraxoutput.items():
     chi2_func[freqc] = Chi2Func(value_inputforhiraxoutput, INPUT)

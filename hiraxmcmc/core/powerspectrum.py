@@ -403,7 +403,7 @@ class CreatePs2d:
         
         self.pcl.set({'lensing':'no',
                       'output':'mPk',
-                      'P_k_max_h/Mpc':2,
+                      'P_k_max_1/Mpc':2,
                       'z_max_pk':3.5,
                       'non linear':'none'
                       })
@@ -428,12 +428,14 @@ class CreatePs2d:
         #     assert hubble_units_override != None
         #     hubble_units_val = hubble_units_override
         
-        try:
-            assert k_hunit_val == False
-            pk_k_z = lambda kv,zv: PK(kv , zv)
-        except:
-            raise ValueError("Please turn off the flag 'k_hunit_val = True' \
-                             in the function arguments")
+        # try:
+        #     assert k_hunit_val == False
+        #     pk_k_z = lambda kv,zv: PK(kv , zv)
+        # except:
+        #     raise ValueError("Please turn off the flag 'k_hunit_val = True' \
+        #                      in the function arguments")
+        
+        assert k_hunit_val == False
         
         # try:
         #     assert ((k_hunit_val == True) and (hubble_units_val==False))
@@ -446,7 +448,7 @@ class CreatePs2d:
         #     elif k_hunit_val == False and hubble_units_val==False:
         #         pk_kh_z = lambda kh,zv: PK(kh, zv)
         
-        return pk_k_z, self.pcl
+        return PK, self.pcl
         
         # try:
         #     assert output_CLASS_instance

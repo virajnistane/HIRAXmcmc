@@ -78,10 +78,14 @@ class Chi2Func:
         
         
         
-        self.xsens =  (self.kperp > self.kperp_limits_hunits['l']) * (self.kperp < self.kperp_limits_hunits['u']) *  (
-            self.kpar > self.kpar_limits_hunits['l']) * (self.kpar < self.kpar_limits_hunits['u']) * (
-                abs(self.errs) < 1) *  (
-                    self.kcenter > self.kcenter_limits_hunits['l']) * (self.kcenter < self.kcenter_limits_hunits['u']) #(k_center.flat > 0.1) * (k_center.flat < 0.15) * (np.diag(y['cov']) < 1)
+        self.xsens =  ((self.kperp > self.kperp_limits_hunits['l']) 
+                       * (self.kperp < self.kperp_limits_hunits['u']) 
+                       * (self.kpar > self.kpar_limits_hunits['l']) 
+                       * (self.kpar < self.kpar_limits_hunits['u']) 
+                       * (abs(self.errs) < 1) 
+                       * (self.kcenter > self.kcenter_limits_hunits['l']) 
+                       * (self.kcenter < self.kcenter_limits_hunits['u'])) 
+        #(k_center.flat > 0.1) * (k_center.flat < 0.15) * (np.diag(y['cov']) < 1)
         
         
         self.xsensflat = np.array(self.xsens.flat)
@@ -124,8 +128,8 @@ class Chi2Func:
             self.hz_fid = self.pspackage_properties.Hubble(self.redshift)
             
             self.f_growth_for_ps_estimated = self.pspackage_properties.scale_independent_growth_factor_f(self.redshift)
-            self.q_perp_for_ps_estimated =  self.pspackage_properties.angular_distance(self.redshift) / self.dA_fid   * self.cosmoparams_fixed['h']/self.h_fiducial
-            self.q_par_for_ps_estimated =  self.hz_fid / self.pspackage_properties.Hubble(self.redshift)              * self.cosmoparams_fixed['h']/self.h_fiducial
+            self.q_perp_for_ps_estimated =  self.pspackage_properties.angular_distance(self.redshift) / self.dA_fid   #* self.cosmoparams_fixed['h']/self.h_fiducial
+            self.q_par_for_ps_estimated =  self.hz_fid / self.pspackage_properties.Hubble(self.redshift)              #* self.cosmoparams_fixed['h']/self.h_fiducial
         except:
             assert self.cp_sample.pspackage == 'camb'
             self.dA_fid = self.pspackage_properties.angular_diameter_distance(self.redshift)
