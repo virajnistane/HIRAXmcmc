@@ -416,19 +416,6 @@ class CreatePs2d:
         
         
         # try:
-        #     assert k_hunit_override == None
-        #     k_hunit_val = True
-        # except:
-        #     assert k_hunit_override != None
-        #     k_hunit_val = k_hunit_override
-        # try:
-        #     assert hubble_units_override == None
-        #     hubble_units_val = False
-        # except:
-        #     assert hubble_units_override != None
-        #     hubble_units_val = hubble_units_override
-        
-        # try:
         #     assert k_hunit_val == False
         #     pk_k_z = lambda kv,zv: PK(kv , zv)
         # except:

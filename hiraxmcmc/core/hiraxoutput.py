@@ -82,8 +82,8 @@ class HiraxOutput:
 
         f2 = self.fisherfileload
         
-        kpar = f2['kpar_center'][:]  * self.h
-        kpar_bands = f2['kpar_bands'][:]  * self.h
+        kpar = f2['kpar_center'][:] * self.h
+        kpar_bands = f2['kpar_bands'][:] * self.h
         kpar_size = len(kpar_bands)-1
         self.kpar_size = kpar_size
         
