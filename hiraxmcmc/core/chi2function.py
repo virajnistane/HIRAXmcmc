@@ -147,9 +147,9 @@ class Chi2Func:
                                                              q_par_input = self.q_par_for_ps_estimated,
                                                              z=self.redshift,
                                                              f_growth = self.f_growth_for_ps_estimated,
+                                                             D_growth_z = self.pspackage_properties.scale_independent_growth_factor(self.redshift),
                                                              powerspectra_rescaling_factor = self.powerspectra_rescaling_factor_ps_estimated)
                                                              # currentparams_input = self.params_fixed.cosmoparams_fixed,
-                                                             # D_growth_z = self.pspackage_properties.scale_independent_growth_factor(self.redshift)
                                                              # )
         
         
