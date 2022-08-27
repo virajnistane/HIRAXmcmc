@@ -237,14 +237,14 @@ class Chi2Func:
         #     assert freqdep_paramstovary
         #     pkz_input_temp = PK_k_z_currentstep
         
-        # D_growth_here = PK_properties_currentstep.scale_independent_growth_factor(z)
+        D_growth_here = PK_properties_currentstep.scale_independent_growth_factor(z)
         
         pscalc = self.cp_params.get_ps2d_from_pok(PK_k_zClass = PK_k_z_currentstep,
                                                   q_perp_input = q_perp,
                                                   q_par_input = q_par,
                                                   z=z,
                                                   f_growth = f_growth,
-                                                  # D_growth_z = D_growth_here,
+                                                  D_growth_z = D_growth_here,
                                                   powerspectra_rescaling_factor = powerspectra_rescaling_factor
                                                   )
                                                   # currentparams_input = currentparams_input_for_pscalc,

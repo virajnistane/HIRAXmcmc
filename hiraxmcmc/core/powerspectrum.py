@@ -115,7 +115,7 @@ class Ps2dFromPofk:
     
     def get_ps2d_bandfunc(self, PK_k_zClass, 
                           pspackage, q_perp, q_par, 
-                          f_growth, #D_growth_z,
+                          f_growth, D_growth_z,
                           powerspectra_rescaling_factor,
                           bias=1, PKinterp=None):  #, currentparams
         
@@ -128,7 +128,7 @@ class Ps2dFromPofk:
             try:
                 assert PKinterp == None
                 assert pspackage == 'class'
-                pofk_final = lambda k: PK_k_zClass(k, self.redshift_from_hiraxoutput) #* D_growth_z**2
+                pofk_final = lambda k: PK_k_zClass(k, 0) * D_growth_z**2
                 # elif pspackage == 'camb':
                 #     pofk_final = lambda k: PK_k_zClass(k)
             except:
@@ -463,7 +463,7 @@ class CreatePs2d:
                           PK_k_zClass,
                           q_perp_input, q_par_input,
                           f_growth, 
-                          # D_growth_z,
+                          D_growth_z,
                           powerspectra_rescaling_factor,
                           # currentparams_input,
                           z=None):                          # currentparams,
@@ -478,7 +478,7 @@ class CreatePs2d:
                                                      q_perp = q_perp_input, 
                                                      q_par = q_par_input,
                                                      f_growth = f_growth,
-                                                     # D_growth_z = D_growth_z,
+                                                     D_growth_z = D_growth_z,
                                                      powerspectra_rescaling_factor = powerspectra_rescaling_factor)
                                                      # currentparams = currentparams_input,
                                                      #) #currentparams, 
