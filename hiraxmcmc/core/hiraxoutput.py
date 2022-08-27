@@ -144,7 +144,7 @@ class HiraxOutput:
         
         errs = np.sqrt(abs(np.diag(self.covhirax))).reshape(kpar_params['kpar_size'],kperp_params['kperp_size'])
         
-        errs1 = errs / self.h**3
+        errs1 = errs / self.h**(3/2)
         
         return errs1 
         

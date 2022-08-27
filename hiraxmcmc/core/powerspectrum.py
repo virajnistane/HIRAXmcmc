@@ -386,8 +386,8 @@ class CreatePs2d:
             
         self.pcl.set({'h': currentparamstemp['h'],
                       'Omega_b': self.parameters_fixed.Omb_fid,
-                      'Omega_cdm': Omc,
-                      # 'Omega_m': OmM,
+                      # 'Omega_cdm': Omc,
+                      'Omega_m': OmM,
                       'Omega_k': currentparamstemp['Omk'],
                       # 'Omega_fld': currentparamstemp['Oml'],
                       'Omega_Lambda': 0,
@@ -421,9 +421,7 @@ class CreatePs2d:
         # except:
         #     raise ValueError("Please turn off the flag 'k_hunit_val = True' \
         #                      in the function arguments")
-        
-        assert k_hunit_val == False
-        
+                
         # try:
         #     assert ((k_hunit_val == True) and (hubble_units_val==False))
         #     pk_kh_z = lambda kh,zv: PK(kh*h , zv)
