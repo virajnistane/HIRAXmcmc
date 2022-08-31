@@ -22,11 +22,11 @@
         "thetacov0": {
             "do_override": "yes",
             "manual_input_variance": {
-                "h": 0.06,
-                "Omk": 0.04,
-                "Oml": 0.02,
-                "w0": 0.01,
-                "wa": 0.6
+                "h": 0.006,
+                "Omk": 0.004,
+                "Oml": 0.004,
+                "w0": 0.001,
+                "wa": 0.003
             }
         },
         "burnin_for_run2": 4000
