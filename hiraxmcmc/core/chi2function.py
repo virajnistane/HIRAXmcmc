@@ -26,7 +26,7 @@ from hiraxmcmc.util.cosmoparamvalues import ParametersFixed
 
 class Chi2Func:
     
-    def __init__(self, inputforhiraxoutput, INPUT=None):
+    def __init__(self, inputforhiraxoutput, rank_mpi=None, INPUT=None):
         
         self.modulelocation = os.path.dirname(hiraxmcmc.__file__)
         self.inputforhiraxoutput = inputforhiraxoutput
@@ -47,6 +47,8 @@ class Chi2Func:
                 assert INPUT['likelihood']['PS_cov']['override'] == 'no'
             self.covhirax = self.hirax_output.covhirax
             self.errs = self.hirax_output.rel_err
+            if rank_mpi == 0:
+                print('Covariance in likelihood used from m-mode sims')
         except:
             if INPUT != None:
                 assert INPUT['likelihood']['PS_cov']['override'] == 'yes'
@@ -55,7 +57,8 @@ class Chi2Func:
             self.covhirax = np.loadtxt(os.path.join(INPUT['likelihood']['PS_cov']['files_dirfullpath'],
                                                     cov_override_file))
             self.errs  =  np.sqrt(abs(np.diag(self.covhirax))).reshape(self.kpar_all['kpar_size'],self.kperp_all['kperp_size'])
-        
+            if rank_mpi == 0:
+                print('Covariance in likelihood used from external file: \n %s'%(cov_override_file))
         
         self.kparstart = self.kpar_all['kpar_bands'][:-1]
         self.kparend = self.kpar_all['kpar_bands'][1:]
@@ -188,7 +191,7 @@ class Chi2Func:
                 
             except:
                 assert self.cp_params.pspackage == 'camb'
-                raise ValueError("Hello! It seems you are using CAMB for generating \
+                raise ValueError("Hellooo! It seems you are using CAMB for generating \
                                  signal for varying parameters. It is recommended to \
                                      use CLASS code instead. If you insist on using \
                                          CAMB, please comment out this line from the code.")
@@ -237,7 +240,7 @@ class Chi2Func:
         #     assert freqdep_paramstovary
         #     pkz_input_temp = PK_k_z_currentstep
         
-        D_growth_here = PK_properties_currentstep.scale_independent_growth_factor(z)
+        D_growth_here = self.pspackage_properties.scale_independent_growth_factor(z)
         
         pscalc = self.cp_params.get_ps2d_from_pok(PK_k_zClass = PK_k_z_currentstep,
                                                   q_perp_input = q_perp,
