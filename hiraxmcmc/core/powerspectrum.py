@@ -117,36 +117,40 @@ class Ps2dFromPofk:
                           pspackage, q_perp, q_par, 
                           f_growth, D_growth_z,
                           powerspectra_rescaling_factor,
-                          bias=1, PKinterp=None):  #, currentparams
+                          bias=1):  #, currentparams
         
         # h = currentparams['H0']/100
         
         
         # rescaling_factor = powerspectra_rescaling_factor
         
-        def P_kmu(k,mu):
-            try:
-                assert PKinterp == None
-                assert pspackage == 'class'
-                pofk_final = lambda k: PK_k_zClass(k, 0) * D_growth_z**2
-                # elif pspackage == 'camb':
-                #     pofk_final = lambda k: PK_k_zClass(k)
-            except:
-                print("PKinterp argument entered! Running exception")
-                assert pspackage == 'class'
-                pofk_final = lambda k: PKinterp(k, 0) * D_growth_z**2
-                # elif pspackage == 'camb':
-                #     pofk_final = lambda k: PKinterp.P(0 , k)
+        # def P_kmu(k,mu):
+        #     try:
+        #         assert PKinterp == None
+        #         assert pspackage == 'class'
+        #         pofk0_final = lambda k: PK_k_zClass(k, 0) * D_growth_z**2
+        #         # elif pspackage == 'camb':
+        #         #     pofk_final = lambda k: PK_k_zClass(k)
+        #     except:
+        #         print("PKinterp argument entered! Running exception")
+        #         assert pspackage == 'class'
+        #         pofk0_final = lambda k: PKinterp(k, 0) * D_growth_z**2
+        #         # elif pspackage == 'camb':
+        #         #     pofk_final = lambda k: PKinterp.P(0 , k)
                 
-                # THIS CASE NEEDS TO BE CHECHKED AT SOME POINT 
+        #         # THIS CASE NEEDS TO BE CHECHKED AT SOME POINT 
                     
-            return (pofk_final(k) * (bias + f_growth * mu**2)**2)
+        #     return (pofkz_final(k) * (bias + f_growth * mu**2)**2)
+        
+        assert pspackage == 'class'
+        P_kmu = lambda k,mu: (PK_k_zClass(k, 0) * D_growth_z**2 
+                              * (1 + f_growth * mu**2)**2 * 
+                              powerspectra_rescaling_factor)
         
         
         self.band_pk = [(lambda bandt: 
-                         (lambda k, mu: 
-                          powerspectra_rescaling_factor 
-                          * P_kmu(self.k1(k,mu,qpar=q_par,qperp=q_perp), 
+                         (lambda k, mu:  
+                          P_kmu(self.k1(k,mu,qpar=q_par,qperp=q_perp), 
                                   self.mu1(mu,qpar=q_par,qperp=q_perp))
                           * bandt(k, mu))
                              )(band)
