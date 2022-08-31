@@ -677,7 +677,7 @@ time.sleep(5)
 
 chi2_func = {}
 for freqc,value_inputforhiraxoutput in inputforhiraxoutput.items():
-    chi2_func[freqc] = Chi2Func(value_inputforhiraxoutput, INPUT)
+    chi2_func[freqc] = Chi2Func(value_inputforhiraxoutput, rank_mpi, INPUT)
     
 if rank_mpi == 0:
     if INPUT['likelihood']['PS_cov']['override'] == 'yes':
@@ -980,6 +980,8 @@ time.sleep(5)
 #                               \    /
 #                                \  /
 #                                 \/
+
+
 
 def u():
     return np.random.uniform(0,1)
