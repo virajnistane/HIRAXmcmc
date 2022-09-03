@@ -157,7 +157,7 @@ class Chi2Func:
         
         
     
-    def chi2_multiz(self, PK_k_z_currentstep, PK_properties_currentstep, z, currentparams, cosmoparams):  
+    def chi2_multiz(self, PK_k_z_currentstep, PK_properties_currentstep, z, currentparams, cosmoparams, scalingparams=None):  
         
         freqdep_paramstovary = checkconditionforlist(list(currentparams.keys()), allelements_have_subpart='(z)')
         
@@ -213,6 +213,14 @@ class Chi2Func:
                 H0 = cosmoparams['H0']
                 h = H0/100
             
+            if scalingparams != None:
+                currentparamstemp = currentparams.copy()
+                for i in scalingparams.keys():
+                    try:
+                        assert i in currentparamstemp.keys()
+                    except:
+                        currentparamstemp[i] = scalingparams[i]
+                    
             try:
                 q_par = currentparams['qpar(z)']                #* self.h_fiducial/h
             except:

@@ -231,7 +231,6 @@ class ParametersFixed:
             if '(z)' not in key:
                 temp[key] = val
         return temp
-    
 
     def current_params_to_vary_fixed(self, params_to_vary, toggle_paramstovary_freqdep, fcbin=None, external_current_allparams_fixed=None):
         """
