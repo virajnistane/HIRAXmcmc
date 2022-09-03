@@ -222,18 +222,18 @@ class Chi2Func:
                         currentparamstemp[i] = scalingparams[i]
                     
             try:
-                q_par = currentparams['qpar(z)']                #* self.h_fiducial/h
+                q_par = currentparamstemp['qpar(z)']                #* self.h_fiducial/h
             except:
-                q_par = self.hz_fid / currentparams['h(z)']     #* self.h_fiducial/h
+                q_par = self.hz_fid / currentparamstemp['h(z)']     #* self.h_fiducial/h
                 
             try:
-                q_perp = currentparams['qperp(z)']              #* self.h_fiducial/h
+                q_perp = currentparamstemp['qperp(z)']              #* self.h_fiducial/h
             except:
-                q_perp = currentparams['dA(z)'] / self.dA_fid   #* self.h_fiducial/h
+                q_perp = currentparamstemp['dA(z)'] / self.dA_fid   #* self.h_fiducial/h
                 
             powerspectra_rescaling_factor = 1/(q_perp**2 * q_par)
             
-            f_growth = currentparams['f(z)']
+            f_growth = currentparamstemp['f(z)']
             currentparams_input_for_pscalc = cosmoparams
         
         
