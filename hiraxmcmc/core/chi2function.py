@@ -213,8 +213,9 @@ class Chi2Func:
                 H0 = cosmoparams['H0']
                 h = H0/100
             
-            if scalingparams != None:
-                currentparamstemp = currentparams.copy()
+            currentparamstemp = currentparams.copy()
+            
+            if scalingparams != None:    
                 for i in scalingparams.keys():
                     try:
                         assert i in currentparamstemp.keys()
