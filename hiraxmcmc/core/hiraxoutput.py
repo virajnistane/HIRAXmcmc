@@ -64,7 +64,7 @@ class HiraxOutput:
             M = np.diag(self.cinv.T.reshape(int(self.cinv.shape[0]*self.cinv.shape[1]),int(self.cinv.shape[2]*self.cinv.shape[3])).sum(axis=1)** -1)
             covhirax = np.matmul(M, np.matmul(self.cinv.T.reshape(int(self.cinv.shape[0]*self.cinv.shape[1]),int(self.cinv.shape[2]*self.cinv.shape[3])), M.T))
         # return 0.05**2 * np.identity(len(covhirax)) # 
-        covhirax1 = covhirax / self.h**3
+        covhirax1 = covhirax #/ self.h**3
         return covhirax1
     
     # @property
@@ -144,7 +144,7 @@ class HiraxOutput:
         
         errs = np.sqrt(abs(np.diag(self.covhirax))).reshape(kpar_params['kpar_size'],kperp_params['kperp_size'])
         
-        errs1 = errs / self.h**(3/2)
+        errs1 = errs # / self.h**(3/2)
         
         return errs1 
         
