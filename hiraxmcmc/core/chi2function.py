@@ -74,11 +74,9 @@ class Chi2Func:
         """ select k-bins """
         
         
-        
         self.kperp_limits_hunits =  {'l':self.kperpstart[2], 'u':self.kperpend[6]}  # {'l':0.025, 'u':0.1}
         self.kpar_limits_hunits =    {'l':self.kparstart[4], 'u':self.kparend[12]} # {'l':0.025, 'u':0.25}
         self.kcenter_limits_hunits = {'l':0.05 * self.hirax_output.h, 'u':0.15 * self.hirax_output.h}
-        
         
         
         self.xsens =  ((self.kperp > self.kperp_limits_hunits['l']) 
