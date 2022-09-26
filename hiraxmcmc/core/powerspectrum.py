@@ -144,7 +144,7 @@ class Ps2dFromPofk:
         
         assert pspackage == 'class'
         P_kmu = lambda k,mu: (PK_k_zClass(k, 0) * D_growth_z**2 
-                              * (1 + f_growth * mu**2)**2 * 
+                              * (bias + f_growth * mu**2)**2 * 
                               powerspectra_rescaling_factor)
         
         
