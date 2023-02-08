@@ -1061,9 +1061,9 @@ for ii in np.arange(1,int(niterations+1)):
             
             
             
-            print("planck chi2: ",chi2_planck)
+        # print("planck chi2: ",chi2_planck)
         
-        chi2new = np.sum(list(chi2new1.values()))
+        chi2new = np.sum(list(chi2new1.values())) + chi2_planck
         
         if not paramv_within_priors(priors, currentparams):
             chi2new = 1e99
