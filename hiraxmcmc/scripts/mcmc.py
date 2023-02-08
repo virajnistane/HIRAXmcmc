@@ -52,6 +52,11 @@ from camb import model, initialpower
 from classy import Class
 
 
+""" COBAYA """
+
+from cobaya.model import get_model
+from cobaya.yaml import yaml_load
+
 # =============================================================================
 # Initialize MPI
 # =============================================================================
@@ -1030,6 +1035,17 @@ for ii in np.arange(1,int(niterations+1)):
             PK_k_z_current , CLASS_instance_current = chi2_func[key0].cp_params.get_pk_and_prop(currentparams=currentparams)
             # if rank_mpi == 0:
             #     print("time for CLASS comp:",time.time()-timertime0)
+            
+            plik_include = True
+            if plik_include:
+                info = yaml_load(chi2_func[key0].cp_params.info_txt_for_plik)
+                info['planck_packages_path'] = '/home/s/sievers/nistanev/planck2/'
+                model_cobaya = get_model(info)
+                point = dict(zip(model_cobaya.parameterization.sampled_params(),
+                                 model_cobaya.prior.sample(ignore_external=True)[0]))
+                logposterior = model_cobaya.logposterior(point, as_dict=True)
+                chi2_planck = -2 * list(logposterior['loglikes'].values())[0]
+                
         except:
             assert freqdep_paramstovary
             
@@ -1042,7 +1058,10 @@ for ii in np.arange(1,int(niterations+1)):
                                                            currentparams=currentparams,
                                                            cosmoparams=cosmoparams_fixed)
             
-            print("planck chi2: ",chi2new1[freqc].chi2_planck)
+            
+            
+            
+            print("planck chi2: ",chi2_planck)
         
         chi2new = np.sum(list(chi2new1.values()))
         
