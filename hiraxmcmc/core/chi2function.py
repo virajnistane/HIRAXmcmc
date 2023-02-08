@@ -15,7 +15,8 @@ from hiraxmcmc.core.powerspectrum import CreatePs2d
 from hiraxmcmc.core.powerspectrum import Ps2dFromPofk
 from hiraxmcmc.util.cosmoparamvalues import ParametersFixed
     
-
+from cobaya.model import get_model
+from cobaya.yaml import yaml_load
 
 
 # =============================================================================
@@ -266,6 +267,16 @@ class Chi2Func:
         self.ps_masked_sens_chi2 = ps_masked_sens_chi2
         
         chi2 = np.matmul(np.matmul(ps_masked_sens_chi2, la.inv(self.cov_masked_sens)), ps_masked_sens_chi2)
+        
+        plik_include = True
+        if plik_include:
+            info = yaml_load(self.cp_params.info_txt_for_plik)
+            info['planck_packages_path'] = '/home/s/sievers/nistanev/planck2/'
+            model = get_model(info)
+            point = dict(zip(model.parameterization.sampled_params(),
+                             model.prior.sample(ignore_external=True)[0]))
+            logposterior = model.logposterior(point, as_dict=True)
+            self.chi2_planck = -2 * list(logposterior['loglikes'].values())[0]
         
         return chi2
     

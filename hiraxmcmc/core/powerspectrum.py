@@ -404,6 +404,27 @@ class CreatePs2d:
                       'sigma8': 0.8211752725010274,
                       })
         
+        self.info_txt_for_plik = r"""
+        likelihood:
+          planck_2018_highl_plik.TTTEEE_lite_native:
+        theory:
+          classy:
+            extra_args: {N_ur: %s}
+        params:
+          sigma8: {value: 0.8211752725010274}
+          H0: {value: %s}
+          Omega_b: {value: %s}
+          Omega_m: {value: %s}
+          Omega_k: {value: %s}
+          Omega_Lambda: {value: 0}
+          Omega_scf: {value: 0}
+          Omega_g: {value: %s}
+          w0_fld: {value: %s}
+          wa_fld: {value: %s}
+        """%(self.parameters_fixed.nnu, currentparamstemp['h']*100, 
+        self.parameters_fixed.Omb_fid, OmM, currentparamstemp['Omk'], self.parameters_fixed.Omg_fid,
+        currentparamstemp['w0'],currentparamstemp['wa'])
+        
         
         self.pcl.set({'lensing':'no',
                       'output':'mPk',
