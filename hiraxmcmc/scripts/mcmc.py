@@ -1042,7 +1042,7 @@ for ii in np.arange(1,int(niterations+1)):
                                                            currentparams=currentparams,
                                                            cosmoparams=cosmoparams_fixed)
             
-            print(chi2new1[freqc].chi2_planck)
+            print("planck chi2: ",chi2new1[freqc].chi2_planck)
         
         chi2new = np.sum(list(chi2new1.values()))
         
