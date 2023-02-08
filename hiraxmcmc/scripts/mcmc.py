@@ -1039,7 +1039,7 @@ for ii in np.arange(1,int(niterations+1)):
             plik_include = True
             if plik_include:
                 info = yaml_load(chi2_func[key0].cp_params.info_txt_for_plik)
-                info['planck_packages_path'] = '/home/s/sievers/nistanev/planck2/'
+                info['packages_path'] = '/home/s/sievers/nistanev/planck2/'
                 model_cobaya = get_model(info)
                 point = dict(zip(model_cobaya.parameterization.sampled_params(),
                                  model_cobaya.prior.sample(ignore_external=True)[0]))

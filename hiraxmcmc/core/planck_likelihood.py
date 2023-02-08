@@ -18,6 +18,8 @@ from cobaya.yaml import yaml_load
 info_txt = r"""
 likelihood:
   planck_2018_highl_plik.TTTEEE_lite_native:
+packages_path:
+  /Users/Viraj.Nistane/Desktop/phdmywork/planck2
 theory:
   classy:
     extra_args: {N_ur: 2.0328, N_ncdm: 1}
@@ -60,7 +62,7 @@ params:
 """
     
 info = yaml_load(info_txt)
-info['packages_path'] = '/Users/Viraj.Nistane/Desktop/phdmywork/planck2'
+# info['packages_path'] = '/Users/Viraj.Nistane/Desktop/phdmywork/planck2'
 
 
 model = get_model(info)
