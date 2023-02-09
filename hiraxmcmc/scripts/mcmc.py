@@ -749,7 +749,7 @@ Dltt = CLASS_instance_current.lensed_cl()['tt'][2:] * ls * (ls+1)/2/np.pi
 Dlte = CLASS_instance_current.lensed_cl()['te'][2:] * ls * (ls+1)/2/np.pi
 Dlee = CLASS_instance_current.lensed_cl()['ee'][2:] * ls * (ls+1)/2/np.pi
 ellmin=int(ls[0])
-TTTEEE2018=PlanckLitePy(data_directory='data', year=2018, spectra='TTTEEE', use_low_ell_bins=False)
+TTTEEE2018=PlanckLitePy(data_directory=os.path.join(MCMCmodulespath,'util','data'), year=2018, spectra='TTTEEE', use_low_ell_bins=False)
 planckloglike_old =TTTEEE2018.loglike(Dltt, Dlte, Dlee, ellmin)
 chi2_planck_old = -2 * planckloglike_old
 
@@ -1074,18 +1074,18 @@ for ii in np.arange(1,int(niterations+1)):
             # using planck_lite_py.py
             # =================================================================
             
-
+            
             
             ls = CLASS_instance_current.lensed_cl()['ell'][2:]
             Dltt = CLASS_instance_current.lensed_cl()['tt'][2:] * ls * (ls+1)/2/np.pi
             Dlte = CLASS_instance_current.lensed_cl()['te'][2:] * ls * (ls+1)/2/np.pi
             Dlee = CLASS_instance_current.lensed_cl()['ee'][2:] * ls * (ls+1)/2/np.pi
             ellmin=int(ls[0])
-            TTTEEE2018=PlanckLitePy(data_directory='data', year=2018, spectra='TTTEEE', use_low_ell_bins=False)
+            TTTEEE2018=PlanckLitePy(data_directory=os.path.join(MCMCmodulespath,'util','data'), year=2018, spectra='TTTEEE', use_low_ell_bins=False)
             planckloglike_new =TTTEEE2018.loglike(Dltt, Dlte, Dlee, ellmin)
             chi2_planck_new = -2 * planckloglike_new
             
-                
+            
         except:
             assert freqdep_paramstovary
             
@@ -1103,7 +1103,7 @@ for ii in np.arange(1,int(niterations+1)):
             
         # print("planck chi2: ",chi2_planck)
         
-        chi2new = np.sum(list(chi2new1.values())) + chi2_planck
+        chi2new = np.sum(list(chi2new1.values())) + chi2_planck_new
         
         if not paramv_within_priors(priors, currentparams):
             chi2new = 1e99
