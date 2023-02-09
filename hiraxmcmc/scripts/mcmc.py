@@ -1036,15 +1036,17 @@ for ii in np.arange(1,int(niterations+1)):
             # if rank_mpi == 0:
             #     print("time for CLASS comp:",time.time()-timertime0)
             
-            plik_include = True
-            if plik_include:
-                info = yaml_load(chi2_func[key0].cp_params.info_txt_for_plik)
-                info['packages_path'] = '/home/s/sievers/nistanev/planck2/'
-                model_cobaya = get_model(info)
-                point = dict(zip(model_cobaya.parameterization.sampled_params(),
-                                 model_cobaya.prior.sample(ignore_external=True)[0]))
-                logposterior = model_cobaya.logposterior(point, as_dict=True)
-                chi2_planck = -2 * list(logposterior['loglikes'].values())[0]
+            # plik_include = True
+            # if plik_include:
+            info = yaml_load(chi2_func[key0].cp_params.info_txt_for_plik)
+            info['packages_path'] = '/home/s/sievers/nistanev/planck2/'
+            model_cobaya = get_model(info)
+            point = dict(zip(model_cobaya.parameterization.sampled_params(),
+                             model_cobaya.prior.sample(ignore_external=True)[0]))
+            logposterior = model_cobaya.logposterior(point, as_dict=True)
+            chi2_planck = -2 * list(logposterior['loglikes'].values())[0]
+            if np.isinf(chi2_planck):
+                chi2_planck = 1e99
                 
         except:
             assert freqdep_paramstovary
