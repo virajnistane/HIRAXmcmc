@@ -740,9 +740,21 @@ for freqc,val in inputforhiraxoutput.items():
                                                    cosmoparams=cosmoparams_fixed)
 
 
+# =============================================================================
+# planck likelihood
+# =============================================================================
+
+ls = CLASS_instance_current.lensed_cl()['ell'][2:]
+Dltt = CLASS_instance_current.lensed_cl()['tt'][2:] * ls * (ls+1)/2/np.pi
+Dlte = CLASS_instance_current.lensed_cl()['te'][2:] * ls * (ls+1)/2/np.pi
+Dlee = CLASS_instance_current.lensed_cl()['ee'][2:] * ls * (ls+1)/2/np.pi
+ellmin=int(ls[0])
+TTTEEE2018=PlanckLitePy(data_directory='data', year=2018, spectra='TTTEEE', use_low_ell_bins=False)
+planckloglike_old =TTTEEE2018.loglike(Dltt, Dlte, Dlee, ellmin)
+chi2_planck_old = -2 * planckloglike_old
 
 
-chi2old = np.sum(list(chi2old1.values()))
+chi2old = np.sum(list(chi2old1.values())) + chi2_planck_old
 
 
 if rank_mpi==0:
@@ -1070,8 +1082,8 @@ for ii in np.arange(1,int(niterations+1)):
             Dlee = CLASS_instance_current.lensed_cl()['ee'][2:] * ls * (ls+1)/2/np.pi
             ellmin=int(ls[0])
             TTTEEE2018=PlanckLitePy(data_directory='data', year=2018, spectra='TTTEEE', use_low_ell_bins=False)
-            planckloglike=TTTEEE2018.loglike(Dltt, Dlte, Dlee, ellmin)
-            chi2_planck = -2 * planckloglike
+            planckloglike_new =TTTEEE2018.loglike(Dltt, Dlte, Dlee, ellmin)
+            chi2_planck_new = -2 * planckloglike_new
             
                 
         except:
