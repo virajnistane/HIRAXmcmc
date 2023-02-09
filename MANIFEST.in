@@ -2,3 +2,4 @@ include hiraxmcmc/planckfiles/*.ini
 include hiraxmcmc/mmoderesults/run*/draco/*.h5
 include hiraxmcmc/mmoderesults/run*/drift*/bt/*/psmc*/*.hdf5
 include hiraxmcmc/mmoderesults/run*/drift*/*.yaml
+include hiraxmcmc/util/data/
