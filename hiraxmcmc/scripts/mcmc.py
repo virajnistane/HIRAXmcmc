@@ -54,8 +54,8 @@ from classy import Class
 
 """ COBAYA """
 
-from cobaya.model import get_model
-from cobaya.yaml import yaml_load
+# from cobaya.model import get_model
+# from cobaya.yaml import yaml_load
 
 # =============================================================================
 # Initialize MPI
