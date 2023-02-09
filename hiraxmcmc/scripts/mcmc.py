@@ -57,6 +57,11 @@ from classy import Class
 # from cobaya.model import get_model
 # from cobaya.yaml import yaml_load
 
+
+""" PlanckLitePy ; https://github.com/heatherprince/planck-lite-py """
+
+from hiraxmcmc.core.planck_lite_py import PlanckLitePy
+
 # =============================================================================
 # Initialize MPI
 # =============================================================================
@@ -1057,7 +1062,7 @@ for ii in np.arange(1,int(niterations+1)):
             # using planck_lite_py.py
             # =================================================================
             
-            from hiraxmcmc.core.planck_lite_py import PlanckLitePy
+
             
             ls = CLASS_instance_current.lensed_cl()['ell'][2:]
             Dltt = CLASS_instance_current.lensed_cl()['tt'][2:] * ls * (ls+1)/2/np.pi
