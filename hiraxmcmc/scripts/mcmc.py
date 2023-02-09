@@ -749,6 +749,7 @@ Dltt = CLASS_instance_current.lensed_cl()['tt'][2:] * ls * (ls+1)/2/np.pi
 Dlte = CLASS_instance_current.lensed_cl()['te'][2:] * ls * (ls+1)/2/np.pi
 Dlee = CLASS_instance_current.lensed_cl()['ee'][2:] * ls * (ls+1)/2/np.pi
 ellmin=int(ls[0])
+
 TTTEEE2018=PlanckLitePy(data_directory=os.path.join(MCMCmodulespath,'util','data'), year=2018, spectra='TTTEEE', use_low_ell_bins=False)
 planckloglike_old =TTTEEE2018.loglike(Dltt, Dlte, Dlee, ellmin)
 chi2_planck_old = -2 * planckloglike_old

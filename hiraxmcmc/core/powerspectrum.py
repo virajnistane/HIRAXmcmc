@@ -430,6 +430,7 @@ class CreatePs2d:
                       'output': 'tCl,pCl,lCl,mPk', # {'mPk','tCl','pCl'},
                       'P_k_max_1/Mpc':2,
                       'z_max_pk':3.5,
+                      'l_max_scalars': 2700,
                       'non linear':'none'
                       })
         
