@@ -1036,17 +1036,38 @@ for ii in np.arange(1,int(niterations+1)):
             # if rank_mpi == 0:
             #     print("time for CLASS comp:",time.time()-timertime0)
             
+            
+            
+            # =================================================================
+            #    using COBAYA 
+            # =================================================================
             # plik_include = True
             # if plik_include:
-            info = yaml_load(chi2_func[key0].cp_params.info_txt_for_plik)
-            info['packages_path'] = '/home/s/sievers/nistanev/planck2/'
-            model_cobaya = get_model(info)
-            point = dict(zip(model_cobaya.parameterization.sampled_params(),
-                             model_cobaya.prior.sample(ignore_external=True)[0]))
-            logposterior = model_cobaya.logposterior(point, as_dict=True)
-            chi2_planck = -2 * list(logposterior['loglikes'].values())[0]
-            if np.isinf(chi2_planck):
-                chi2_planck = 1e99
+            # info = yaml_load(chi2_func[key0].cp_params.info_txt_for_plik)
+            # info['packages_path'] = '/home/s/sievers/nistanev/planck2/'
+            # model_cobaya = get_model(info)
+            # point = dict(zip(model_cobaya.parameterization.sampled_params(),
+            #                  model_cobaya.prior.sample(ignore_external=True)[0]))
+            # logposterior = model_cobaya.logposterior(point, as_dict=True)
+            # chi2_planck = -2 * list(logposterior['loglikes'].values())[0]
+            # if np.isinf(chi2_planck):
+            #     chi2_planck = 1e99
+            
+            # =================================================================
+            # using planck_lite_py.py
+            # =================================================================
+            
+            from hiraxmcmc.core.planck_lite_py import PlanckLitePy
+            
+            ls = CLASS_instance_current.lensed_cl()['ell'][2:]
+            Dltt = CLASS_instance_current.lensed_cl()['tt'][2:] * ls * (ls+1)/2/np.pi
+            Dlte = CLASS_instance_current.lensed_cl()['te'][2:] * ls * (ls+1)/2/np.pi
+            Dlee = CLASS_instance_current.lensed_cl()['ee'][2:] * ls * (ls+1)/2/np.pi
+            ellmin=int(ls[0])
+            TTTEEE2018=PlanckLitePy(data_directory='data', year=2018, spectra='TTTEEE', use_low_ell_bins=False)
+            planckloglike=TTTEEE2018.loglike(Dltt, Dlte, Dlee, ellmin)
+            chi2_planck = -2 * planckloglike
+            
                 
         except:
             assert freqdep_paramstovary
