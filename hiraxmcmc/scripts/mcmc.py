@@ -1086,6 +1086,8 @@ for ii in np.arange(1,int(niterations+1)):
             planckloglike_new =TTTEEE2018.loglike(Dltt, Dlte, Dlee, ellmin)
             chi2_planck_new = -2 * planckloglike_new
             
+            # if np.isinf(chi2_planck_new):
+            #     chi2_planck_new = 1e99
             
         except:
             assert freqdep_paramstovary
@@ -1105,6 +1107,9 @@ for ii in np.arange(1,int(niterations+1)):
         # print("planck chi2: ",chi2_planck)
         
         chi2new = np.sum(list(chi2new1.values())) + chi2_planck_new
+        
+        if np.isnan(chi2new) or np.isinf(chi2new):
+            print("Alert! chi2_planck = %s"%(chi2_planck_new))
         
         if not paramv_within_priors(priors, currentparams):
             chi2new = 1e99
