@@ -15,6 +15,12 @@ planck calibration is set to 1 by default but this can easily be modified
 import numpy as np
 from scipy.io import FortranFile
 import scipy.linalg
+import os
+import hiraxmcmc
+
+
+MCMCmodulespath = os.path.dirname(hiraxmcmc.__file__)
+
 
 def main():
     TTTEEE2018=PlanckLitePy(year=2018, spectra='TTTEEE', use_low_ell_bins=False)
@@ -31,7 +37,8 @@ def main():
 
 
 class PlanckLitePy:
-    def __init__(self, data_directory='data', year=2018, spectra='TT', use_low_ell_bins=False):
+    def __init__(self, data_directory=os.path.join(MCMCmodulespath,'util','data'), 
+                 year=2018, spectra='TT', use_low_ell_bins=False):
         '''
         data_directory = path from where you are running this to the folder
           containing the planck2015/8_low_ell and planck2015/8_plik_lite data
