@@ -1082,7 +1082,7 @@ for ii in np.arange(1,int(niterations+1)):
             Clte = CLASS_instance_current.lensed_cl()['te'][2:] * ls * (ls+1)/2/np.pi
             Clee = CLASS_instance_current.lensed_cl()['ee'][2:] * ls * (ls+1)/2/np.pi
             ellmin=int(ls[0])
-            chi2_planck_new = -2 * TTTEEE2018.loglike(Cltt, Clte, Clee, ellmin)
+            chi2_planck_new = -2 * TT2018.loglike(Cltt, Clte, Clee, ellmin)
             
             
             if np.isinf(chi2_planck_new) or np.isnan(chi2_planck_new):
