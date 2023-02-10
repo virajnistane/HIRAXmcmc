@@ -176,14 +176,21 @@ class PlanckLitePy:
 
         return fisher
 
-    def loglike(self, Dltt, Dlte, Dlee, ellmin=2):
-        #convert model Dl's to Cls then bin them
-        ls=np.arange(len(Dltt))+ellmin
-        fac=ls*(ls+1)/(2*np.pi)
-        Cltt=Dltt/fac
-        Clte=Dlte/fac
-        Clee=Dlee/fac
+    # def loglike(self, Dltt, Dlte, Dlee, ellmin=2):
+    #     #convert model Dl's to Cls then bin them
+    #     ls=np.arange(len(Dltt))+ellmin
+    #     fac=ls*(ls+1)/(2*np.pi)
+    #     Cltt=Dltt/fac
+    #     Clte=Dlte/fac
+    #     Clee=Dlee/fac
 
+    def loglike(self, Cltt, Clte, Clee, ellmin=2):
+        #convert model Dl's to Cls then bin them
+        # ls=np.arange(len(Cltt))+ellmin
+        # fac=ls*(ls+1)/(2*np.pi)
+        # Cltt=Dltt/fac
+        # Clte=Dlte/fac
+        # Clee=Dlee/fac
 
         # Fortran to python slicing: a:b becomes a-1:b
         # need to subtract 1 to use 0 indexing for cl,
@@ -239,7 +246,8 @@ class PlanckLitePy:
 
 
     def test(self):
-        ls, Dltt, Dlte, Dlee = np.genfromtxt('data/Dl_planck2015fit.dat', unpack=True)
+        ls, Dltt, Dlte, Dlee = np.genfromtxt(os.path.join(MCMCmodulespath,'util','data','Dl_planck2015fit.dat'), 
+                                              unpack=True)
         ellmin=int(ls[0])
         loglikelihood=self.loglike(Dltt, Dlte, Dlee, ellmin)
 
