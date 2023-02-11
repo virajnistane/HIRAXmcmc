@@ -32,38 +32,49 @@ class ParametersFixed:
     
     def __init__(self):
         
-        self._h = 0.6777
+        
+        # case  18.1 of https://wiki.cosmos.esa.int/planck-legacy-archive/images/b/be/Baseline_params_table_2018_68pc.pdf
+        
+        self._h = 0.6686
         self._H0 = self._h * 100
         
-        self._ombh2 = 0.022161
-        self._omch2 = 0.11889
+        self._ombh2 = 0.022126
+        self._omch2 =  0.12068
         
         self._Omb = self._ombh2/self._h**2
         self._Omc = self._omch2/self._h**2
         
         self._Omk = 0.0
+        self._Oml = 0.6791
         
         self._OmM = (self._ombh2 + self._omch2)/self._h**2
         
         
         rhoc = 3.0 * self._H0**2 * cc**2 / (8.0 * np.pi * self._G) / (1e6 * self._parsec_in_km)**2
-        
-        
         # fixing Omega_gamma
         rhorad = self._a_rad * self._T0**4
         self._Omg = rhorad / rhoc
         
+        # Finally, evaluating Omega_rad and nnu from the other fixed parameters
+        self._Omr = 1 - self._Oml - self._OmM - self._Omk
+        self._Omnu = self._Omr - self._Omg 
+        rhonu = self._Omnu * rhoc
+        
+        self.nnu = rhonu / (rhorad * 7.0 / 8.0 * (4.0 / 11.0)**(4.0 / 3.0))
+        
+        
         # fixing Omega_nu
-        self.nnu = 3.046
-        rhonu = self.nnu * rhorad * 7.0 / 8.0 * (4.0 / 11.0)**(4.0 / 3.0)
-        self._Omnu = rhonu / rhoc
+        # self.nnu = 0 # 3.046
+        # rhonu = self.nnu * rhorad * 7.0 / 8.0 * (4.0 / 11.0)**(4.0 / 3.0)
+        # self._Omnu = rhonu / rhoc
         self._omnuh2 = self._Omnu * self._h**2
         
         # Adding Omega_gamma and Omega_nu, temporarily set to 0 for simplicity
-        self._Omr = self._Omg + self._Omnu
+        # self._Omr = self._Omg + self._Omnu
                 
         # Finally, evaluating Omega_Lambda from the other fixed parameters
-        self._Oml = 1 - self._Omk - self._OmM - self._Omr
+        # self._Oml = 1 - self._Omk - self._OmM - self._Omr
+        # self._Omk = 1 - self._Oml - self._OmM  - self._Omr
         
         
         self._w0 = -1.0

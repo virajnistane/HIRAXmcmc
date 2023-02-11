@@ -382,10 +382,10 @@ class CreatePs2d:
             OmM = 1 - (currentparamstemp['Oml'] 
                        + currentparamstemp['Omk'] 
                        + self.parameters_fixed.Omr_fid)
-            Omc = OmM - self.parameters_fixed.Omb_fid
+            # Omc = OmM - self.parameters_fixed.Omb_fid
         except:
             assert self.pstype == 'sample'
-            Omc = self.parameters_fixed.Omc_fid
+            # Omc = self.parameters_fixed.Omc_fid
             OmM = self.parameters_fixed.OmM_fid
             
         self.pcl.set({'h': currentparamstemp['h'],
@@ -401,7 +401,7 @@ class CreatePs2d:
                       'fluid_equation_of_state': 'CLP',
                       'w0_fld': currentparamstemp['w0'],
                       'wa_fld': currentparamstemp['wa'],
-                      'sigma8': 0.8211752725010274,
+                      'sigma8': 0.8126 # 0.8211752725010274,
                       })
         
         # self.info_txt_for_plik = r"""
