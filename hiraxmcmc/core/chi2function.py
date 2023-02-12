@@ -265,8 +265,8 @@ class Chi2Func:
         
         self.ps_masked_sens_chi2 = ps_masked_sens_chi2
         
-        chi2 = np.matmul(np.matmul(ps_masked_sens_chi2, la.inv(self.cov_masked_sens)), ps_masked_sens_chi2)
-        
+        # chi2 = np.matmul(np.matmul(ps_masked_sens_chi2, la.inv(self.cov_masked_sens)), ps_masked_sens_chi2)
+        chi2 = ps_masked_sens_chi2.dot( (la.inv(self.cov_masked_sens)).dot( ps_masked_sens_chi2))
         
         
         return chi2

@@ -426,11 +426,12 @@ class CreatePs2d:
         # currentparamstemp['w0'],currentparamstemp['wa'])
         
         
-        self.pcl.set({'lensing':'yes',
-                      'output': 'tCl,pCl,lCl,mPk', # {'mPk','tCl','pCl'},
+        self.pcl.set({'lensing':'no',
+                      'output': 'tCl,mPk,pCl', # {'mPk','tCl','pCl'},
+                      # 'output': 'mPk', # {'mPk','tCl','pCl'},
                       'P_k_max_1/Mpc':2,
                       'z_max_pk':3.5,
-                      'l_max_scalars': 2700,
+                      'l_max_scalars': 2600,
                       'non linear':'none'
                       })
         

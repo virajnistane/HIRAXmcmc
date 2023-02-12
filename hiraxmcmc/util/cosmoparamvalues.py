@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from scipy.integrate import cumtrapz, trapz
 from scipy.constants import speed_of_light as cc
 import numpy as np
+
+from hiraxmcmc.util.basicfunctions import *
 
 # =============================================================================
 # Fixed param values
@@ -35,74 +38,74 @@ class ParametersFixed:
         
         # case  18.1 of https://wiki.cosmos.esa.int/planck-legacy-archive/images/b/be/Baseline_params_table_2018_68pc.pdf
         
+        
+        # Hubble parameter
         self._h = 0.6686
         self._H0 = self._h * 100
         
+        # Omega_matter
         self._ombh2 = 0.022126
         self._omch2 =  0.12068
         
         self._Omb = self._ombh2/self._h**2
         self._Omc = self._omch2/self._h**2
-        
-        self._Omk = 0.0
-        self._Oml = 0.6791
-        
         self._OmM = (self._ombh2 + self._omch2)/self._h**2
         
+        # Omega_curvature
+        self._Omk = 0.0
         
+        
+        # Omega_radiation
         rhoc = 3.0 * self._H0**2 * cc**2 / (8.0 * np.pi * self._G) / (1e6 * self._parsec_in_km)**2
-        # fixing Omega_gamma
+            # Omega_gamma
         rhorad = self._a_rad * self._T0**4
         self._Omg = rhorad / rhoc
-        
-        # Finally, evaluating Omega_rad and nnu from the other fixed parameters
-        self._Omr = 1 - self._Oml - self._OmM - self._Omk
-        self._Omnu = self._Omr - self._Omg 
-        rhonu = self._Omnu * rhoc
-        
-        self.nnu = rhonu / (rhorad * 7.0 / 8.0 * (4.0 / 11.0)**(4.0 / 3.0))
-        
-        
-        # fixing Omega_nu
-        # self.nnu = 0 # 3.046
-        # rhonu = self.nnu * rhorad * 7.0 / 8.0 * (4.0 / 11.0)**(4.0 / 3.0)
-        # self._Omnu = rhonu / rhoc
+            # Omega_nu
+        self.nnu = 3.046
+        rhonu = self.nnu * rhorad * 7.0 / 8.0 * (4.0 / 11.0)**(4.0 / 3.0)
+        self._Omnu = rhonu / rhoc
         self._omnuh2 = self._Omnu * self._h**2
+            # Omega_r = Omega_nu + Omega_gamma
+        self._Omr = self._Omg + self._Omnu
         
-        # Adding Omega_gamma and Omega_nu, temporarily set to 0 for simplicity
-        # self._Omr = self._Omg + self._Omnu
+        
+        # self._Omr = 1 - self._Oml - self._OmM - self._Omk
+        # self._Omnu = self._Omr - self._Omg 
+        # rhonu = self._Omnu * rhoc
+        
+        # self.nnu = rhonu / (rhorad * 7.0 / 8.0 * (4.0 / 11.0)**(4.0 / 3.0))
+        
                 
         # Finally, evaluating Omega_Lambda from the other fixed parameters
-        # self._Oml = 1 - self._Omk - self._OmM - self._Omr
+        self._Oml = 1 - self._Omk - self._OmM - self._Omr
         # self._Omk = 1 - self._Oml - self._OmM  - self._Omr
         
         
         self._w0 = -1.0
         self._wa = 0.0
         
-        self._hz = {'400_500':0.0007327671367151243, 
-                    '500_600':0.0005568269434413366, 
-                    '600_700':0.0004491941045627553,
-                    '700_800':0.0003790722414922297}
+        
+        self._hz = {}
+        for key in ['400_500','500_600','600_700','700_800']:
+            self._hz[key] = self.hz_fun(freq2z( (float(key.split('_')[0]) + float(key.split('_')[1]))/2))
         
         self._Hz = {}
         for key,val in self._hz.items():
             self._Hz[key] = val*cc/1e3
-        
         self._qpar = 1
         
-        self._dA = {'400_500':1753.152138846927, 
-                    '500_600':1794.9333333728628, 
-                    '600_700':1757.6610835353,
-                    '700_800':1655.0761074055235}
-        
+        # _dA = {}
+        # for key in ['400_500','500_600','600_700','700_800']:
+        #     _dA[key] = pkpr.angular_distance(freq2z( (float(key.split('_')[0]) + float(key.split('_')[1]))/2))
+        self._dA = {'400_500': 1758.2926246185887,
+                    '500_600': 1802.503416422851,
+                    '600_700': 1767.395306138714,
+                    '700_800': 1666.4200025225027}
         self._qperp = 1
         
-        self._fz = {'400_500':0.9628415413719129, 
-                    '500_600':0.9354237272393772, 
-                    '600_700':0.8994759926141177, 
-                    '700_800':0.8561943222181662}
-        
+        self._fz = {}
+        for key in ['400_500','500_600','600_700','700_800']:
+            self._fz[key] = self.fz_fun(freq2z( (float(key.split('_')[0]) + float(key.split('_')[1]))/2))
     
     ###### ###### ###### ######
     
@@ -302,9 +305,39 @@ class ParametersFixed:
         return truncdict
     
     
+    ###### ###### ###### ######
     
+    def hz_fun(self, z):   # in Mpc^-1
+        ez = np.sqrt(self._OmM * (1+z)**3 
+                     + self._Oml * (1+z)**(3*(1+self._w0+self._wa)) * np.exp(-3*self._wa * (z/(1+z)))
+                     + self._Omk * (1+z)**2 + self._Omr * (1+z)**4
+                     )
+        return self._h * ez * 1e5/cc
+
+    def dAz_fun(self, z):  # in Mpc
+        omk = self._Omk
+        aa_arr = np.linspace(1, 1e-4, 10000)
+        # zarr = np.linspace(0,1e4, 100000)
+        ea_fun = lambda a: np.sqrt(self._OmM * a**-3 
+                                   + self._Oml * a**(-3*(1+self._w0+self._wa)) * np.exp(3*self._wa * (a-1))
+                                   + self._Omk * a**-2 
+                                   + self._Omr * a**-4)
+        rz = cc/1e3 / self._H0 * trapz(ea_fun(aa_arr)**(-1) * aa_arr**(-2), aa_arr[::-1])#, initial=0)
+        if omk < 0:
+            return (1+z)**(-1) * cc/1e3/self._H0 * 1/np.sqrt(
+                abs(omk)) * np.sin(np.sqrt(abs(omk))*self._H0/(cc/1e3) * rz)
+        elif omk == 0:
+            return (1+z)**(-1) * rz
+        elif omk > 0:
+            return (1+z)**(-1) * cc/1e3/self._H0 * 1/np.sqrt(
+                omk) * np.sinh(np.sqrt(omk)*self._H0/(cc/1e3) * rz)
     
-    
+    def fz_fun(self,z):
+        ez = np.sqrt(self._OmM * (1+z)**3 
+                     + self._Oml * (1+z)**(3*(1+self._w0+self._wa)) * np.exp(-3*self._wa * (z/(1+z)))
+                     + self._Omk * (1+z)**2 + self._Omr * (1+z)**4
+                     )
+        return (self._OmM * (1+z)**3/ez**2)**(0.55)
     
     
     
