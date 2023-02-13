@@ -752,7 +752,7 @@ ellmin=int(ls[0])
 
 TT2018 = PlanckLitePy(data_directory=os.path.join(MCMCmodulespath,'util','data'), year=2018, spectra='TT', use_low_ell_bins=False)
 
-chi2_planck_old = -2 * TT2018.loglike(Cltt, ellmin, Clte=None, Clee=None)
+chi2_planck_old = -2 * TT2018.loglike(Cltt=Cltt, ellmin=ellmin, Clte=None, Clee=None)
 
 
 chi2old = np.sum(list(chi2old1.values())) + chi2_planck_old
@@ -1082,7 +1082,7 @@ for ii in np.arange(1,int(niterations+1)):
             # Clte = CLASS_instance_current.raw_cl()['te'][2:] #* ls * (ls+1)/2/np.pi
             # Clee = CLASS_instance_current.raw_cl()['ee'][2:] #* ls * (ls+1)/2/np.pi
             # ellmin=int(ls[0])
-            chi2_planck_new = -2 * TT2018.loglike(Cltt, ellmin, Clte=None, Clee=None)
+            chi2_planck_new = -2 * TT2018.loglike(Cltt=Cltt, ellmin=ellmin, Clte=None, Clee=None)
             
             
             if np.isinf(chi2_planck_new) or np.isnan(chi2_planck_new):
