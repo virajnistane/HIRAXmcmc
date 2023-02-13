@@ -22,18 +22,18 @@ import hiraxmcmc
 MCMCmodulespath = os.path.dirname(hiraxmcmc.__file__)
 
 
-def main():
-    TTTEEE2018=PlanckLitePy(year=2018, spectra='TTTEEE', use_low_ell_bins=False)
-    TTTEEE2018.test()
+# def main():
+#     TTTEEE2018=PlanckLitePy(year=2018, spectra='TTTEEE', use_low_ell_bins=False)
+#     TTTEEE2018.test()
 
-    TTTEEE2018_lowTTbins=PlanckLitePy(year=2018, spectra='TTTEEE', use_low_ell_bins=True)
-    TTTEEE2018_lowTTbins.test()
+#     TTTEEE2018_lowTTbins=PlanckLitePy(year=2018, spectra='TTTEEE', use_low_ell_bins=True)
+#     TTTEEE2018_lowTTbins.test()
 
-    TT2018=PlanckLitePy(year=2018, spectra='TT', use_low_ell_bins=False)
-    TT2018.test()
+#     TT2018=PlanckLitePy(year=2018, spectra='TT', use_low_ell_bins=False)
+#     TT2018.test()
 
-    TT2018_lowTTbins=PlanckLitePy(year=2018, spectra='TT', use_low_ell_bins=True)
-    TT2018_lowTTbins.test()
+#     TT2018_lowTTbins=PlanckLitePy(year=2018, spectra='TT', use_low_ell_bins=True)
+#     TT2018_lowTTbins.test()
 
 
 class PlanckLitePy:
@@ -199,23 +199,27 @@ class PlanckLitePy:
         for i in range(self.nbintt):
             Cltt_bin[i]=np.sum(Cltt[self.blmin_TT[i]+self.plmin_TT-ellmin:self.blmax_TT[i]+self.plmin_TT+1-ellmin]*self.bin_w_TT[self.blmin_TT[i]:self.blmax_TT[i]+1])
 
-        # bin widths and weights are the same for TT, TE and EE
-        Clte_bin=np.zeros(self.nbinte)
-        for i in range(self.nbinte):
-            Clte_bin[i]=np.sum(Clte[self.blmin[i]+self.plmin-ellmin:self.blmax[i]+self.plmin+1-ellmin]*self.bin_w[self.blmin[i]:self.blmax[i]+1])
-
-        # bin widths and weights are the same for TT, TE and EE
-        Clee_bin=np.zeros(self.nbinee)
-        for i in range(self.nbinee):
-            Clee_bin[i]=np.sum(Clee[self.blmin[i]+self.plmin-ellmin:self.blmax[i]+self.plmin+1-ellmin]*self.bin_w[self.blmin[i]:self.blmax[i]+1])
+        if Clte != None:
+            # bin widths and weights are the same for TT, TE and EE
+            Clte_bin=np.zeros(self.nbinte)
+            for i in range(self.nbinte):
+                Clte_bin[i]=np.sum(Clte[self.blmin[i]+self.plmin-ellmin:self.blmax[i]+self.plmin+1-ellmin]*self.bin_w[self.blmin[i]:self.blmax[i]+1])
+        
+        if Clee != None:
+            # bin widths and weights are the same for TT, TE and EE
+            Clee_bin=np.zeros(self.nbinee)
+            for i in range(self.nbinee):
+                Clee_bin[i]=np.sum(Clee[self.blmin[i]+self.plmin-ellmin:self.blmax[i]+self.plmin+1-ellmin]*self.bin_w[self.blmin[i]:self.blmax[i]+1])
 
         X_model=np.zeros(self.nbin_tot)
         X_model[:self.nbintt]=Cltt_bin/self.calPlanck**2
-        X_model[self.nbintt:self.nbintt+self.nbinte]=Clte_bin/self.calPlanck**2
-        X_model[self.nbintt+self.nbinte:]=Clee_bin/self.calPlanck**2
-
-        Y=self.X_data-X_model
-
+        if Clte != None:
+            X_model[self.nbintt:self.nbintt+self.nbinte]=Clte_bin/self.calPlanck**2
+        if Clee != None:
+            X_model[self.nbintt+self.nbinte:]=Clee_bin/self.calPlanck**2
+        
+        Y=self.X_data[:self.nbintt]-X_model[:self.nbintt]
+        
         #choose relevant bits based on whether using TT, TE, EE
         if self.use_tt and not(self.use_ee) and not(self.use_te):
             #just tt
@@ -245,52 +249,52 @@ class PlanckLitePy:
         return -0.5*diff_vec.dot(self.fisher.dot(diff_vec))
 
 
-    def test(self):
-        ls, Dltt, Dlte, Dlee = np.genfromtxt(os.path.join(MCMCmodulespath,'util','data','Dl_planck2015fit.dat'), 
-                                              unpack=True)
-        ellmin=int(ls[0])
-        loglikelihood=self.loglike(Dltt, Dlte, Dlee, ellmin)
+    # def test(self):
+    #     ls, Dltt, Dlte, Dlee = np.genfromtxt(os.path.join(MCMCmodulespath,'util','data','Dl_planck2015fit.dat'), 
+    #                                           unpack=True)
+    #     ellmin=int(ls[0])
+    #     loglikelihood=self.loglike(Dltt, Dlte, Dlee, ellmin)
 
-        if self.year==2018 and self.spectra=='TTTEEE' and not self.use_low_ell_bins:
-            print('Log likelihood for 2018 high-l TT, TE and EE:')
-            expected = -291.33481235418026
-            # Plik-lite within cobaya gives  -291.33481235418003
-        elif self.year==2018 and self.spectra=='TTTEEE' and self.use_low_ell_bins:
-            print('Log likelihood for 2018 high-l TT, TE and EE + low-l TT bins:')
-            expected = -293.95586501795134
-        elif self.year==2018 and self.spectra=='TT' and not self.use_low_ell_bins:
-            print('Log likelihood for 2018 high-l TT:')
-            expected = -101.58123068722583
-            #Plik-lite within cobaya gives -101.58123068722568
-        elif self.year==2018 and self.spectra=='TT' and self.use_low_ell_bins:
-            print('Log likelihood for 2018 high-l TT + low-l TT bins:')
-            expected = -104.20228335099686
+    #     if self.year==2018 and self.spectra=='TTTEEE' and not self.use_low_ell_bins:
+    #         print('Log likelihood for 2018 high-l TT, TE and EE:')
+    #         expected = -291.33481235418026
+    #         # Plik-lite within cobaya gives  -291.33481235418003
+    #     elif self.year==2018 and self.spectra=='TTTEEE' and self.use_low_ell_bins:
+    #         print('Log likelihood for 2018 high-l TT, TE and EE + low-l TT bins:')
+    #         expected = -293.95586501795134
+    #     elif self.year==2018 and self.spectra=='TT' and not self.use_low_ell_bins:
+    #         print('Log likelihood for 2018 high-l TT:')
+    #         expected = -101.58123068722583
+    #         #Plik-lite within cobaya gives -101.58123068722568
+    #     elif self.year==2018 and self.spectra=='TT' and self.use_low_ell_bins:
+    #         print('Log likelihood for 2018 high-l TT + low-l TT bins:')
+    #         expected = -104.20228335099686
 
-        elif self.year==2015 and self.spectra=='TTTEEE' and not self.use_low_ell_bins:
-            print('NB: Don\'t use 2015 polarization!')
-            print('Log likelihood for 2015 high-l TT, TE and EE:')
-            expected = -280.9388125627618
-            # Plik-lite within cobaya gives  -291.33481235418003
-        elif self.year==2015 and self.spectra=='TTTEEE' and self.use_low_ell_bins:
-            print('NB: Don\'t use 2015 polarization!')
-            print('Log likelihood for 2015 high-l TT, TE and EE + low-l TT bins:')
-            expected = -283.1905700256343
-        elif self.year==2015 and self.spectra=='TT' and not self.use_low_ell_bins:
-            print('Log likelihood for 2015 high-l TT:')
-            expected = -102.34403873289027
-            #Plik-lite within cobaya gives -101.58123068722568
-        elif self.year==2015 and self.spectra=='TT' and self.use_low_ell_bins:
-            print('Log likelihood for 2015 high-l TT + low-l TT bins:')
-            expected = -104.59579619576277
-        else:
-            expected=None
+    #     elif self.year==2015 and self.spectra=='TTTEEE' and not self.use_low_ell_bins:
+    #         print('NB: Don\'t use 2015 polarization!')
+    #         print('Log likelihood for 2015 high-l TT, TE and EE:')
+    #         expected = -280.9388125627618
+    #         # Plik-lite within cobaya gives  -291.33481235418003
+    #     elif self.year==2015 and self.spectra=='TTTEEE' and self.use_low_ell_bins:
+    #         print('NB: Don\'t use 2015 polarization!')
+    #         print('Log likelihood for 2015 high-l TT, TE and EE + low-l TT bins:')
+    #         expected = -283.1905700256343
+    #     elif self.year==2015 and self.spectra=='TT' and not self.use_low_ell_bins:
+    #         print('Log likelihood for 2015 high-l TT:')
+    #         expected = -102.34403873289027
+    #         #Plik-lite within cobaya gives -101.58123068722568
+    #     elif self.year==2015 and self.spectra=='TT' and self.use_low_ell_bins:
+    #         print('Log likelihood for 2015 high-l TT + low-l TT bins:')
+    #         expected = -104.59579619576277
+    #     else:
+    #         expected=None
 
-        print('Planck-lite-py:',loglikelihood)
-        if(expected):
-            print('expected:', expected)
-            print('difference:', loglikelihood-expected, '\n')
+    #     print('Planck-lite-py:',loglikelihood)
+    #     if(expected):
+    #         print('expected:', expected)
+    #         print('difference:', loglikelihood-expected, '\n')
 
 
 
-if __name__=='__main__':
-    main()
+# if __name__=='__main__':
+#     main()
