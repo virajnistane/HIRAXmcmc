@@ -1006,8 +1006,8 @@ time.sleep(5)
 
 
 
-def u():
-    return np.random.uniform(0,1)
+# def u():
+#     return np.random.uniform(0,1)
 
 for ii in np.arange(1,int(niterations+1)):
     
@@ -1124,7 +1124,7 @@ for ii in np.arange(1,int(niterations+1)):
         
         
         # MAIN SELECTION LINE
-        if chi2new < chi2old or np.exp(-0.5*(chi2new-chi2old)) > u():          
+        if chi2new < chi2old or np.exp(-0.5*(chi2new-chi2old)) > np.random.uniform(0,1):          
             
             paramsAccepted[0,ii]         = chi2new
             try:
