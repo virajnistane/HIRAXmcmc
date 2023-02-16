@@ -1082,11 +1082,13 @@ for ii in np.arange(1,int(niterations+1)):
             # Clte = CLASS_instance_current.raw_cl()['te'][2:] #* ls * (ls+1)/2/np.pi
             # Clee = CLASS_instance_current.raw_cl()['ee'][2:] #* ls * (ls+1)/2/np.pi
             # ellmin=int(ls[0])
-            chi2_planck_new = -2 * TT2018.loglike(Cltt=Cltt, ellmin=ellmin, Clte=None, Clee=None)
             
-            
-            if np.isinf(chi2_planck_new) or np.isnan(chi2_planck_new):
+            try:
+                chi2_planck_new = -2 * TT2018.loglike(Cltt=Cltt, ellmin=ellmin, Clte=None, Clee=None)
+            except:
+                assert np.isinf(chi2_planck_new) or np.isnan(chi2_planck_new)
                 chi2_planck_new = 1e99
+                
             
         except:
             assert freqdep_paramstovary
