@@ -165,7 +165,7 @@ except:
                           'TRFold_until': 6000,
                           'thetacov0': {'do_override': 'yes',
                                         'manual_input_variance': {'h': 0.05,
-                                                                  'Omk': 0.23,
+                                                                  'Omk': 0.05,
                                                                   'Oml': 0.09,
                                                                   'w0': 0.1,
                                                                   'wa': 1}},
@@ -206,7 +206,7 @@ except:
                              'TRFold_until': 60,
                              'thetacov0': {'do_override': 'yes',
                                            'manual_input_variance': {'h': 0.05,
-                                                                     'Omk': 0.23,
+                                                                     'Omk': 0.05,
                                                                      'Oml': 0.09,
                                                                      'w0': 0.1,
                                                                      'wa': 1}},
@@ -744,10 +744,10 @@ for freqc,val in inputforhiraxoutput.items():
 # planck likelihood
 # =============================================================================
 
-ls = CLASS_instance_current.raw_cl()['ell'][2:]
-Cltt = CLASS_instance_current.raw_cl()['tt'][2:] #* ls * (ls+1)/2/np.pi
-# Clte = CLASS_instance_current.raw_cl()['te'][2:] #* ls * (ls+1)/2/np.pi
-# Clee = CLASS_instance_current.raw_cl()['ee'][2:] #* ls * (ls+1)/2/np.pi
+ls = CLASS_instance_current.lensed_cl()['ell'][2:]
+Cltt = CLASS_instance_current.lensed_cl()['tt'][2:] #* ls * (ls+1)/2/np.pi
+# Clte = CLASS_instance_current.lensed_cl()['te'][2:] #* ls * (ls+1)/2/np.pi
+# Clee = CLASS_instance_current.lensed_cl()['ee'][2:] #* ls * (ls+1)/2/np.pi
 ellmin=int(ls[0])
 
 TT2018 = PlanckLitePy(data_directory=os.path.join(MCMCmodulespath,'util','data'), year=2018, spectra='TT', use_low_ell_bins=False)
@@ -1077,10 +1077,10 @@ for ii in np.arange(1,int(niterations+1)):
             
             
             
-            # ls = CLASS_instance_current.raw_cl()['ell'][2:]
-            Cltt = CLASS_instance_current.raw_cl()['tt'][2:] #* ls * (ls+1)/2/np.pi
-            # Clte = CLASS_instance_current.raw_cl()['te'][2:] #* ls * (ls+1)/2/np.pi
-            # Clee = CLASS_instance_current.raw_cl()['ee'][2:] #* ls * (ls+1)/2/np.pi
+            # ls = CLASS_instance_current.lensed_cl()['ell'][2:]
+            Cltt = CLASS_instance_current.lensed_cl()['tt'][2:] #* ls * (ls+1)/2/np.pi
+            # Clte = CLASS_instance_current.lensed_cl()['te'][2:] #* ls * (ls+1)/2/np.pi
+            # Clee = CLASS_instance_current.lensed_cl()['ee'][2:] #* ls * (ls+1)/2/np.pi
             # ellmin=int(ls[0])
             
             try:
