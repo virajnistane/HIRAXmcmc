@@ -26,43 +26,55 @@ class ParametersFixed:
     _a_rad = 4*_stefan_boltzmann / cc
     # Boltzmann constant
     _k_B = 1.3806503e-23
-    # CMB temperature
-    _T0 = 2.726
     # Parsecs in m
     _parsec_in_m = 3.08568025e16
     # Parsecs in km
     _parsec_in_km = 3.08568025e13
+    # CMB temperature
+    _T0 = 2.7255
     
     def __init__(self):
         
         
-        # case  18.1 of https://wiki.cosmos.esa.int/planck-legacy-archive/images/b/be/Baseline_params_table_2018_68pc.pdf
+        # 68% limit values in 
+        # case 2.5 of 
+        # https://wiki.cosmos.esa.int/planck-legacy-archive/images/b/be/Baseline_params_table_2018_68pc.pdf
         
         
         # Hubble parameter
-        self._h = 0.6686
+        self._h = 0.6732117
         self._H0 = self._h * 100
         
-        # Omega_matter
-        self._ombh2 = 0.022126
-        self._omch2 =  0.12068
+        rhoc = 3.0 * self._H0**2 * cc**2 / (8.0 * np.pi * self._G) / (1e6 * self._parsec_in_km)**2
         
+        # Omega_matter
+        self._ombh2 = 0.02238280
+        self._omch2 = 0.1201075
         self._Omb = self._ombh2/self._h**2
         self._Omc = self._omch2/self._h**2
+        
+        # self.N_ncdm = 1
+        # self.m_ncdm = 0.06 
+        # self.T_ncdm = 0.7137658555036082   # (4/11)^(1/3)
+        # self.rho_ncdm = self.m_ncdm * self.N_ncdm
+        # self._Omncdm = self.rho_ncdm / rhoc
+        
         self._OmM = (self._ombh2 + self._omch2)/self._h**2
+        # self._OmM = 0.3158 # (self._ombh2 + self._omch2)/self._h**2 + self._Omncdm
+        # self._Omncdm = self._OmM - self._Omb - self._Omc
         
         # Omega_curvature
         self._Omk = 0.0
         
         
         # Omega_radiation
-        rhoc = 3.0 * self._H0**2 * cc**2 / (8.0 * np.pi * self._G) / (1e6 * self._parsec_in_km)**2
-            # Omega_gamma
-        rhorad = self._a_rad * self._T0**4
-        self._Omg = rhorad / rhoc
-            # Omega_nu
-        self.nnu = 3.046
-        rhonu = self.nnu * rhorad * 7.0 / 8.0 * (4.0 / 11.0)**(4.0 / 3.0)
+        
+        # Omega_gamma
+        rhog = self._a_rad * self._T0**4
+        self._Omg = rhog / rhoc
+        # Omega_nu
+        self.N_ur = 3.046
+        rhonu = self.N_ur * rhog * 7/8 * (4/11)**(4/3)
         self._Omnu = rhonu / rhoc
         self._omnuh2 = self._Omnu * self._h**2
             # Omega_r = Omega_nu + Omega_gamma
@@ -73,9 +85,8 @@ class ParametersFixed:
         # self._Omnu = self._Omr - self._Omg 
         # rhonu = self._Omnu * rhoc
         
-        # self.nnu = rhonu / (rhorad * 7.0 / 8.0 * (4.0 / 11.0)**(4.0 / 3.0))
         
-                
+        
         # Finally, evaluating Omega_Lambda from the other fixed parameters
         self._Oml = 1 - self._Omk - self._OmM - self._Omr
         # self._Omk = 1 - self._Oml - self._OmM  - self._Omr

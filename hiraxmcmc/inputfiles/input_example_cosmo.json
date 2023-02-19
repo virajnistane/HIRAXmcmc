@@ -2,7 +2,7 @@
     "current_run_index": 1,
     "params_to_vary": [
         "h",
-        "Omk",
+        "Omb",
         "Oml"
     ],
     "mmode_output": {
@@ -23,7 +23,7 @@
             "do_override": "yes",
             "manual_input_variance": {
                 "h": 0.05,
-                "Omk": 0.05,
+                "Omb": 0.05,
                 "Oml": 0.09,
                 "w0": 0.1,
                 "wa": 1
@@ -42,6 +42,12 @@
             "prior": [
                 0.5,
                 0.9
+            ]
+        },
+        "Omb": {
+            "prior": [
+                0.04,
+                0.06
             ]
         },
         "Omk": {
@@ -105,7 +111,7 @@
         }
     },
     "output": {
-        "write_out_truly_accepted_chains": true,
-        "extract_scaling_parameters_in_cosmo_case": true
+        "write_out_truly_accepted_chains": false,
+        "extract_scaling_parameters_in_cosmo_case": false
     }
 }
