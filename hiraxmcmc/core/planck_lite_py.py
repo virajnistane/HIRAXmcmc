@@ -38,7 +38,7 @@ MCMCmodulespath = os.path.dirname(hiraxmcmc.__file__)
 
 class PlanckLitePy:
     def __init__(self, data_directory=os.path.join(MCMCmodulespath,'util','data'), 
-                 year=2018, spectra='TT', use_low_ell_bins=False):
+                 year=2018, spectra='TTTEEE', use_low_ell_bins=False):
         '''
         data_directory = path from where you are running this to the folder
           containing the planck2015/8_low_ell and planck2015/8_plik_lite data
@@ -199,26 +199,26 @@ class PlanckLitePy:
         for i in range(self.nbintt):
             Cltt_bin[i]=np.sum(Cltt[self.blmin_TT[i]+self.plmin_TT-ellmin:self.blmax_TT[i]+self.plmin_TT+1-ellmin]*self.bin_w_TT[self.blmin_TT[i]:self.blmax_TT[i]+1])
 
-        if Clte != None:
-            # bin widths and weights are the same for TT, TE and EE
-            Clte_bin=np.zeros(self.nbinte)
-            for i in range(self.nbinte):
-                Clte_bin[i]=np.sum(Clte[self.blmin[i]+self.plmin-ellmin:self.blmax[i]+self.plmin+1-ellmin]*self.bin_w[self.blmin[i]:self.blmax[i]+1])
+        # if Clte != None:
+        # bin widths and weights are the same for TT, TE and EE
+        Clte_bin=np.zeros(self.nbinte)
+        for i in range(self.nbinte):
+            Clte_bin[i]=np.sum(Clte[self.blmin[i]+self.plmin-ellmin:self.blmax[i]+self.plmin+1-ellmin]*self.bin_w[self.blmin[i]:self.blmax[i]+1])
         
-        if Clee != None:
-            # bin widths and weights are the same for TT, TE and EE
-            Clee_bin=np.zeros(self.nbinee)
-            for i in range(self.nbinee):
-                Clee_bin[i]=np.sum(Clee[self.blmin[i]+self.plmin-ellmin:self.blmax[i]+self.plmin+1-ellmin]*self.bin_w[self.blmin[i]:self.blmax[i]+1])
+        # if Clee != None:
+        # bin widths and weights are the same for TT, TE and EE
+        Clee_bin=np.zeros(self.nbinee)
+        for i in range(self.nbinee):
+            Clee_bin[i]=np.sum(Clee[self.blmin[i]+self.plmin-ellmin:self.blmax[i]+self.plmin+1-ellmin]*self.bin_w[self.blmin[i]:self.blmax[i]+1])
 
         X_model=np.zeros(self.nbin_tot)
         X_model[:self.nbintt]=Cltt_bin/self.calPlanck**2
-        if Clte != None:
-            X_model[self.nbintt:self.nbintt+self.nbinte]=Clte_bin/self.calPlanck**2
-        if Clee != None:
-            X_model[self.nbintt+self.nbinte:]=Clee_bin/self.calPlanck**2
+        # if Clte != None:
+        X_model[self.nbintt:self.nbintt+self.nbinte]=Clte_bin/self.calPlanck**2
+        # if Clee != None:
+        X_model[self.nbintt+self.nbinte:]=Clee_bin/self.calPlanck**2
         
-        Y=self.X_data[:self.nbintt]-X_model[:self.nbintt]
+        Y=self.X_data-X_model
         
         #choose relevant bits based on whether using TT, TE, EE
         if self.use_tt and not(self.use_ee) and not(self.use_te):
