@@ -756,7 +756,7 @@ TTTEEE2018 = PlanckLitePy(data_directory=os.path.join(MCMCmodulespath,'util','da
 chi2_planck_old = -2 * TTTEEE2018.loglike(Cltt=Cltt, ellmin=ellmin, Clte=Clte, Clee=Clee)
 
 
-chi2old = np.sum(list(chi2old1.values())) + chi2_planck_old
+chi2old = chi2_planck_old # np.sum(list(chi2old1.values())) + 
 
 
 if rank_mpi==0:
@@ -1101,7 +1101,7 @@ for ii in np.arange(1,int(niterations+1)):
         
         # print("planck chi2: ",chi2_planck)
         
-        chi2new = np.sum(list(chi2new1.values())) + chi2_planck_new
+        chi2new = chi2_planck_new  #  np.sum(list(chi2new1.values())) +
         
         # if np.isnan(chi2new) or np.isinf(chi2new):
         #     print("Alert! chi2_planck = %s"%(chi2_planck_new))
