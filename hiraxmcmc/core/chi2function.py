@@ -3,7 +3,8 @@
 
 import os,sys
 import numpy as np
-import numpy.linalg as la
+# import numpy.linalg as la
+import scipy.linalg as la
 
 from scipy.constants import speed_of_light as cc
 

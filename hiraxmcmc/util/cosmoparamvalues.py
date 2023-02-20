@@ -59,9 +59,10 @@ class ParametersFixed:
         # self.rho_ncdm = self.m_ncdm * self.N_ncdm
         # self._Omncdm = self.rho_ncdm / rhoc
         
-        self._OmM = (self._ombh2 + self._omch2)/self._h**2
-        # self._OmM = 0.3158 # (self._ombh2 + self._omch2)/self._h**2 + self._Omncdm
-        # self._Omncdm = self._OmM - self._Omb - self._Omc
+        # self._OmM = (self._ombh2 + self._omch2)/self._h**2
+        
+        self._OmM = 0.3158 # (self._ombh2 + self._omch2)/self._h**2 + self._Omncdm
+        self._Omncdm = self._OmM - self._Omb - self._Omc
         
         # Omega_curvature
         self._Omk = 0.0
@@ -73,11 +74,12 @@ class ParametersFixed:
         rhog = self._a_rad * self._T0**4
         self._Omg = rhog / rhoc
         # Omega_nu
-        self.N_ur = 3.046
+        # self.N_ur = 3.046
+        self.N_ur = 2.046
         rhonu = self.N_ur * rhog * 7/8 * (4/11)**(4/3)
         self._Omnu = rhonu / rhoc
         self._omnuh2 = self._Omnu * self._h**2
-            # Omega_r = Omega_nu + Omega_gamma
+        # Omega_r = Omega_nu + Omega_gamma
         self._Omr = self._Omg + self._Omnu
         
         
