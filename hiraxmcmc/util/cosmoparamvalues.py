@@ -31,7 +31,7 @@ class ParametersFixed:
     # Parsecs in km
     _parsec_in_km = 3.08568025e13
     # CMB temperature
-    _T0 = 2.7255
+    _T0 = 2.725
     
     def __init__(self):
         
@@ -42,14 +42,14 @@ class ParametersFixed:
         
         
         # Hubble parameter
-        self._h = 0.6732117
+        self._h = 0.6732
         self._H0 = self._h * 100
         
         rhoc = 3.0 * self._H0**2 * cc**2 / (8.0 * np.pi * self._G) / (1e6 * self._parsec_in_km)**2
         
         # Omega_matter
-        self._ombh2 = 0.02238280
-        self._omch2 = 0.1201075
+        self._ombh2 = 0.022377
+        self._omch2 = 0.12010
         self._Omb = self._ombh2/self._h**2
         self._Omc = self._omch2/self._h**2
         
@@ -59,9 +59,9 @@ class ParametersFixed:
         # self.rho_ncdm = self.m_ncdm * self.N_ncdm
         # self._Omncdm = self.rho_ncdm / rhoc
         
-        self._OmM = (self._ombh2 + self._omch2)/self._h**2
-        # self._OmM = 0.3158 # (self._ombh2 + self._omch2)/self._h**2 + self._Omncdm
-        # self._Omncdm = self._OmM - self._Omb - self._Omc
+        # self._OmM = (self._ombh2 + self._omch2)/self._h**2
+        self._OmM = 0.3158 # (self._ombh2 + self._omch2)/self._h**2 + self._Omncdm
+        self._Omncdm = self._OmM - self._Omb - self._Omc
         
         # Omega_curvature
         self._Omk = 0.0
@@ -73,7 +73,8 @@ class ParametersFixed:
         rhog = self._a_rad * self._T0**4
         self._Omg = rhog / rhoc
         # Omega_nu
-        self.N_ur = 3.046
+        self.N_ur = 2.046
+        # self.N_ur = 3.044
         rhonu = self.N_ur * rhog * 7/8 * (4/11)**(4/3)
         self._Omnu = rhonu / rhoc
         self._omnuh2 = self._Omnu * self._h**2

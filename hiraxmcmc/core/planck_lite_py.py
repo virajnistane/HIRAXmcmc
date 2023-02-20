@@ -14,20 +14,20 @@ planck calibration is set to 1 by default but this can easily be modified
 '''
 import numpy as np
 from scipy.io import FortranFile
-import scipy.linalg
+from scipy.linalg import cho_factor, cho_solve
 
 def main():
     TTTEEE2018=PlanckLitePy(year=2018, spectra='TTTEEE', use_low_ell_bins=False)
     TTTEEE2018.test()
 
-    TTTEEE2018_lowTTbins=PlanckLitePy(year=2018, spectra='TTTEEE', use_low_ell_bins=True)
-    TTTEEE2018_lowTTbins.test()
+    # TTTEEE2018_lowTTbins=PlanckLitePy(year=2018, spectra='TTTEEE', use_low_ell_bins=True)
+    # TTTEEE2018_lowTTbins.test()
 
-    TT2018=PlanckLitePy(year=2018, spectra='TT', use_low_ell_bins=False)
-    TT2018.test()
+    # TT2018=PlanckLitePy(year=2018, spectra='TT', use_low_ell_bins=False)
+    # TT2018.test()
 
-    TT2018_lowTTbins=PlanckLitePy(year=2018, spectra='TT', use_low_ell_bins=True)
-    TT2018_lowTTbins.test()
+    # TT2018_lowTTbins=PlanckLitePy(year=2018, spectra='TT', use_low_ell_bins=True)
+    # TT2018_lowTTbins.test()
 
 
 class PlanckLitePy:
@@ -125,10 +125,11 @@ class PlanckLitePy:
         #read full covmat
         f = FortranFile(self.cov_file, 'r')
         covmat = f.read_reals(dtype=float).reshape((self.nbin_hi,self.nbin_hi))
+        f.close()
         for i in range(self.nbin_hi):
             for j in range(i,self.nbin_hi):
                 covmat[i,j] = covmat[j,i]
-        f.close()
+        
         
         #select relevant covmat
         if self.use_tt and not(self.use_ee) and not(self.use_te):
@@ -157,7 +158,7 @@ class PlanckLitePy:
             print("not implemented")
 
         #invert high ell covariance matrix (cholesky decomposition should be faster)
-        fisher=scipy.linalg.cho_solve(scipy.linalg.cho_factor(cov), np.identity(bin_no))
+        fisher=cho_solve(cho_factor(cov), np.identity(bin_no))
         fisher=fisher.transpose()
 
 
@@ -177,7 +178,6 @@ class PlanckLitePy:
         Cltt=Dltt/fac
         Clte=Dlte/fac
         Clee=Dlee/fac
-
 
         # Fortran to python slicing: a:b becomes a-1:b
         # need to subtract 1 to use 0 indexing for cl,
@@ -272,9 +272,9 @@ class PlanckLitePy:
             expected=None
 
         print('Planck-lite-py:',loglikelihood)
-        if(expected):
-            print('expected:', expected)
-            print('difference:', loglikelihood-expected, '\n')
+        # if(expected):
+        print('expected:', expected)
+        print('difference:', loglikelihood-expected, '\n')
 
 
 
