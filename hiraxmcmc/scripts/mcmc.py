@@ -745,6 +745,7 @@ try:
                                                        cosmoparams=cosmoparams_fixed)
     chi2_old_comp_dict['hirax'] = np.sum(list(chi2old1.values()))
 except:
+    assert 'hirax' not in INPUT['likelihood']['which'] 
     chi2_old_comp_dict['hirax'] = 0
 
 
@@ -760,9 +761,10 @@ try:
     Dlte = CLASS_instance_current.lensed_cl()['te'][2:] * ls * (ls+1)/2/np.pi * temperature_units_factor
     Dlee = CLASS_instance_current.lensed_cl()['ee'][2:] * ls * (ls+1)/2/np.pi * temperature_units_factor
     ellmin=int(ls[0])
-    planckLikeInstance = PlanckLitePy(data_directory='data', year=2018, spectra='TTTEEE', use_low_ell_bins=False)
+    planckLikeInstance = PlanckLitePy(data_directory=os.path.join(MCMCmodulespath,'core','data'), year=2018, spectra='TTTEEE', use_low_ell_bins=False)
     chi2_old_comp_dict['planck'] = -2 * planckLikeInstance.loglike(Dltt, Dlte, Dlee, ellmin)
 except:
+    assert ('planck' not in INPUT['likelihood']['which']) and ('cmb' not in INPUT['likelihood']['which'])
     chi2_old_comp_dict['planck'] = 0 
     
 
@@ -1082,6 +1084,7 @@ for ii in np.arange(1,int(niterations+1)):
                                     ) or np.isnan(planckLikeInstance.loglike(Dltt, Dlte, Dlee, ellmin))
                     chi2_new_comp_dict['planck'] = 1e99
             except: # if planck is not included
+                assert ('planck' not in INPUT['likelihood']['which']) and ('cmb' not in INPUT['likelihood']['which'])
                 chi2_new_comp_dict['planck'] = 0
                 
         except:
@@ -1098,6 +1101,7 @@ for ii in np.arange(1,int(niterations+1)):
                                                                cosmoparams=cosmoparams_fixed)
             chi2_new_comp_dict['hirax'] = np.sum(list(chi2old1.values()))
         except:
+            assert 'hirax' not in INPUT['likelihood']['which'] 
             chi2_new_comp_dict['hirax'] = 0
             
         chi2new = np.sum(list(chi2_new_comp_dict.values()))
