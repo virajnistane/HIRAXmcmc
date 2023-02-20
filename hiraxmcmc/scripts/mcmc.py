@@ -170,7 +170,8 @@ except:
                                                                    'w0': 0.1,
                                                                    'wa': 1}},
                            'burnin_for_run2': 4000},
-                  'likelihood': {'PS_cov': {'override': 'no', 
+                  'likelihood': {'which': ['hirax','planck'],
+                                 'PS_cov': {'override': 'no', 
                                             'files_dirfullpath': '/scratch/s/sievers/nistanev/mcmc22/PScov_override_files'}},
                   'PARAMS': {'h': {'prior': [0.5, 0.9]},
                              'Omb': {'prior': [0.04, 0.06]},
@@ -732,31 +733,42 @@ except:
 #         PK_k_z_current , CLASS_instance_current = chi2_func[key0].cp_params.get_pk_and_prop(currentparams=cosmoparams_fixed)
 
 
-chi2old1 = {}
-for freqc,val in inputforhiraxoutput.items():
-    chi2old1[freqc] = chi2_func[freqc].chi2_multiz(PK_k_z_currentstep=PK_k_z_current, 
-                                                   PK_properties_currentstep=CLASS_instance_current, 
-                                                   z=val['redshift'],
-                                                   currentparams=currentparams,
-                                                   cosmoparams=cosmoparams_fixed)
+chi2_old_comp_dict = {}
+try:
+    assert 'hirax' in INPUT['likelihood']['which'] 
+    chi2old1 = {}
+    for freqc,val in inputforhiraxoutput.items():
+        chi2old1[freqc] = chi2_func[freqc].chi2_multiz(PK_k_z_currentstep=PK_k_z_current, 
+                                                       PK_properties_currentstep=CLASS_instance_current, 
+                                                       z=val['redshift'],
+                                                       currentparams=currentparams,
+                                                       cosmoparams=cosmoparams_fixed)
+    chi2_old_comp_dict['hirax'] = np.sum(list(chi2old1.values()))
+except:
+    chi2_old_comp_dict['hirax'] = 0
 
 
-# =============================================================================
-# planck likelihood
-# =============================================================================
+try:
+    assert ('planck' in INPUT['likelihood']['which']) or ('cmb' in INPUT['likelihood']['which'])
+    # =============================================================================
+    # planck likelihood
+    # =============================================================================
+    temperature_units_factor = chi2_func[key0].params_fixed._T0**2 * 1e12
+    
+    ls = CLASS_instance_current.lensed_cl()['ell'][2:]
+    Dltt = CLASS_instance_current.lensed_cl()['tt'][2:] * ls * (ls+1)/2/np.pi * temperature_units_factor
+    Dlte = CLASS_instance_current.lensed_cl()['te'][2:] * ls * (ls+1)/2/np.pi * temperature_units_factor
+    Dlee = CLASS_instance_current.lensed_cl()['ee'][2:] * ls * (ls+1)/2/np.pi * temperature_units_factor
+    ellmin=int(ls[0])
+    planckLikeInstance = PlanckLitePy(data_directory='data', year=2018, spectra='TTTEEE', use_low_ell_bins=False)
+    chi2_old_comp_dict['planck'] = -2 * planckLikeInstance.loglike(Dltt, Dlte, Dlee, ellmin)
+except:
+    chi2_old_comp_dict['planck'] = 0 
+    
 
-ls = CLASS_instance_current.lensed_cl()['ell'][2:]
-Cltt = CLASS_instance_current.lensed_cl()['tt'][2:] #* ls * (ls+1)/2/np.pi
-Clte = CLASS_instance_current.lensed_cl()['te'][2:] #* ls * (ls+1)/2/np.pi
-Clee = CLASS_instance_current.lensed_cl()['ee'][2:] #* ls * (ls+1)/2/np.pi
-ellmin=int(ls[0])
-
-TTTEEE2018 = PlanckLitePy(data_directory=os.path.join(MCMCmodulespath,'util','data'), year=2018, spectra='TTTEEE', use_low_ell_bins=False)
-
-chi2_planck_old = -2 * TTTEEE2018.loglike(Cltt=Cltt, ellmin=ellmin, Clte=Clte, Clee=Clee)
+chi2old = np.sum(list(chi2_old_comp_dict.values()))
 
 
-chi2old = np.sum(list(chi2old1.values())) + chi2_planck_old
 
 
 if rank_mpi==0:
@@ -1046,62 +1058,49 @@ for ii in np.arange(1,int(niterations+1)):
     
     try:
         
-        # any of "chi2_func_*" works for pofk_interpolator_for_pscalc
+        
+        chi2_new_comp_dict = {}
+        
+        # any of "chi2_func[*]" works for pofk_interpolator_for_pscalc
         try:
             assert not(freqdep_paramstovary)
-            # if rank_mpi == 0:
-            #     timertime0 = time.time()
             PK_k_z_current , CLASS_instance_current = chi2_func[key0].cp_params.get_pk_and_prop(currentparams=currentparams)
-            # if rank_mpi == 0:
-            #     print("time for CLASS comp:",time.time()-timertime0)
             
-            # =================================================================
-            #    using COBAYA 
-            # =================================================================
-            # plik_include = True
-            # if plik_include:
-            # info = yaml_load(chi2_func[key0].cp_params.info_txt_for_plik)
-            # info['packages_path'] = '/home/s/sievers/nistanev/planck2/'
-            # model_cobaya = get_model(info)
-            # point = dict(zip(model_cobaya.parameterization.sampled_params(),
-            #                  model_cobaya.prior.sample(ignore_external=True)[0]))
-            # logposterior = model_cobaya.logposterior(point, as_dict=True)
-            # chi2_planck = -2 * list(logposterior['loglikes'].values())[0]
-            # if np.isinf(chi2_planck):
-            #     chi2_planck = 1e99
             
-            # =================================================================
-            # using planck_lite_py.py
-            # =================================================================
-            # ls = CLASS_instance_current.lensed_cl()['ell'][2:]
-            Cltt = CLASS_instance_current.lensed_cl()['tt'][2:] #* ls * (ls+1)/2/np.pi
-            Clte = CLASS_instance_current.lensed_cl()['te'][2:] #* ls * (ls+1)/2/np.pi
-            Clee = CLASS_instance_current.lensed_cl()['ee'][2:] #* ls * (ls+1)/2/np.pi
-            # ellmin=int(ls[0])
-            try:
-                chi2_planck_new = -2 * TTTEEE2018.loglike(Cltt=Cltt, ellmin=ellmin, Clte=Clte, Clee=Clee)
-            except:
-                assert np.isinf(chi2_planck_new) or np.isnan(chi2_planck_new)
-                chi2_planck_new = 1e99
-            
+            try: # if planck is included
+                assert ('planck' in INPUT['likelihood']['which']) or ('cmb' in INPUT['likelihood']['which'])
+                temperature_units_factor = chi2_func[key0].params_fixed._T0**2 * 1e12
+                # ls = CLASS_instance_current.lensed_cl()['ell'][2:]
+                Dltt = CLASS_instance_current.lensed_cl()['tt'][2:] * ls * (ls+1)/2/np.pi * temperature_units_factor
+                Dlte = CLASS_instance_current.lensed_cl()['te'][2:] * ls * (ls+1)/2/np.pi * temperature_units_factor
+                Dlee = CLASS_instance_current.lensed_cl()['ee'][2:] * ls * (ls+1)/2/np.pi * temperature_units_factor
+                # ellmin=int(ls[0])
+                try:
+                    chi2_new_comp_dict['planck'] = -2 * planckLikeInstance.loglike(Dltt, Dlte, Dlee, ellmin)
+                except:
+                    assert np.isinf(planckLikeInstance.loglike(Dltt, Dlte, Dlee, ellmin)
+                                    ) or np.isnan(planckLikeInstance.loglike(Dltt, Dlte, Dlee, ellmin))
+                    chi2_new_comp_dict['planck'] = 1e99
+            except: # if planck is not included
+                chi2_new_comp_dict['planck'] = 0
+                
         except:
-            
-            chi2_planck_new = chi2_planck_old
-            
             assert freqdep_paramstovary
         
-        
-        chi2new1 = {}
-        for freqc,val in inputforhiraxoutput.items():
-            chi2new1[freqc] = chi2_func[freqc].chi2_multiz(PK_k_z_currentstep=PK_k_z_current, 
-                                                           PK_properties_currentstep=CLASS_instance_current, 
-                                                           z=val['redshift'],
-                                                           currentparams=currentparams,
-                                                           cosmoparams=cosmoparams_fixed)
-        
-        # print("planck chi2: ",chi2_planck)
-        
-        chi2new = np.sum(list(chi2new1.values())) + chi2_planck_new
+        try:
+            assert 'hirax' in INPUT['likelihood']['which'] 
+            chi2new1 = {}
+            for freqc,val in inputforhiraxoutput.items():
+                chi2new1[freqc] = chi2_func[freqc].chi2_multiz(PK_k_z_currentstep=PK_k_z_current, 
+                                                               PK_properties_currentstep=CLASS_instance_current, 
+                                                               z=val['redshift'],
+                                                               currentparams=currentparams,
+                                                               cosmoparams=cosmoparams_fixed)
+            chi2_new_comp_dict['hirax'] = np.sum(list(chi2old1.values()))
+        except:
+            chi2_new_comp_dict['hirax'] = 0
+            
+        chi2new = np.sum(list(chi2_new_comp_dict.values()))
         
         # if np.isnan(chi2new) or np.isinf(chi2new):
         #     print("Alert! chi2_planck = %s"%(chi2_planck_new))

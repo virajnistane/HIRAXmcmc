@@ -14,7 +14,7 @@ from hiraxmcmc.core.hiraxoutput import HiraxOutput
 from hiraxmcmc.core.powerspectrum import CreatePs2d
 from hiraxmcmc.core.powerspectrum import Ps2dFromPofk
 from hiraxmcmc.util.cosmoparamvalues import ParametersFixed
-    
+
 
 
 
