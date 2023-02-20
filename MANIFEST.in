@@ -1,7 +1,7 @@
 include hiraxmcmc/planckfiles/*.ini
-include hiraxmcmc/mmoderesults/run*/draco/*.h5
-include hiraxmcmc/mmoderesults/run*/drift*/bt/*/psmc*/*.hdf5
-include hiraxmcmc/mmoderesults/run*/drift*/*.yaml
-include hiraxmcmc/util/data/
-include hiraxmcmc/util/data/*
-include hiraxmcmc/util/data/planck*/*
+include hiraxmcmc/mmoderesults/run*multiKL/draco/*.h5
+include hiraxmcmc/mmoderesults/run*multiKL/drift*/bt/*/psmc*/*.hdf5
+include hiraxmcmc/mmoderesults/run*multiKL/drift*/*.yaml
+include hiraxmcmc/core/data
+include hiraxmcmc/core/data/*
+include hiraxmcmc/core/data/planck*/*
