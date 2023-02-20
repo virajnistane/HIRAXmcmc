@@ -32,6 +32,10 @@
         "burnin_for_run2": 4000
     },
     "likelihood": {
+        "which": [
+            "hirax",
+            "planck"
+        ],
         "PS_cov": {
             "override": "no",
             "files_dirfullpath": "/scratch/s/sievers/nistanev/mcmc22/PScov_override_files"
