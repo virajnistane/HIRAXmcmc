@@ -209,7 +209,7 @@ except:
                              'TRFold_until': 60,
                              'thetacov0': {'do_override': 'yes',
                                            'manual_input_variance': {'h': 0.05,
-                                                                     'Omb': 0.01,
+                                                                     'omb': 0.01,
                                                                      'Oml': 0.09,
                                                                      'w0': 0.1,
                                                                      'wa': 1}},
