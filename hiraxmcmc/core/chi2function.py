@@ -115,8 +115,8 @@ class Chi2Func:
         self.ps2d_from_Pofk = Ps2dFromPofk(inputforhiraxoutput = self.inputforhiraxoutput)
         
         # Instances (sample and params (varying)) of PS 1D generating class "CreatePs2d"
-        self.cp_sample = CreatePs2d(inputforhiraxoutput = inputforhiraxoutput, pspackage='class', pstype = 'sample')
-        self.cp_params = CreatePs2d(inputforhiraxoutput = inputforhiraxoutput, pspackage='class', pstype = 'param')
+        self.cp_sample = CreatePs2d(inputforhiraxoutput = inputforhiraxoutput, pspackage='class', pstype = 'sample', INPUT=INPUT)
+        self.cp_params = CreatePs2d(inputforhiraxoutput = inputforhiraxoutput, pspackage='class', pstype = 'param', INPUT=INPUT)
         
         
         

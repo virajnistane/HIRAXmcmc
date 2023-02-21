@@ -288,7 +288,8 @@ class Ps2dFromPofk:
 
 class CreatePs2d:
     
-    def __init__(self, inputforhiraxoutput, pspackage='class', pstype = 'param'):
+    def __init__(self, inputforhiraxoutput, pspackage='class', pstype = 'param',
+                 INPUT = None):
         """
         
         Parameters
@@ -311,7 +312,7 @@ class CreatePs2d:
         self.parameters_fixed = ParametersFixed()
         self.cosmoparams_fixed = self.parameters_fixed.cosmoparams_fixed
         self.inputforhiraxoutput = inputforhiraxoutput
-        
+        self.INPUT = INPUT
         
         try:
             assert pspackage == 'class'
@@ -398,16 +399,20 @@ class CreatePs2d:
             Omb = self.parameters_fixed.Omb_fid
             
         try:
+            Omk = currentparamstemp['Omk']
+        except:
+            Omk = self.parameters_fixed.Omk_fid
+            
+        try:
             assert self.pstype == 'param'
             OmM = 1 - (currentparamstemp['Oml'] 
-                       + self.parameters_fixed.Omk_fid
-                       + self.parameters_fixed.Omr_fid)
+                       + Omk + self.parameters_fixed.Omr_fid)
             # Omc = OmM - currentparamstemp['Omb']
         except:
             assert self.pstype == 'sample'
             # Omc = self.parameters_fixed.Omc_fid
             OmM = self.parameters_fixed.OmM_fid
-            
+        
         self.pcl.set({'h': currentparamstemp['h'],
                       'Omega_b': Omb,
                       # 'Omega_cdm': Omc,
@@ -415,7 +420,7 @@ class CreatePs2d:
                       'N_ncdm': 1,
                       'm_ncdm': 0.06,
                       'T_ncdm': 0.7137658555036082,
-                      'Omega_k': self.parameters_fixed.Omk_fid ,
+                      'Omega_k': Omk,
                       'Omega_Lambda': 0,
                       'Omega_scf': 0,
                       'Omega_g': self.parameters_fixed.Omg_fid,
@@ -426,37 +431,29 @@ class CreatePs2d:
                       'sigma8': 0.8126 # 0.8211752725010274,
                       })
         
-        # self.info_txt_for_plik = r"""
-        # likelihood:
-        #   planck_2018_highl_plik.TTTEEE_lite_native:
-        # theory:
-        #   classy:
-        #     extra_args: {N_ur: %s}
-        # params:
-        #   sigma8: {value: 0.8211752725010274}
-        #   H0: {value: %s}
-        #   Omega_b: {value: %s}
-        #   Omega_m: {value: %s}
-        #   Omega_k: {value: %s}
-        #   Omega_Lambda: {value: 0}
-        #   Omega_scf: {value: 0}
-        #   Omega_g: {value: %s}
-        #   w0_fld: {value: %s}
-        #   wa_fld: {value: %s}
-        # """%(self.parameters_fixed.nnu, currentparamstemp['h']*100, 
-        # self.parameters_fixed.Omb_fid, OmM, currentparamstemp['Omk'], self.parameters_fixed.Omg_fid,
-        # currentparamstemp['w0'],currentparamstemp['wa'])
-        
-        
-        self.pcl.set({'lensing':'yes',
-                      'output': 'tCl,mPk,pCl,lCl', # {'mPk','tCl','pCl'},
-                      # 'output': 'mPk', # {'mPk','tCl','pCl'},
-                      'P_k_max_1/Mpc':2,
-                      # 'z_max_pk':3.5,
-                      'z_pk': 0,
-                      'l_max_scalars': 2600,
-                      'non linear':'none'
-                      })
+        try:
+            assert not (('planck' in self.INPUT['likelihood']['which']) or ('cmb' in self.INPUT['likelihood']['which']))
+            
+            self.pcl.set({'lensing':'no',
+                          'output': 'mPk', # {'mPk','tCl','pCl'},
+                          # 'output': 'mPk', # {'mPk','tCl','pCl'},
+                          'P_k_max_1/Mpc':2,
+                          # 'z_max_pk':3.5,
+                          'z_pk': 0,
+                          'non linear':'none'
+                          })
+        except: 
+            assert ('planck' in self.INPUT['likelihood']['which']) or ('cmb' in self.INPUT['likelihood']['which'])
+            
+            self.pcl.set({'lensing':'yes',
+                          'output': 'tCl,mPk,pCl,lCl', # {'mPk','tCl','pCl'},
+                          # 'output': 'mPk', # {'mPk','tCl','pCl'},
+                          'P_k_max_1/Mpc':2,
+                          # 'z_max_pk':3.5,
+                          'z_pk': 0,
+                          'l_max_scalars': 2600,
+                          'non linear':'none'
+                          })
         
         # self.pcl.set(self.classprecisionsettings)
         
