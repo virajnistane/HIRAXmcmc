@@ -378,6 +378,26 @@ class CreatePs2d:
             h = H0/100
         
         try:
+            try:
+                ombh2 = currentparamstemp['omb']
+                Omb = ombh2/h**2
+            except: 
+                Omb = currentparamstemp['Omb']
+                ombh2 = Omb * h**2
+        except: 
+            Omb = self.parameters_fixed.Omb_fid
+        
+        try:
+            try:
+                omch2 = currentparamstemp['omc']
+                Omc = omch2/h**2
+            except: 
+                Omc = currentparamstemp['Omc']
+                omch2 = Omc * h**2
+        except:
+            Omb = self.parameters_fixed.Omb_fid
+            
+        try:
             assert self.pstype == 'param'
             OmM = 1 - (currentparamstemp['Oml'] 
                        + self.parameters_fixed.Omk_fid
@@ -389,7 +409,7 @@ class CreatePs2d:
             OmM = self.parameters_fixed.OmM_fid
             
         self.pcl.set({'h': currentparamstemp['h'],
-                      'Omega_b': currentparamstemp['Omb'],
+                      'Omega_b': Omb,
                       # 'Omega_cdm': Omc,
                       'Omega_m': OmM,
                       'N_ncdm': 1,

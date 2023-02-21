@@ -2,7 +2,7 @@
     "current_run_index": 1,
     "params_to_vary": [
         "h",
-        "Omb",
+        "omb",
         "Oml"
     ],
     "mmode_output": {
@@ -46,6 +46,12 @@
             "prior": [
                 0.5,
                 0.9
+            ]
+        },
+        "omb": {
+            "prior": [
+                0.02,
+                0.025
             ]
         },
         "Omb": {

@@ -246,7 +246,9 @@ class ParametersFixed:
     
     @property
     def current_allparams_fixed(self):
-        return {'h':self._h, 'Omk':self._Omk, 'Omb':self._Omb, 'Oml':self._Oml, 'w0':self._w0, 'wa':self._wa,
+        return {'h':self._h, 'Omk':self._Omk, 'Omb':self._Omb, 'omb':self._ombh2, 
+                'Omc':self._Omc, 'omc':self._omch2, 'Oml':self._Oml, 
+                'w0':self._w0, 'wa':self._wa,
                 'h(z)':self._hz, 'qpar(z)':self._qpar, 'dA(z)':self._dA, 'qperp(z)':self._qperp, 'f(z)':self._fz}
     
     

@@ -154,7 +154,7 @@ except:
         #                       'extract_scaling_parameters_in_cosmo_case': True}}
         
         INPUT = {'current_run_index': 1,
-                  'params_to_vary': ['h', 'Omb', 'Oml'],
+                  'params_to_vary': ['h', 'omb', 'Oml'],
                   'mmode_output': {'freq_channel': {'start': 400, 'end': 500},
                                   'klmode': 'kl_5thresh_nofg',
                                   'power_spectrum_estimator_type': 'minvar'},
@@ -165,7 +165,7 @@ except:
                            'TRFold_until': 6000,
                            'thetacov0': {'do_override': 'yes',
                                          'manual_input_variance': {'h': 0.05,
-                                                                   'Omb': 0.01,
+                                                                   'omb': 0.01,
                                                                    'Oml': 0.09,
                                                                    'w0': 0.1,
                                                                    'wa': 1}},
@@ -174,6 +174,7 @@ except:
                                  'PS_cov': {'override': 'no', 
                                             'files_dirfullpath': '/scratch/s/sievers/nistanev/mcmc22/PScov_override_files'}},
                   'PARAMS': {'h': {'prior': [0.5, 0.9]},
+                             'omb': {'prior': [0.02, 0.025]},
                              'Omb': {'prior': [0.04, 0.06]},
                              'Omk': {'prior': [-1, 1]},
                              'Oml': {'prior': [0.6, 0.8]},
@@ -744,6 +745,9 @@ try:
                                                        currentparams=currentparams,
                                                        cosmoparams=cosmoparams_fixed)
     chi2_old_comp_dict['hirax'] = np.sum(list(chi2old1.values()))
+    
+    if rank_mpi == 0:
+        print("HIRAX likelihood included: χ2_old_hirax = %s on rank 0"%(chi2_old_comp_dict['hirax']))
 except:
     assert 'hirax' not in INPUT['likelihood']['which'] 
     chi2_old_comp_dict['hirax'] = 0
@@ -763,8 +767,11 @@ try:
     ellmin=int(ls[0])
     planckLikeInstance = PlanckLitePy(data_directory=os.path.join(MCMCmodulespath,'core','data'), year=2018, spectra='TTTEEE', use_low_ell_bins=False)
     chi2_old_comp_dict['planck'] = -2 * planckLikeInstance.loglike(Dltt, Dlte, Dlee, ellmin)
+    
+    if rank_mpi == 0:
+        print("HIRAX likelihood included: χ2_old_hirax = %s on rank 0"%(chi2_old_comp_dict['planck']))
 except:
-    assert ('planck' not in INPUT['likelihood']['which']) and ('cmb' not in INPUT['likelihood']['which'])
+    assert not (('planck' in INPUT['likelihood']['which']) or ('cmb' in INPUT['likelihood']['which']))
     chi2_old_comp_dict['planck'] = 0 
     
 
