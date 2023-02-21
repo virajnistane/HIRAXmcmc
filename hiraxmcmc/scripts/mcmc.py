@@ -1109,7 +1109,7 @@ for ii in np.arange(1,int(niterations+1)):
                                                                z=val['redshift'],
                                                                currentparams=currentparams,
                                                                cosmoparams=cosmoparams_fixed)
-            chi2_new_comp_dict['hirax'] = np.sum(list(chi2old1.values()))
+            chi2_new_comp_dict['hirax'] = np.sum(list(chi2new1.values()))
             if ii == 1 and rank_mpi == 0:
                 print("HIRAX likelihood included: χ2_new_hirax = %s on rank 0"%(chi2_new_comp_dict['hirax']))
         except:
