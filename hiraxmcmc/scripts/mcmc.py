@@ -769,7 +769,7 @@ try:
     chi2_old_comp_dict['planck'] = -2 * planckLikeInstance.loglike(Dltt, Dlte, Dlee, ellmin)
     
     if rank_mpi == 0:
-        print("HIRAX likelihood included: χ2_old_hirax = %s on rank 0"%(chi2_old_comp_dict['planck']))
+        print("CMB likelihood included: χ2_old_planck = %s on rank 0"%(chi2_old_comp_dict['planck']))
 except:
     assert not (('planck' in INPUT['likelihood']['which']) or ('cmb' in INPUT['likelihood']['which']))
     chi2_old_comp_dict['planck'] = 0 
@@ -1090,6 +1090,9 @@ for ii in np.arange(1,int(niterations+1)):
                     assert np.isinf(planckLikeInstance.loglike(Dltt, Dlte, Dlee, ellmin)
                                     ) or np.isnan(planckLikeInstance.loglike(Dltt, Dlte, Dlee, ellmin))
                     chi2_new_comp_dict['planck'] = 1e99
+                    
+                if ii == 1 and rank_mpi == 0:
+                    print("CMB likelihood included: χ2_new_planck = %s on rank 0"%(chi2_old_comp_dict['planck']))
             except: # if planck is not included
                 assert ('planck' not in INPUT['likelihood']['which']) and ('cmb' not in INPUT['likelihood']['which'])
                 chi2_new_comp_dict['planck'] = 0
@@ -1107,6 +1110,8 @@ for ii in np.arange(1,int(niterations+1)):
                                                                currentparams=currentparams,
                                                                cosmoparams=cosmoparams_fixed)
             chi2_new_comp_dict['hirax'] = np.sum(list(chi2old1.values()))
+            if ii == 1 and rank_mpi == 0:
+                print("HIRAX likelihood included: χ2_new_hirax = %s on rank 0"%(chi2_new_comp_dict['hirax']))
         except:
             assert 'hirax' not in INPUT['likelihood']['which'] 
             chi2_new_comp_dict['hirax'] = 0
