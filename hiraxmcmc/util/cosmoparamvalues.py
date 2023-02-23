@@ -42,14 +42,14 @@ class ParametersFixed:
         
         
         # Hubble parameter
-        self._h = 0.6732
+        self._h = 0.6494
         self._H0 = self._h * 100
         
         rhoc = 3.0 * self._H0**2 * cc**2 / (8.0 * np.pi * self._G) / (1e6 * self._parsec_in_km)**2
         
         # Omega_matter
-        self._ombh2 = 0.022377
-        self._omch2 = 0.12010
+        self._ombh2 = 0.022172
+        self._omch2 = 0.12035 
         self._Omb = self._ombh2/self._h**2
         self._Omc = self._omch2/self._h**2
         
@@ -60,7 +60,7 @@ class ParametersFixed:
         # self._Omncdm = self.rho_ncdm / rhoc
         
         # self._OmM = (self._ombh2 + self._omch2)/self._h**2
-        self._OmM = 0.3158 # (self._ombh2 + self._omch2)/self._h**2 + self._Omncdm
+        self._OmM = 0.3395 # (self._ombh2 + self._omch2)/self._h**2 + self._Omncdm
         self._Omncdm = self._OmM - self._Omb - self._Omc
         
         # Omega_curvature
@@ -82,6 +82,7 @@ class ParametersFixed:
         self._Omr = self._Omg + self._Omnu
         
         
+        
         # self._Omr = 1 - self._Oml - self._OmM - self._Omk
         # self._Omnu = self._Omr - self._Omg 
         # rhonu = self._Omnu * rhoc
@@ -93,8 +94,8 @@ class ParametersFixed:
         # self._Omk = 1 - self._Oml - self._OmM  - self._Omr
         
         
-        self._w0 = -1.0
-        self._wa = 0.0
+        self._w0 = -0.617 
+        self._wa = -1.20
         
         
         self._hz = {}

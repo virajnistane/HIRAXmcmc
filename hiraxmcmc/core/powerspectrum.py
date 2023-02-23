@@ -428,7 +428,7 @@ class CreatePs2d:
                       'fluid_equation_of_state': 'CLP',
                       'w0_fld': currentparamstemp['w0'],
                       'wa_fld': currentparamstemp['wa'],
-                      'sigma8': 0.8126 # 0.8211752725010274,
+                      'sigma8': 0.7977  # 0.8211752725010274,
                       })
         
         try:
