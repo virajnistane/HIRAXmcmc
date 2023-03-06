@@ -432,26 +432,38 @@ class CreatePs2d:
                       })
         
         try:
-            assert not (('planck' in self.INPUT['likelihood']['which']) or ('cmb' in self.INPUT['likelihood']['which']))
-            
+            assert self.INPUT != None
+            try:
+                assert not (('planck' in self.INPUT['likelihood']['which']) or ('cmb' in self.INPUT['likelihood']['which']))
+                
+                self.pcl.set({'lensing':'no',
+                              'output': 'mPk', # {'mPk','tCl','pCl'},
+                              # 'output': 'mPk', # {'mPk','tCl','pCl'},
+                              'P_k_max_1/Mpc':2,
+                              # 'z_max_pk':3.5,
+                              'z_pk': 0,
+                              'non linear':'none'
+                              })
+            except: 
+                assert ('planck' in self.INPUT['likelihood']['which']) or ('cmb' in self.INPUT['likelihood']['which'])
+                
+                self.pcl.set({'lensing':'yes',
+                              'output': 'tCl,mPk,pCl,lCl', # {'mPk','tCl','pCl'},
+                              # 'output': 'mPk', # {'mPk','tCl','pCl'},
+                              'P_k_max_1/Mpc':2,
+                              # 'z_max_pk':3.5,
+                              'z_pk': 0,
+                              'l_max_scalars': 2600,
+                              'non linear':'none'
+                              })
+        except:
+            assert self.INPUT == None
             self.pcl.set({'lensing':'no',
                           'output': 'mPk', # {'mPk','tCl','pCl'},
                           # 'output': 'mPk', # {'mPk','tCl','pCl'},
                           'P_k_max_1/Mpc':2,
-                          # 'z_max_pk':3.5,
-                          'z_pk': 0,
-                          'non linear':'none'
-                          })
-        except: 
-            assert ('planck' in self.INPUT['likelihood']['which']) or ('cmb' in self.INPUT['likelihood']['which'])
-            
-            self.pcl.set({'lensing':'yes',
-                          'output': 'tCl,mPk,pCl,lCl', # {'mPk','tCl','pCl'},
-                          # 'output': 'mPk', # {'mPk','tCl','pCl'},
-                          'P_k_max_1/Mpc':2,
-                          # 'z_max_pk':3.5,
-                          'z_pk': 0,
-                          'l_max_scalars': 2600,
+                          'z_max_pk':3.5,
+                          # 'z_pk': 0,
                           'non linear':'none'
                           })
         
