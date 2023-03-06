@@ -16,7 +16,7 @@ from hiraxmcmc.util.cosmoparamvalues import ParametersFixed
 
 class HiraxOutput:
     
-    def __init__(self, inputforhiraxoutput):
+    def __init__(self, inputforhiraxoutput, k_hunits=False):
         
 
         
@@ -28,7 +28,11 @@ class HiraxOutput:
         self.klmode = inputforhiraxoutput['klmode']
         self.uname = os.uname()[1]
         self.parameters_fixed = ParametersFixed()
-        self.h = self.parameters_fixed.h_fid
+        
+        if k_hunits == False:
+            self.h = self.parameters_fixed.h_fid
+        elif k_hunits == True:
+            self.h = 1
         
         self.psfileload = hh.File(
             os.path.join(
