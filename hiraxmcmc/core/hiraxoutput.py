@@ -4,6 +4,7 @@
 import os, sys
 import numpy as np
 import h5py as hh
+import zarr
 
 import hiraxmcmc
 from hiraxmcmc.util.basicfunctions import *
@@ -22,7 +23,11 @@ class HiraxOutput:
         
         self.modulelocation = os.path.dirname(hiraxmcmc.__file__)
         self.hiraxrundir_name = inputforhiraxoutput['result_dir_name']
-        self.hiraxrundir_fullpath = os.path.join(self.modulelocation, 'mmoderesults', self.hiraxrundir_name)
+        try:
+            assert os.path.dirname(self.hiraxrundir_name) == ''
+            self.hiraxrundir_fullpath = os.path.join(self.modulelocation, 'mmoderesults', self.hiraxrundir_name)
+        except:
+            self.hiraxrundir_fullpath = self.hiraxrundir_name
         self.redshift = inputforhiraxoutput['redshift']
         self.psetype = inputforhiraxoutput['estimator_type']
         self.klmode = inputforhiraxoutput['klmode']
@@ -34,19 +39,31 @@ class HiraxOutput:
         elif k_hunits == True:
             self.h = 1
         
-        self.psfileload = hh.File(
-            os.path.join(
-                self.hiraxrundir_fullpath, 
-                'draco/psmc_%s_wnoise_fgfilter_%s_group_0.h5'%(self.psetype,self.klmode) ),'r')
-        self.fisherfileload = hh.File(
-            os.path.join(
-                self.hiraxrundir_fullpath, 
-                'drift_prod_hirax_survey_49elem_7point_64bands/bt/%s/psmc_%s_1threshold/fisher.hdf5'%(self.klmode,self.klmode)),'r')
+        try:
+            self.psfileload = hh.File(
+                os.path.join(
+                    self.hiraxrundir_fullpath, 
+                    'draco/psmc_%s_wnoise_fgfilter_%s_group_0.h5'%(self.psetype,self.klmode) ),'r')
+        except:
+            if self.psetype == 'minvar':
+                self.psetypeshort = 'mv'
+            elif self.psetype == 'unwindowed':
+                self.psetypeshort = 'uw'
+            psfile = [i for i in find_subdirs_containing(self.klmode, os.path.join(self.hiraxrundir_fullpath, 'draco'))
+                      if self.psetypeshort in i][0]
+            self.psfileload = zarr.load(os.path.join(self.hiraxrundir_fullpath, 'draco', psfile))
+            
+        
+        driftproddir = find_subdirs_begin_with('drift', self.hiraxrundir_fullpath)[0]
+        self.fisherfileload = hh.File(os.path.join(self.hiraxrundir_fullpath, 
+                                                   driftproddir,
+                                                   'bt/%s/psmc_%s_1threshold/fisher.hdf5'%(self.klmode,
+                                                                                           self.klmode)),'r')
         
         
-        # "None"-Initiated attributes
+        # None-Initiated attributes
         self.cinv = None
-        self.extent1 = None
+        self.extentlower = None
         
         
     
@@ -63,12 +80,12 @@ class HiraxOutput:
         self.cinv = self.psfileload['C_inv'][:];
         
         if self.psetype == "unwindowed":
-            covhirax = np.linalg.inv(self.cinv.T.reshape(int(self.cinv.shape[0]* self.cinv.shape[1]),int(self.cinv.shape[2]* self.cinv.shape[3])));
+            covh = np.linalg.inv(self.cinv.T.reshape(int(self.cinv.shape[0]* self.cinv.shape[1]),int(self.cinv.shape[2]* self.cinv.shape[3])));
         elif self.psetype == "minvar":
             M = np.diag(self.cinv.T.reshape(int(self.cinv.shape[0]*self.cinv.shape[1]),int(self.cinv.shape[2]*self.cinv.shape[3])).sum(axis=1)** -1)
-            covhirax = np.matmul(M, np.matmul(self.cinv.T.reshape(int(self.cinv.shape[0]*self.cinv.shape[1]),int(self.cinv.shape[2]*self.cinv.shape[3])), M.T))
+            covh = np.matmul(M, np.matmul(self.cinv.T.reshape(int(self.cinv.shape[0]*self.cinv.shape[1]),int(self.cinv.shape[2]*self.cinv.shape[3])), M.T))
         # return 0.05**2 * np.identity(len(covhirax)) # 
-        return covhirax
+        return covh
     
     # @property
     # def covhirax(self):
