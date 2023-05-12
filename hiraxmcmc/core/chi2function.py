@@ -26,14 +26,14 @@ from hiraxmcmc.util.cosmoparamvalues import ParametersFixed
 
 class Chi2Func:
     
-    def __init__(self, inputforhiraxoutput, rank_mpi=None, INPUT=None):
+    def __init__(self, inputforhiraxoutput, k_hunits = False, rank_mpi=None, INPUT=None):
         
         self.modulelocation = os.path.dirname(hiraxmcmc.__file__)
         self.inputforhiraxoutput = inputforhiraxoutput
         self.INPUT = INPUT
         
         """ hirax output """
-        self.hirax_output        =   HiraxOutput(inputforhiraxoutput)
+        self.hirax_output        =   HiraxOutput(inputforhiraxoutput, k_hunits = k_hunits)
         self.kpar_all, self.kperp_all, self.kc_all = self.hirax_output.k_space_parameters()
         
         self.kpar       =   self.kpar_all['kpar']
@@ -76,16 +76,24 @@ class Chi2Func:
         
         self.kperp_limits_hunits =  {'l':self.kperpstart[2], 'u':self.kperpend[6]}  # {'l':0.025, 'u':0.1}
         self.kpar_limits_hunits =    {'l':self.kparstart[4], 'u':self.kparend[12]} # {'l':0.025, 'u':0.25}
-        self.kcenter_limits_hunits = {'l':0.05 * self.hirax_output.h, 'u':0.15 * self.hirax_output.h}
+        
+        if self.hirax_output.psetype == 'minvar':
+            self.kpar_limits_hunits['l'] = self.kparstart[5]
+            self.kpar_limits_hunits['u'] = self.kparend[21]
+        elif self.hirax_output.psetype == 'unwindowed':
+            self.kpar_limits_hunits['l'] = self.kparstart[3]
+            self.kpar_limits_hunits['u'] = self.kparend[16]
+            
+        # self.kcenter_limits_hunits = {'l':0.05 * self.hirax_output.h, 'u':0.15 * self.hirax_output.h}
         
         
         self.xsens =  ((self.kperp > self.kperp_limits_hunits['l']) 
                        * (self.kperp < self.kperp_limits_hunits['u']) 
                        * (self.kpar > self.kpar_limits_hunits['l']) 
                        * (self.kpar < self.kpar_limits_hunits['u']) 
-                       * (abs(self.errs) < 1) 
-                       * (self.kcenter > self.kcenter_limits_hunits['l']) 
-                       * (self.kcenter < self.kcenter_limits_hunits['u'])) 
+                       * (abs(self.errs) < 1) )
+                       # * (self.kcenter > self.kcenter_limits_hunits['l']) 
+                       # * (self.kcenter < self.kcenter_limits_hunits['u'])) 
         #(k_center.flat > 0.1) * (k_center.flat < 0.15) * (np.diag(y['cov']) < 1)
         
         
