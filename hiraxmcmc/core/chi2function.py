@@ -78,8 +78,10 @@ class Chi2Func:
         self.kpar_limits_hunits =    {'l':self.kparstart[4], 'u':self.kparend[12]} # {'l':0.025, 'u':0.25}
         
         if self.hirax_output.psetype == 'minvar':
-            self.kpar_limits_hunits['l'] = self.kparstart[5]
-            self.kpar_limits_hunits['u'] = self.kparend[21]
+            self.kpar_limits_hunits['l'] = self.kparstart[3]
+            self.kpar_limits_hunits['u'] = self.kparend[16]
+            # self.kpar_limits_hunits['l'] = self.kparstart[5]
+            # self.kpar_limits_hunits['u'] = self.kparend[21]
         elif self.hirax_output.psetype == 'unwindowed':
             self.kpar_limits_hunits['l'] = self.kparstart[3]
             self.kpar_limits_hunits['u'] = self.kparend[16]
