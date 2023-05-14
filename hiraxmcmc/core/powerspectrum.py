@@ -36,7 +36,7 @@ from classy import Class
 
 class Ps2dFromPofk:
     
-    def __init__(self, inputforhiraxoutput):
+    def __init__(self, inputforhiraxoutput, k_hunits=False):
         
         self.inputforhiraxoutput = inputforhiraxoutput
         
@@ -48,7 +48,7 @@ class Ps2dFromPofk:
         #    V
         # self.h_fid = self.parameters_fixed.h_fid
         
-        self.hirax_output = HiraxOutput(inputforhiraxoutput)    # inputforhiraxoutput = hiraxrundirname, psetype
+        self.hirax_output = HiraxOutput(inputforhiraxoutput, k_hunits=k_hunits)    # inputforhiraxoutput = hiraxrundirname, psetype
         # |__
         #    |
         #   \|/
@@ -288,7 +288,7 @@ class Ps2dFromPofk:
 
 class CreatePs2d:
     
-    def __init__(self, inputforhiraxoutput, pspackage='class', pstype = 'param',
+    def __init__(self, inputforhiraxoutput, pspackage='class', pstype = 'param', k_hunits = False,
                  INPUT = None):
         """
         
@@ -331,7 +331,7 @@ class CreatePs2d:
             self.cambpars = camb.read_ini(os.path.join(self.modulelocation, 'planckfiles', 'planck_2018.ini'))
         
         
-        self.ps2d_from_Pofk = Ps2dFromPofk(inputforhiraxoutput = self.inputforhiraxoutput)
+        self.ps2d_from_Pofk = Ps2dFromPofk(inputforhiraxoutput = self.inputforhiraxoutput, k_hunits=k_hunits)
         
         self.redshift_from_hiraxoutput = self.ps2d_from_Pofk.redshift_from_hiraxoutput
         
