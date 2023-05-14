@@ -54,7 +54,8 @@ class HiraxOutput:
             self.psfileload = zarr.load(os.path.join(self.hiraxrundir_fullpath, 'draco', psfile))
             
         
-        driftproddir = find_subdirs_begin_with('drift', self.hiraxrundir_fullpath)[0]
+        # driftproddir = find_subdirs_begin_with('drift', self.hiraxrundir_fullpath)[0]
+        driftproddir = 'drift_prod_hirax_survey_49elem_7point_64bands'
         self.fisherfileload = hh.File(os.path.join(self.hiraxrundir_fullpath, 
                                                    driftproddir,
                                                    'bt/%s/psmc_%s_1threshold/fisher.hdf5'%(self.klmode,
