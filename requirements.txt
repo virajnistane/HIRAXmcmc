@@ -3,3 +3,8 @@ scipy
 cython
 h5py
 camb
+classy
+configobj
+pygit2
+mpi4py
+zarr
