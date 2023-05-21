@@ -10,22 +10,88 @@ from scipy.constants import c as speedoflight
 
 
 def freq2lambda(freq):
-    # convert freq in MHz to wavelength in cm
+    """
+    Convert freq in MHz to wavelength in cm
+    Parameters
+    ----------
+    freq : float
+        frequency value in MHz.
+    Returns
+    -------
+    float
+        wavelength in cm.
+    """
     return speedoflight/(freq*1e6) * 100
+
 def lambda2freq(lambda1):
-    # convert wavelength in cm to freq in MHz
+    """
+    Convert wavelength in cm to freq in MHz
+    Parameters
+    ----------
+    lambda1 : float
+        wavelength value in cm
+    Returns
+    -------
+    float
+        frequency value in MHz.
+    """
     return speedoflight/(lambda1*0.01)*1e-6
+
 def z2freq(z):
-    # convert 21cm redshift to freq in MHz
+    """
+    Convert 21cm redshift to freq in MHz
+    Parameters
+    ----------
+    z : float
+        redshift (unitless).
+    Returns
+    -------
+    float
+        frequency in MHz.
+
+    """
     return lambda2freq(21)/(1+z)
+
 def z2lambda(z):
-    # convert 21cm redshift to wavelength in cm
+    """
+    Convert 21cm redshift to wavelength in cm
+    Parameters
+    ----------
+    z : float
+        redshift (unitless).
+    Returns
+    -------
+    float
+        wavelengh in cm.
+    """
     return (1+z) * 21
+
 def freq2z(freq):
-    # convert 21cm freq in MHz to redshift
+    """
+    Convert 21cm freq in MHz to redshift
+    Parameters
+    ----------
+    freq : float
+        frequency value in MHz.
+    Returns
+    -------
+    float
+        redshift (unitless).
+    """
     return lambda2freq(21)/freq - 1
+
 def lambda2z(lambda1):
-    # convert 21cm wavelength (in cm) to redshift
+    """
+    Convert 21cm wavelength (in cm) to redshift
+    Parameters
+    ----------
+    lambda1 : float
+        wavelengh in cm.
+    Returns
+    -------
+    float
+        redshift (unitless).
+    """
     return lambda1/21 - 1
 
 def find_freqchannel_for_redshift(z, fc_all = ['400_500', '500_600', '600_700', '700_800']):
@@ -33,8 +99,6 @@ def find_freqchannel_for_redshift(z, fc_all = ['400_500', '500_600', '600_700', 
         if float(i.split('_')[0]) <= z2freq(z) <= float(i.split('_')[1]):
             return i
 
-# def freq2z(freq):       # freq in MHz
-#     return (speedoflight/freq/1e6)/0.21 - 1
 
 # =============================================================================
 # Prior limiting function
@@ -66,10 +130,33 @@ def paramv_within_priors(priors, currentparams):
         templist.append(bool(priors[elem][0] < currentparams[elem] < priors[elem][1]))
     return bool(np.product(templist))
     
+# =============================================================================
+# search for files/subdirs
+# =============================================================================
+
 
 def find_files_begin_with(str1,dirname,fullpathoutput=False):
+    """
+    Find files beginning with a given string argument in the given directory name argument
+
+    Parameters
+    ----------
+    str1 : str
+        string to search for in the beginning of the files.
+    dirname : str
+        full path of directory to search in.
+    fullpathoutput : bool, optional
+        DESCRIPTION. The default is False.
+
+    Returns
+    -------
+    entries : numpy array 
+        List of files present in the given dir.
+
+    """
     entries = np.array([])
-    for entry in [name for name in os.listdir(dirname) if os.path.isfile(os.path.join(dirname,name))]:   # the list only includes directories     
+    for entry in [name for name in os.listdir(dirname) 
+                  if os.path.isfile(os.path.join(dirname,name))]:   # the list only includes directories     
         if entry[:len(str1)]==str1:
             if fullpathoutput:
                 entries = np.append(entries, os.path.abspath(os.path.join(dirname,entry))) # os.path.join(dirname, entry))
@@ -79,37 +166,63 @@ def find_files_begin_with(str1,dirname,fullpathoutput=False):
 
 
 
-def find_files_containing(str1,dirname):
+def find_files_containing(str1,dirname, fullpathoutput=False):
     """
     This function is used to list all the files containing <str1> in the 
     path/dir <dirname>
 
     Parameters
     ----------
-    str1 : TYPE: string
-        DESCRIPTION. Any part/full of filename to search for
-    dirname : TYPE: string
-        DESCRIPTION. Full path of the immediate parent directory to be searched in
+    str1 : string
+        Any part/full of filename to search for
+    dirname : string
+        full path of directory to search in.
 
     Returns
     -------
-    entries : Numpy array
-        DESCRIPTION. List of the file names found (not full paths)
+    entries : numpy array 
+        List of the file names found 
     """
     entries = np.array([])
     for entry in [name for name in os.listdir(dirname) 
                   if os.path.isfile(os.path.join(dirname,name))]:   # the list only includes files     
         if str1 in entry:
-            entries = np.append(entries, entry)
+            if fullpathoutput:
+                entries = np.append(entries, os.path.abspath(os.path.join(dirname,entry))) # os.path.join(dirname, entry))
+            else:
+                entries = np.append(entries, entry)
     return entries
 
 
 
-def find_subdirs_begin_with(str1,dirname):
+def find_subdirs_begin_with(str1,dirname, fullpathoutput=False):
+    """
+    This function is used to list all the subdirectories beginning with <str1> in 
+    the given path/dir <dirname>
+
+    Parameters
+    ----------
+    str1 : string
+        string to search for in the beginning of the subdirs.
+    dirname : string
+        full path of directory to search in.
+    fullpathoutput : TYPE, optional
+        DESCRIPTION. The default is False.
+
+    Returns
+    -------
+    entries : Numpy array
+        List of the subdir names found (not full paths).
+
+    """
     entries = np.array([])
-    for entry in [name for name in os.listdir(dirname) if os.path.isdir(os.path.join(dirname,name))]:   # the list only includes directories     
+    for entry in [name for name in os.listdir(dirname) 
+                  if os.path.isdir(os.path.join(dirname,name))]:   # the list only includes directories     
         if entry[:len(str1)]==str1:
-            entries = np.append(entries, entry)
+            if fullpathoutput:
+                entries = np.append(entries, os.path.abspath(os.path.join(dirname,entry))) # os.path.join(dirname, entry))
+            else:
+                entries = np.append(entries, entry)
     return entries
 
 
@@ -120,15 +233,15 @@ def find_subdirs_containing(str1,dirname,fullpathoutput=False):
 
     Parameters
     ----------
-    str1 : TYPE: string
-        DESCRIPTION. Any part/full of the subdir name to search for
-    dirname : TYPE: string
+    str1 : string
+        Any part/full of the subdir name to search for
+    dirname : string
         DESCRIPTION. Full path of the immediate parent directory to be searched in
 
     Returns
     -------
     entries : Numpy array
-        DESCRIPTION. List of the subdir names found (not full paths)
+        List of the subdir names found (not full paths)
     """
     entries = np.array([])
     for entry in [name for name in os.listdir(os.path.abspath(dirname))
@@ -140,7 +253,9 @@ def find_subdirs_containing(str1,dirname,fullpathoutput=False):
                 entries = np.append(entries, entry)
     return entries
 
-
+# =============================================================================
+# Matrix sections
+# =============================================================================
 
 def extract_matrix_section(matrix, givenparams, 
                            ordered_params_list=['H0','Omk','Oml','w0','wa']):
