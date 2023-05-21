@@ -34,19 +34,19 @@ class Chi2Func:
         
         """ hirax output """
         self.hirax_output        =   HiraxOutput(inputforhiraxoutput, k_hunits = k_hunits)
-        self.kpar_all, self.kperp_all, self.kc_all = self.hirax_output.k_space_parameters()
+        # self.kpar_all, self.kperp_all, self.kc_all = self.hirax_output.k_space_parameters()
         
-        self.kpar       =   self.kpar_all['kpar']
-        self.kperp      =   self.kperp_all['kperp']
-        self.kcenter    =   self.kc_all['kcenter']
+        # self.kpar       =   self.kpar_all['kpar']
+        # self.kperp      =   self.kperp_all['kperp']
+        # self.kcenter    =   self.kc_all['kcenter']
         
         self.redshift = self.hirax_output.redshift
         
         try:
             if INPUT != None:
                 assert INPUT['likelihood']['PS_cov']['override'] == 'no'
-            self.covhirax = self.hirax_output.covhirax
-            self.errs = self.hirax_output.rel_err
+            self.covhirax = self.hirax_output.relPS_cov
+            self.errs = self.hirax_output.relPS_err
             if rank_mpi == 0:
                 print('Covariance in likelihood used from m-mode sims')
         except:
@@ -60,12 +60,12 @@ class Chi2Func:
             if rank_mpi == 0:
                 print('Covariance in likelihood used from external file: \n %s'%(cov_override_file))
         
-        self.kparstart = self.kpar_all['kpar_bands'][:-1]
-        self.kparend = self.kpar_all['kpar_bands'][1:]
-        self.kperpstart = self.kperp_all['kperp_bands'][:-1]
-        self.kperpend = self.kperp_all['kperp_bands'][1:]
+        # self.kparstart = self.kpar_all['kpar_bands'][:-1]
+        # self.kparend = self.kpar_all['kpar_bands'][1:]
+        # self.kperpstart = self.kperp_all['kperp_bands'][:-1]
+        # self.kperpend = self.kperp_all['kperp_bands'][1:]
         
-        self.psrel_estimatedfromhirax = self.hirax_output.ps_relative_estimated_from_hirax
+        self.relPS_amp_fromHirax = self.hirax_output.relPS_amp
         
         
         
@@ -73,39 +73,61 @@ class Chi2Func:
         
         """ select k-bins """
         
+        if 400<z2freq(self.redshift)<500:
+            kperplimits=(0.02, 0.06)
+            kparlimits=(0.05,0.18)
+            kcenterlimits=(0.05,0.2)
+        elif 500<z2freq(self.redshift)<600:
+            kperplimits=(0.02, 0.07)
+            kparlimits=(0.05,0.18)
+            kcenterlimits=(0.05,0.2)
+        elif 600<z2freq(self.redshift)<700:
+            kperplimits=(0.03, 0.1)
+            kparlimits=(0.05,0.18)
+            kcenterlimits=(0.05,0.2)
+        elif 700<z2freq(self.redshift)<800:
+            kperplimits=(0.04, 0.12)
+            kparlimits=(0.05,0.18)
+            kcenterlimits=(0.05,0.2)
+
         
-        self.kperp_limits_hunits =  {'l':self.kperpstart[2], 'u':self.kperpend[6]}  # {'l':0.025, 'u':0.1}
-        self.kpar_limits_hunits =    {'l':self.kparstart[4], 'u':self.kparend[12]} # {'l':0.025, 'u':0.25}
+        # self.kperp_limits_hunits =  {'l':self.kperpstart[2], 'u':self.kperpend[6]}  # {'l':0.025, 'u':0.1}
+        # self.kpar_limits_hunits =    {'l':self.kparstart[4], 'u':self.kparend[12]} # {'l':0.025, 'u':0.25}
         
-        if self.hirax_output.psetype == 'minvar':
-            self.kpar_limits_hunits['l'] = self.kparstart[3]
-            self.kpar_limits_hunits['u'] = self.kparend[16]
-            # self.kpar_limits_hunits['l'] = self.kparstart[5]
-            # self.kpar_limits_hunits['u'] = self.kparend[21]
-        elif self.hirax_output.psetype == 'unwindowed':
-            self.kpar_limits_hunits['l'] = self.kparstart[3]
-            self.kpar_limits_hunits['u'] = self.kparend[16]
+        # if self.hirax_output.psetype == 'minvar':
+        #     self.kpar_limits_hunits['l'] = self.kparstart[3]
+        #     self.kpar_limits_hunits['u'] = self.kparend[16]
+        #     # self.kpar_limits_hunits['l'] = self.kparstart[5]
+        #     # self.kpar_limits_hunits['u'] = self.kparend[21]
+        # elif self.hirax_output.psetype == 'unwindowed':
+        #     self.kpar_limits_hunits['l'] = self.kparstart[3]
+        #     self.kpar_limits_hunits['u'] = self.kparend[16]
             
         # self.kcenter_limits_hunits = {'l':0.05 * self.hirax_output.h, 'u':0.15 * self.hirax_output.h}
         
         
-        self.xsens =  ((self.kperp > self.kperp_limits_hunits['l']) 
-                       * (self.kperp < self.kperp_limits_hunits['u']) 
-                       * (self.kpar > self.kpar_limits_hunits['l']) 
-                       * (self.kpar < self.kpar_limits_hunits['u']) 
-                       * (abs(self.errs) < 1) )
-                       # * (self.kcenter > self.kcenter_limits_hunits['l']) 
-                       # * (self.kcenter < self.kcenter_limits_hunits['u'])) 
-        #(k_center.flat > 0.1) * (k_center.flat < 0.15) * (np.diag(y['cov']) < 1)
+        # self.xsens =  ((self.kperp > self.kperp_limits_hunits['l']) 
+        #                * (self.kperp < self.kperp_limits_hunits['u']) 
+        #                * (self.kpar > self.kpar_limits_hunits['l']) 
+        #                * (self.kpar < self.kpar_limits_hunits['u']) 
+        #                * (abs(self.errs) < 1) )
+        #                # * (self.kcenter > self.kcenter_limits_hunits['l']) 
+        #                # * (self.kcenter < self.kcenter_limits_hunits['u'])) 
+        # #(k_center.flat > 0.1) * (k_center.flat < 0.15) * (np.diag(y['cov']) < 1)
         
         
-        self.xsensflat = np.array(self.xsens.flat)
-        self.ysens = np.outer(self.xsensflat,self.xsensflat)
+        # self.xsensflat = np.array(self.xsens.flat)
+        # self.ysens = np.outer(self.xsensflat,self.xsensflat)
         
-        cov_masked_sens = self.covhirax[self.ysens]
-        self.newshape_sens = int(cov_masked_sens.shape[0]**0.5)
-        self.cov_masked_sens = cov_masked_sens.reshape(self.newshape_sens,self.newshape_sens);
+        # cov_masked_sens = self.covhirax[self.ysens]
+        # self.newshape_sens = int(cov_masked_sens.shape[0]**0.5)
+        # self.cov_masked_sens = cov_masked_sens.reshape(self.newshape_sens,self.newshape_sens);
         
+        (self.cov_masked, 
+         self.ps_masked_flat, 
+         self.Nbins_masked) = self.hirax_output.masked_cov_and_ps(kperp_limits_tuple = kperplimits,
+                                                                  kpar_limits_tuple = kparlimits,
+                                                                  kcenter_limits_tuple = kcenterlimits)
         
         """ params_fixed """
         self.params_fixed = ParametersFixed()
@@ -271,12 +293,12 @@ class Chi2Func:
         
         ps = (pscalc/self.ps_estimated - 1)
         
-        ps_masked_sens_chi2 = ps.flat[:][self.xsensflat]
+        ps_masked = ps.flat[:][self.hirax_output.xmasked.flatten()]
         
-        self.ps_masked_sens_chi2 = ps_masked_sens_chi2
+        self.ps_masked = ps_masked
         
         # chi2 = np.matmul(np.matmul(ps_masked_sens_chi2, la.inv(self.cov_masked_sens)), ps_masked_sens_chi2)
-        chi2 = ps_masked_sens_chi2.dot( (la.inv(self.cov_masked_sens)).dot( ps_masked_sens_chi2))
+        chi2 = (self.ps_masked).dot( (la.inv(self.cov_masked)).dot( self.ps_masked))
         
         
         return chi2
@@ -303,27 +325,27 @@ class Chi2Func:
     def kcenter_limits(self, newlimitstuple):
         self.kcenter_minlimit, self.kcenter_maxlimit = newlimitstuple
     
-    def chi2(self, current_params, z, get_pscalc_out = False):
+    # def chi2(self, current_params, z, get_pscalc_out = False):
         
-        # t0 = time.time()
+    #     # t0 = time.time()
         
-        pscalc = self.cp_class_param.create_ps2d_from_class(currentparams = current_params, z=z)
+    #     pscalc = self.cp_class_param.create_ps2d_from_class(currentparams = current_params, z=z)
         
-        # pscalc = self.cp_camb_param.create_ps2d_from_camb(currentparams = current_params, z=z)
+    #     # pscalc = self.cp_camb_param.create_ps2d_from_camb(currentparams = current_params, z=z)
         
         
-        ps = (pscalc/self.ps_estimated - 1).T
+    #     ps = (pscalc/self.ps_estimated - 1).T
         
-        ps_masked_sens_chi2 = ps.flat[:][self.x_sens] 
+    #     ps_masked_sens_chi2 = ps.flat[:][self.x_sens] 
         
-        chi2 = np.matmul(np.matmul(ps_masked_sens_chi2,la.inv(self.cov_masked_sens)), ps_masked_sens_chi2)
+    #     chi2 = np.matmul(np.matmul(ps_masked_sens_chi2,la.inv(self.cov_masked_sens)), ps_masked_sens_chi2)
         
-        # print(time.time() - t0)
+    #     # print(time.time() - t0)
         
-        if get_pscalc_out:
-            return chi2, pscalc
-        else:
-            return chi2, None
+    #     if get_pscalc_out:
+    #         return chi2, pscalc
+    #     else:
+    #         return chi2, None
     
     def chi2_from_hirax(self, current_params, z, get_pscalc_out = False):
         
@@ -331,11 +353,11 @@ class Chi2Func:
         
         pscalc = self.cp_class_param.create_ps2d_from_class(current_params, z = self.redshift)
         
-        ps = (pscalc/self.psrel_estimatedfromhirax - 1)
+        ps = (pscalc/self.relPS_amp_fromHirax - 1)
         
-        ps_masked_sens_chi2 = (ps.flat[:][self.x_sens]).T
+        ps_masked = (ps.flat[:][self.hirax_output.xmasked.flatten()])
         
-        chi2 = np.matmul(np.matmul(ps_masked_sens_chi2,la.inv(self.cov_masked_sens)), ps_masked_sens_chi2)
+        chi2 = np.matmul(np.matmul(ps_masked,la.inv(self.cov_masked)), ps_masked)
         
         # print(time.time() - t0)
         

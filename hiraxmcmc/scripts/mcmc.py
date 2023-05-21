@@ -391,7 +391,7 @@ for index, freqlimits1 in enumerate(auto_hiraxoutput_kw_list):
     inputforhiraxoutput[freqlimits1] = {}
     inputforhiraxoutput[freqlimits1]['result_dir_name'] = auto_hiraxoutput_selection_dir[index]
     inputforhiraxoutput[freqlimits1]['estimator_type'] = INPUT['mmode_output']['power_spectrum_estimator_type']
-    inputforhiraxoutput[freqlimits1]['redshift'] = redshiftlist[index]
+    # inputforhiraxoutput[freqlimits1]['redshift'] = redshiftlist[index]
     
     btdir = os.path.join(find_subdirs_containing('drift_prod', auto_hiraxoutput_selection_dir[index], fullpathoutput=True)[0],'bt')
     inputforhiraxoutput[freqlimits1]['klmode'] = INPUT['mmode_output']['klmode']
@@ -409,8 +409,8 @@ errs = {}
 
 for index1, freqlimits in enumerate(auto_hiraxoutput_kw_list):
     hirax_output[freqlimits] = HiraxOutput(inputforhiraxoutput[freqlimits])
-    covhirax[freqlimits] = hirax_output[freqlimits].covhirax
-    errs[freqlimits] = hirax_output[freqlimits].rel_err
+    covhirax[freqlimits] = hirax_output[freqlimits].relPS_cov
+    errs[freqlimits] = hirax_output[freqlimits].relPS_err
 
 
 

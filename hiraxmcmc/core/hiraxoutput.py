@@ -3,8 +3,11 @@
 
 import os, sys
 import numpy as np
+import numpy.linalg as la
 import h5py as hh
 import zarr
+import yaml
+from yaml import Loader, Dumper
 
 import hiraxmcmc
 from hiraxmcmc.util.basicfunctions import *
@@ -13,6 +16,91 @@ from hiraxmcmc.util.cosmoparamvalues import ParametersFixed
 # =============================================================================
 # HIRAX cov matrix and k-params
 # =============================================================================
+
+# def find_subdirs_begin_with(str1,dirname, fullpathoutput=False):
+#     """
+#     This function is used to list all the subdirectories beginning with <str1> in 
+#     the given path/dir <dirname>
+
+#     Parameters
+#     ----------
+#     str1 : string
+#         string to search for in the beginning of the subdirs.
+#     dirname : string
+#         full path of directory to search in.
+#     fullpathoutput : TYPE, optional
+#         DESCRIPTION. The default is False.
+
+#     Returns
+#     -------
+#     entries : Numpy array
+#         List of the subdir names found (not full paths).
+
+#     """
+#     entries = np.array([])
+#     for entry in [name for name in os.listdir(dirname) 
+#                   if os.path.isdir(os.path.join(dirname,name))]:   # the list only includes directories     
+#         if entry[:len(str1)]==str1:
+#             if fullpathoutput:
+#                 entries = np.append(entries, os.path.abspath(os.path.join(dirname,entry))) # os.path.join(dirname, entry))
+#             else:
+#                 entries = np.append(entries, entry)
+#     return entries
+
+# def find_files_containing(str1,dirname, fullpathoutput=False):
+#     """
+#     This function is used to list all the files containing <str1> in the 
+#     path/dir <dirname>
+
+#     Parameters
+#     ----------
+#     str1 : string
+#         Any part/full of filename to search for
+#     dirname : string
+#         full path of directory to search in.
+
+#     Returns
+#     -------
+#     entries : numpy array 
+#         List of the file names found 
+#     """
+#     entries = np.array([])
+#     for entry in [name for name in os.listdir(dirname) 
+#                   if os.path.isfile(os.path.join(dirname,name))]:   # the list only includes files     
+#         if str1 in entry:
+#             if fullpathoutput:
+#                 entries = np.append(entries, os.path.abspath(os.path.join(dirname,entry))) # os.path.join(dirname, entry))
+#             else:
+#                 entries = np.append(entries, entry)
+#     return entries
+
+# def find_subdirs_containing(str1,dirname,fullpathoutput=False):
+#     """
+#     This function is used to list all the subdirectories containing <str1> in 
+#     the path/dir <dirname>
+
+#     Parameters
+#     ----------
+#     str1 : string
+#         Any part/full of the subdir name to search for
+#     dirname : string
+#         DESCRIPTION. Full path of the immediate parent directory to be searched in
+
+#     Returns
+#     -------
+#     entries : Numpy array
+#         List of the subdir names found (not full paths)
+#     """
+#     entries = np.array([])
+#     for entry in [name for name in os.listdir(os.path.abspath(dirname))
+#                   if os.path.isdir(os.path.join(dirname,name))]:   # the list only includes directories     
+#         if str1 in entry:
+#             if fullpathoutput:
+#                 entries = np.append(entries, os.path.abspath(os.path.join(dirname,entry)))
+#             else:
+#                 entries = np.append(entries, entry)
+#     return entries
+
 
 
 class HiraxOutput:
@@ -28,38 +116,86 @@ class HiraxOutput:
             self.hiraxrundir_fullpath = os.path.join(self.modulelocation, 'mmoderesults', self.hiraxrundir_name)
         except:
             self.hiraxrundir_fullpath = self.hiraxrundir_name
-        self.redshift = inputforhiraxoutput['redshift']
+        # self.redshift = inputforhiraxoutput['redshift']
+        
         self.psetype = inputforhiraxoutput['estimator_type']
         self.klmode = inputforhiraxoutput['klmode']
         self.uname = os.uname()[1]
         self.parameters_fixed = ParametersFixed()
+        
+        self.driftproddir_fullpath = find_subdirs_begin_with('drift', 
+                                                             self.hiraxrundir_fullpath, 
+                                                             fullpathoutput=True)[0]
+        # driftproddir = 'drift_prod_hirax_survey_49elem_7point_64bands'
+        
+        config_filename = os.path.join(self.driftproddir_fullpath, 'config.yaml')
+        
+        with open(config_filename) as configfile:
+            self.configs_runs = yaml.load(configfile, Loader=Loader)
+        
+        try:
+            try:
+                freqlower = self.configs_runs['telescope']['freq_lower']
+                frequpper = self.configs_runs['telescope']['freq_upper']
+            except:
+                freqlower = self.configs_runs['telescope']['freq_start']
+                frequpper = self.configs_runs['telescope']['freq_end']
+        except:
+            try:
+                freqlower = self.configs_runs['telescope']['hirax_spec']['freq_lower']
+                frequpper = self.configs_runs['telescope']['hirax_spec']['freq_upper']
+            except:
+                freqlower = self.configs_runs['telescope']['hirax_spec']['freq_start']
+                frequpper = self.configs_runs['telescope']['hirax_spec']['freq_end']
+        self.redshift = freq2z(np.mean([freqlower, frequpper]))
+        
+        self.fisherfileload = hh.File(os.path.join(self.driftproddir_fullpath, 
+                                                   'bt/%s/'%(self.klmode),
+                                                   find_subdirs_containing(
+                                                       self.klmode,
+                                                       os.path.join(self.driftproddir_fullpath, 
+                                                                    'bt/%s/'%(self.klmode)))[0],
+                                                   'fisher.hdf5'),
+                                      'r')
+        
+        
         
         if k_hunits == False:
             self.h = self.parameters_fixed.h_fid
         elif k_hunits == True:
             self.h = 1
         
+        
+        if self.psetype == 'minvar':
+            self.psetypeshort = 'mv'
+        elif self.psetype == 'unwindowed':
+            self.psetypeshort = 'uw'
+        
+        
         try:
-            self.psfileload = hh.File(
-                os.path.join(
-                    self.hiraxrundir_fullpath, 
-                    'draco/psmc_%s_wnoise_fgfilter_%s_group_0.h5'%(self.psetype,self.klmode) ),'r')
+            psfile = [i for i in find_files_containing(self.klmode, 
+                                                       os.path.join(self.hiraxrundir_fullpath, 
+                                                                    'draco'), fullpathoutput=True)
+                      if ((self.psetypeshort in os.path.basename(i))
+                          or 
+                          (self.psetype in  os.path.basename(i)))][0]
+            self.psfileload = hh.File(psfile,'r')
         except:
-            if self.psetype == 'minvar':
-                self.psetypeshort = 'mv'
-            elif self.psetype == 'unwindowed':
-                self.psetypeshort = 'uw'
-            psfile = [i for i in find_subdirs_containing(self.klmode, os.path.join(self.hiraxrundir_fullpath, 'draco'))
-                      if self.psetypeshort in i][0]
-            self.psfileload = zarr.load(os.path.join(self.hiraxrundir_fullpath, 'draco', psfile))
+            psfile = [i for i in find_subdirs_containing(self.klmode, 
+                                                         os.path.join(self.hiraxrundir_fullpath, 
+                                                                      'draco'), fullpathoutput=True)
+                      if ((self.psetypeshort in os.path.basename(i))
+                          or 
+                          (self.psetype in  os.path.basename(i)))][0]
+            self.psfileload = zarr.load(psfile)
             
         
         # driftproddir = find_subdirs_begin_with('drift', self.hiraxrundir_fullpath)[0]
-        driftproddir = 'drift_prod_hirax_survey_49elem_7point_64bands'
-        self.fisherfileload = hh.File(os.path.join(self.hiraxrundir_fullpath, 
-                                                   driftproddir,
-                                                   'bt/%s/psmc_%s_1threshold/fisher.hdf5'%(self.klmode,
-                                                                                           self.klmode)),'r')
+        # driftproddir = 'drift_prod_hirax_survey_49elem_7point_64bands'
+        # self.fisherfileload = hh.File(os.path.join(self.hiraxrundir_fullpath, 
+        #                                            driftproddir,
+        #                                            'bt/%s/psmc_%s_1threshold/fisher.hdf5'%(self.klmode,
+        #                                                                                    self.klmode)),'r')
         
         
         # None-Initiated attributes
@@ -77,8 +213,8 @@ class HiraxOutput:
     # If h-units are to be removed, confirm the h-dependence of the covariance matrix from m-mode
     #####
     @property
-    def covhirax(self):
-        self.cinv = self.psfileload['C_inv'][:];
+    def relPS_cov(self):
+        self.cinv = self.psfileload['C_inv'][:]
         
         if self.psetype == "unwindowed":
             covh = np.linalg.inv(self.cinv.T.reshape(int(self.cinv.shape[0]* self.cinv.shape[1]),int(self.cinv.shape[2]* self.cinv.shape[3])));
@@ -94,7 +230,7 @@ class HiraxOutput:
     
     
     @property
-    def ps_relative_estimated_from_hirax(self):
+    def relPS_amp(self):
         return self.psfileload['powerspectrum'][:]
     
     
@@ -150,7 +286,7 @@ class HiraxOutput:
         
         
     @property
-    def rel_err (self):
+    def relPS_err (self):
         """
         
         
@@ -163,36 +299,106 @@ class HiraxOutput:
         """
         kpar_params, kperp_params, kcenter_params = self.k_space_parameters()
         
-        errs = np.sqrt(abs(np.diag(self.covhirax))).reshape(kpar_params['kpar_size'],kperp_params['kperp_size'])
+        errs = np.sqrt(abs(np.diag(self.relPS_cov))).reshape(kpar_params['kpar_size'],kperp_params['kperp_size'])
         
         return errs
         
+    def masked_cov_and_ps(self, kperp_limits_tuple: tuple = None, kpar_limits_tuple: tuple = None, kcenter_limits_tuple: tuple = None):
+        kpar_all, kperp_all, kc_all = self.k_space_parameters()
+        
+        kpar       =   kpar_all['kpar']
+        kperp      =   kperp_all['kperp']
+        kcenter    =   kc_all['kcenter']
+        
+        kparstart = kpar_all['kpar_bands'][:-1]
+        kparend = kpar_all['kpar_bands'][1:]
+        kperpstart = kperp_all['kperp_bands'][:-1]
+        kperpend = kperp_all['kperp_bands'][1:]        
+        
+        if kperp_limits_tuple == None:
+            kperp_limits = {'l':kperpstart[2], 'u':kperpend[6]}  # {'l':0.025, 'u':0.1}
+        else:
+            kperp_lower = kperpstart[np.argmin(abs(kperp_limits_tuple[0] - kperpstart))]
+            kperp_upper = kperpend[np.argmin(abs(kperp_limits_tuple[1] - kperpend))]
+            kperp_limits = {'l':kperp_lower, 'u':kperp_upper}
+        
+        self.kperp_limits = kperp_limits
+        
+        if kpar_limits_tuple == None:
+            kpar_limits  = {'l':kparstart[4] , 'u':kparend[12]} # {'l':0.025, 'u':0.25}
+        else:
+            kpar_lower = kparstart[np.argmin(abs(kpar_limits_tuple[0] - kparstart))]
+            kpar_upper = kparend[np.argmin(abs(kpar_limits_tuple[1] - kparend))]
+            kpar_limits = {'l':kpar_lower, 'u':kpar_upper}
+            
+        self.kpar_limits = kpar_limits
+        
+        if kcenter_limits_tuple == None:
+            kcenter_limits  = {'l':0.0 , 'u':np.sqrt(kperpend[-1]**2 + kparend[-1]**2)} # {'l':0.025, 'u':0.25}
+        else:
+            kcenter_lower = kcenter.flatten()[np.argmin(abs(kcenter_limits_tuple[0] - 
+                                                            np.sqrt(kpar_all['kpar_start_flat']**2 
+                                                                    + kperp_all['kperp_start_flat']**2
+                                                                    ).reshape(kcenter.shape)
+                                                            ))]
+            kcenter_upper = kcenter.flatten()[np.argmin(abs(kcenter_limits_tuple[1] - 
+                                                            np.sqrt(kpar_all['kpar_end_flat']**2 
+                                                                    + kperp_all['kperp_end_flat']**2
+                                                                    ).reshape(kcenter.shape)
+                                                            ))]
+            kcenter_limits = {'l':kcenter_lower, 'u':kcenter_upper}
+        
+        # kcenter_limits_hunits = {'l':0.05 * hirax_output.h, 'u':0.15 * hirax_output.h}
+        
+        self.xmasked =  ((kperp > kperp_limits['l']) 
+                         * (kperp < kperp_limits['u']) 
+                         * (kpar > kpar_limits['l']) 
+                         * (kpar < kpar_limits['u'])
+                         * (abs(self.relPS_err) < 1)
+                         * (kcenter > kcenter_limits['l'])
+                         * (kcenter < kcenter_limits['u'])
+                         )
     
-    # def k_space_parameters_al(self):
+        xmaskedflat = np.array(self.xmasked.flatten())
+        self.ymasked = np.outer(xmaskedflat,xmaskedflat)
         
-    #     kpar_params, kperp_params, kcenter_params = self.k_space_parameters()
+        cov_masked = self.relPS_cov[self.ymasked]
+        newshape_masked = int(cov_masked.shape[0]**0.5)
+        cov_masked = cov_masked.reshape(newshape_masked,newshape_masked)
         
-    #     kpar_bands = kpar_params['kpar_bands']
-    #     kperp_bands = kperp_params['kperp_bands']
+        ps_masked_flat = self.relPS_amp.flatten()[xmaskedflat]
         
-    #     kparb, kperpb = np.broadcast_arrays(kpar_bands[np.newaxis, :], kperp_bands[:, np.newaxis])
+        return cov_masked, ps_masked_flat, newshape_masked
+    
+    def chi2_relPSamp(self, kperp_limits_tuple: tuple = None, kpar_limits_tuple: tuple = None, kcenter_limits_tuple: tuple = None):
+        cov_mask, ps_mask_flat, newshape_masked = self.masked_cov_and_ps(kperp_limits_tuple, kpar_limits_tuple, kcenter_limits_tuple)
+        return (ps_mask_flat.dot(la.inv(cov_mask))).dot(ps_mask_flat)
+    
+    def chi2_relPSamp_perDOF(self, kperp_limits_tuple: tuple = None, kpar_limits_tuple: tuple = None, kcenter_limits_tuple: tuple = None):
+        cov_mask, ps_mask_flat, newshape_masked = self.masked_cov_and_ps(kperp_limits_tuple, kpar_limits_tuple, kcenter_limits_tuple)
+        return (ps_mask_flat.dot(la.inv(cov_mask))).dot(ps_mask_flat)/newshape_masked
+    
+    def sensitivity_relPScov(self, kperp_limits_tuple: tuple = None, kpar_limits_tuple: tuple = None, kcenter_limits_tuple: tuple = None):
+        cov_mask, ps_mask_flat, newshape_masked = self.masked_cov_and_ps(kperp_limits_tuple, kpar_limits_tuple, kcenter_limits_tuple)
+        return np.exp(1/(2* newshape_masked) * la.slogdet(cov_mask)[1])
+    
         
-    #     # Pull out the start, end and centre of the bands in k, mu directions
-    #     kpar_start = kparb[1:, :-1].flatten()
-    #     kpar_end = kparb[1:, 1:].flatten()
-    #     kpar_center = 0.5 * (kpar_end + kpar_start)
+    def off_dia_sum(self, M):
+        return (np.sum(abs(M),axis=0)-1)/M.shape[0]
+    
+    @property
+    def corr_from_cov_diag(self):
         
-    #     kperp_start = kperpb[:-1, 1:].flatten()
-    #     kperp_end = kperpb[1:, 1:].flatten()
-    #     kperp_center = 0.5 * (kperp_end + kperp_start)
-        
-    #     kpar_params_al = {'kpar_start':kpar_start , 'kpar_end':kpar_end , 'kpar_center':kpar_center}
-    #     kperp_params_al = {'kperp_start':kperp_start , 'kperp_end':kperp_end , 'kperp_center':kperp_center}
-        
-    #     return kpar_params_al, kperp_params_al
-
-
-
+        kpar_params, kperp_params, kcenter_params = self.k_space_parameters()
+        cov = self.relPS_cov
+        corr = np.zeros_like(cov)
+        for i, iv in enumerate(cov):
+            for j, jv in enumerate(cov[i]):
+                corr[i,j] = cov[i,j]/np.sqrt(cov[i,i] * cov[j,j])
+                
+        corr_rs = np.log10(self.off_dia_sum(corr).reshape(kpar_params['kpar_size'],kperp_params['kperp_size']))
+        return corr_rs
+    
 
 
 
