@@ -154,14 +154,14 @@ def find_files_begin_with(str1,dirname,fullpathoutput=False):
         List of files present in the given dir.
 
     """
-    entries = np.array([])
+    entries = []
     for entry in [name for name in os.listdir(dirname) 
                   if os.path.isfile(os.path.join(dirname,name))]:   # the list only includes directories     
         if entry[:len(str1)]==str1:
             if fullpathoutput:
-                entries = np.append(entries, os.path.abspath(os.path.join(dirname,entry))) # os.path.join(dirname, entry))
+                entries.append(os.path.abspath(os.path.join(dirname,entry))) # os.path.join(dirname, entry))
             else:
-                entries = np.append(entries, entry)
+                entries.append(entry)
     return entries
 
 
@@ -183,14 +183,14 @@ def find_files_containing(str1,dirname, fullpathoutput=False):
     entries : numpy array 
         List of the file names found 
     """
-    entries = np.array([])
+    entries = []
     for entry in [name for name in os.listdir(dirname) 
                   if os.path.isfile(os.path.join(dirname,name))]:   # the list only includes files     
         if str1 in entry:
             if fullpathoutput:
-                entries = np.append(entries, os.path.abspath(os.path.join(dirname,entry))) # os.path.join(dirname, entry))
+                entries.append(os.path.abspath(os.path.join(dirname,entry))) # os.path.join(dirname, entry))
             else:
-                entries = np.append(entries, entry)
+                entries.append(entry)
     return entries
 
 
@@ -215,14 +215,14 @@ def find_subdirs_begin_with(str1,dirname, fullpathoutput=False):
         List of the subdir names found (not full paths).
 
     """
-    entries = np.array([])
+    entries = []
     for entry in [name for name in os.listdir(dirname) 
                   if os.path.isdir(os.path.join(dirname,name))]:   # the list only includes directories     
         if entry[:len(str1)]==str1:
             if fullpathoutput:
-                entries = np.append(entries, os.path.abspath(os.path.join(dirname,entry))) # os.path.join(dirname, entry))
+                entries.append(os.path.abspath(os.path.join(dirname,entry))) # os.path.join(dirname, entry))
             else:
-                entries = np.append(entries, entry)
+                entries.append(entry)
     return entries
 
 
@@ -243,14 +243,14 @@ def find_subdirs_containing(str1,dirname,fullpathoutput=False):
     entries : Numpy array
         List of the subdir names found (not full paths)
     """
-    entries = np.array([])
+    entries = []
     for entry in [name for name in os.listdir(os.path.abspath(dirname))
                   if os.path.isdir(os.path.join(dirname,name))]:   # the list only includes directories     
         if str1 in entry:
             if fullpathoutput:
-                entries = np.append(entries, os.path.abspath(os.path.join(dirname,entry)))
+                entries.append(os.path.abspath(os.path.join(dirname,entry)))
             else:
-                entries = np.append(entries, entry)
+                entries.append(entry)
     return entries
 
 # =============================================================================
