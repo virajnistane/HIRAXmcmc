@@ -741,7 +741,7 @@ try:
     for freqc,val in inputforhiraxoutput.items():
         chi2old1[freqc] = chi2_func[freqc].chi2_multiz(PK_k_z_currentstep=PK_k_z_current, 
                                                        PK_properties_currentstep=CLASS_instance_current, 
-                                                       z=val['redshift'],
+                                                       z=chi2_func[freqc].redshift,
                                                        currentparams=currentparams,
                                                        cosmoparams=cosmoparams_fixed)
     chi2_old_comp_dict['hirax'] = np.sum(list(chi2old1.values()))
@@ -1106,7 +1106,7 @@ for ii in np.arange(1,int(niterations+1)):
             for freqc,val in inputforhiraxoutput.items():
                 chi2new1[freqc] = chi2_func[freqc].chi2_multiz(PK_k_z_currentstep=PK_k_z_current, 
                                                                PK_properties_currentstep=CLASS_instance_current, 
-                                                               z=val['redshift'],
+                                                               z=chi2_func[freqc].redshift,
                                                                currentparams=currentparams,
                                                                cosmoparams=cosmoparams_fixed)
             chi2_new_comp_dict['hirax'] = np.sum(list(chi2new1.values()))
