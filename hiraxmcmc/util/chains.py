@@ -9,34 +9,33 @@ from hiraxmcmc.util.basicfunctions import *
 # CHAINS - saving and removing old files
 # =============================================================================
 
+
 class Chains:
     
     def __init__(self, currentrunindex, totalParams_inclChi2, rankmpi, comm, testfilekw, parameterssavetxt, mcmc_mainrun_dir_relpath, addsuffix_fromLoadOldRes, write_out_paramsTrulyAccepted = False, deletePrevChainFiles=False):
         
-        self.columnsInFile = totalParams_inclChi2
-        self.currentrunindex = currentrunindex
+        self.columnsInFile = totalParams_inclChi2  # number of columns in the file
+        self.currentrunindex = currentrunindex # current run index
         
-        self.testfilekw = testfilekw
-        self.parameterssavetxt = parameterssavetxt
+        self.testfilekw = testfilekw # keyword for the test file
+        self.parameterssavetxt = parameterssavetxt # keyword for the parameters file
         
-        self.uname = os.uname()[1]
-        self.mcmc_mainrun_dir_relpath = mcmc_mainrun_dir_relpath
+        self.uname = os.uname()[1]  # name of the computer
+        self.mcmc_mainrun_dir_relpath = mcmc_mainrun_dir_relpath # relative path to the main run directory
         
-        self.deletePrevChainFiles = deletePrevChainFiles
+        self.deletePrevChainFiles = deletePrevChainFiles # delete previous chain files - boolean
         
-        self.comm = comm
+        self.comm = comm # MPI communicator
         
-        # if 'MacbookPro' not in self.uname:
-        #     self.changedirname = '../'
-        # else:
-        #     self.changedirname = '../mcmc_cc_xd'
-        
-        
-        if rankmpi == 0:
+
+
+        if rankmpi == 0: 
             if deletePrevChainFiles == True:
-                addsuffix = find_last_suffix(filenamepartToSearchFor='0_allparams_cc%s'%(parameterssavetxt),dirnameToSearchIn=os.path.join(mcmc_mainrun_dir_relpath,'chains/run%s'%(int(currentrunindex))))
+                # Description: If the user has chosen to delete the previous chain files, then no suffix number will be added to the new files.
+                addsuffix = find_last_suffix(filenamepartToSearchFor='0_allparams_cc%s'%(parameterssavetxt),dirnameToSearchIn=os.path.join(mcmc_mainrun_dir_relpath,'chains/run%s'%(int(currentrunindex)))) # find the last suffix for the chain files
                 # self.addsuffix = addsuffix
             else:
+                # Description: If the user has chosen to not delete the previous chain files, then a suffix number will be added to the new files.
                 if addsuffix_fromLoadOldRes == None:
                     prevSuffix = find_last_suffix(filenamepartToSearchFor='0_allparams_cc%s'%(parameterssavetxt),dirnameToSearchIn=os.path.join(mcmc_mainrun_dir_relpath,'chains/run%s'%(int(currentrunindex))))
                     xx = prevSuffix.split('_')[1]
@@ -53,7 +52,7 @@ class Chains:
         
         
         
-        
+        # Description: The chain files are saved in the chains directory in the main run directory.
         self.accepted_chains_file_name = os.path.join(mcmc_mainrun_dir_relpath, 
                                                       'chains',
                                                       'run%s'%(currentrunindex),
@@ -63,6 +62,7 @@ class Chains:
                                                       + addsuffix 
                                                       + '%s.dat'%(testfilekw))
         
+        # Description: The truly accepted chain files are saved in the trulyAccepted directory in the chains directory in the main run directory.
         self.truly_accepted_chains_file_name = os.path.join(mcmc_mainrun_dir_relpath,
                                                             'chains',
                                                             'run%s'%(currentrunindex),
