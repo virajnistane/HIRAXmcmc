@@ -8,6 +8,7 @@ import h5py as hh
 import zarr
 import yaml
 from yaml import Loader, Dumper
+import pdb
 
 import hiraxmcmc
 from hiraxmcmc.util.basicfunctions import *
@@ -82,24 +83,24 @@ class HiraxOutput:
         elif self.psetype == 'unwindowed':
             self.psetypeshort = 'uw'
         
-        
-        try:
-            psfile = [i for i in find_files_containing(self.klmode, 
-                                                       os.path.join(self.hiraxrundir_fullpath, 
-                                                                    'draco'), fullpathoutput=True)
-                      if ((self.psetypeshort in os.path.basename(i))
-                          or 
-                          (self.psetype in  os.path.basename(i)))][0]
-            self.psfileload = hh.File(psfile,'r')
-        except:
-            psfile = [i for i in find_subdirs_containing(self.klmode, 
-                                                         os.path.join(self.hiraxrundir_fullpath, 
-                                                                      'draco'), fullpathoutput=True)
-                      if ((self.psetypeshort in os.path.basename(i))
-                          or 
-                          (self.psetype in  os.path.basename(i)))][0]
-            self.psfileload = zarr.load(psfile)
-            
+        self.psfileload = None
+        self.psmcfile_fullpath = None
+        # try:
+        #     psfile = [i for i in find_files_containing(self.klmode, 
+        #                                                os.path.join(self.hiraxrundir_fullpath, 
+        #                                                             'draco'), fullpathoutput=True)
+        #               if ((self.psetypeshort in os.path.basename(i))
+        #                   or 
+        #                   (self.psetype in  os.path.basename(i)))][0]
+        #     self.psfileload = hh.File(psfile,'r')
+        # except:
+        #     psfile = [i for i in find_subdirs_containing(self.klmode, 
+        #                                                  os.path.join(self.hiraxrundir_fullpath, 
+        #                                                               'draco'), fullpathoutput=True)
+        #               if ((self.psetypeshort in os.path.basename(i))
+        #                   or 
+        #                   (self.psetype in  os.path.basename(i)))][0]
+        #     self.psfileload = zarr.load(psfile)
         
         # driftproddir = find_subdirs_begin_with('drift', self.hiraxrundir_fullpath)[0]
         # driftproddir = 'drift_prod_hirax_survey_49elem_7point_64bands'
@@ -124,16 +125,17 @@ class HiraxOutput:
     # If h-units are to be removed, confirm the h-dependence of the covariance matrix from m-mode
     #####
     @property
-    def relPS_cov(self):
-        self.cinv = self.psfileload['C_inv'][:]
-        
-        if self.psetype == "unwindowed":
-            covh = np.linalg.inv(self.cinv.T.reshape(int(self.cinv.shape[0]* self.cinv.shape[1]),int(self.cinv.shape[2]* self.cinv.shape[3])));
-        elif self.psetype == "minvar":
-            M = np.diag(self.cinv.T.reshape(int(self.cinv.shape[0]*self.cinv.shape[1]),int(self.cinv.shape[2]*self.cinv.shape[3])).sum(axis=1)** -1)
-            covh = np.matmul(M, np.matmul(self.cinv.T.reshape(int(self.cinv.shape[0]*self.cinv.shape[1]),int(self.cinv.shape[2]*self.cinv.shape[3])), M.T))
-        # return 0.05**2 * np.identity(len(covhirax)) # 
-        return covh
+    def cov(self):
+        try:
+            self.cinv = self.psfileload['C_inv'][:]
+            if self.psestimator == "unwindowed":
+                cov_val = la.pinv(self.cinv.reshape(int(self.cinv.shape[0]* self.cinv.shape[1]),int(self.cinv.shape[2]* self.cinv.shape[3])), atol=1e-8).T
+            elif self.psestimator == "min var":
+                M = np.diag(self.cinv.T.reshape(int(self.cinv.shape[0]*self.cinv.shape[1]),int(self.cinv.shape[2]*self.cinv.shape[3])).sum(axis=1)** -1)
+                cov_val = np.matmul(M, np.matmul(self.cinv.T.reshape(int(self.cinv.shape[0]*self.cinv.shape[1]),int(self.cinv.shape[2]*self.cinv.shape[3])), M.T))
+            return cov_val
+        except:
+            return self.fisherfileload['covariance'][:]
     
     # @property
     # def covhirax(self):
@@ -142,7 +144,8 @@ class HiraxOutput:
     
     @property
     def relPS_amp(self):
-        return self.psfileload['powerspectrum'][:]
+        if self.psfileload != None:
+            return self.psfileload['powerspectrum'][:]
     
     
     
@@ -197,22 +200,25 @@ class HiraxOutput:
         
         
     @property
-    def relPS_err (self):
+    def relPS_err(self):
         """
-        
-        
         Returns
         -------
         errs : np.array
             DESCRIPTION. Square root of diagonal elements of HIRAX cov matrix 
             reshaped into <kpar_size> x <kperp_size>
-
         """
         kpar_params, kperp_params, kcenter_params = self.k_space_parameters()
-        
-        errs = np.sqrt(abs(np.diag(self.relPS_cov))).reshape(kpar_params['kpar_size'],kperp_params['kperp_size'])
-        
+
+        # errs = np.sqrt(abs(np.diag(self.cov))).reshape(kpar_params['kpar_size'],kperp_params['kperp_size'])
+
+        if self.psmcfile_fullpath != None:
+            errs = np.sqrt(abs(np.diag(self.cov))).reshape(kperp_params['kperp_size'],kpar_params['kpar_size']).T
+        else:
+            errs = np.sqrt(abs(np.diag(self.cov))).reshape(kperp_params['kperp_size'],kpar_params['kpar_size']).T
+
         return errs
+    
         
     def masked_cov_and_ps(self, kperp_limits_tuple: tuple = None, kpar_limits_tuple: tuple = None, kcenter_limits_tuple: tuple = None):
         kpar_all, kperp_all, kc_all = self.k_space_parameters()
@@ -258,28 +264,32 @@ class HiraxOutput:
                                                                     ).reshape(kcenter.shape)
                                                             ))]
             kcenter_limits = {'l':kcenter_lower, 'u':kcenter_upper}
+            
+            # kcenter_limits = {'l':kcenter_limits_tuple[0], 'u':kcenter_limits_tuple[1]}
+            
         
-        # kcenter_limits_hunits = {'l':0.05 * hirax_output.h, 'u':0.15 * hirax_output.h}
-        
-        self.xmasked =  ((kperp > kperp_limits['l']) 
-                         * (kperp < kperp_limits['u']) 
-                         * (kpar > kpar_limits['l']) 
-                         * (kpar < kpar_limits['u'])
-                         * (abs(self.relPS_err) < 1)
-                         * (kcenter > kcenter_limits['l'])
-                         * (kcenter < kcenter_limits['u'])
-                         )
+        xmasked =  ((kperp > kperp_limits['l']) 
+                    * (kperp < kperp_limits['u']) 
+                    * (kpar > kpar_limits['l']) 
+                    * (kpar < kpar_limits['u'])
+                    * (abs(self.relPS_err) < 1)
+                    * (kcenter > kcenter_limits['l'])
+                    * (kcenter < kcenter_limits['u'])
+                    )
     
-        xmaskedflat = np.array(self.xmasked.flatten())
-        self.ymasked = np.outer(xmaskedflat,xmaskedflat)
+        xmaskedflat = np.array(xmasked.flatten())
+        ymasked = np.outer(xmaskedflat,xmaskedflat)
         
-        cov_masked = self.relPS_cov[self.ymasked]
+        cov_masked = self.cov[ymasked]
         newshape_masked = int(cov_masked.shape[0]**0.5)
         cov_masked = cov_masked.reshape(newshape_masked,newshape_masked)
         
-        ps_masked_flat = self.relPS_amp.flatten()[xmaskedflat]
-        
-        return cov_masked, ps_masked_flat, newshape_masked
+        try:
+            ps_masked_flat = self.relPS_amp.flatten()[xmaskedflat]
+            
+            return cov_masked, ps_masked_flat, newshape_masked
+        except:
+            return cov_masked, None, newshape_masked
     
     def chi2_relPSamp(self, kperp_limits_tuple: tuple = None, kpar_limits_tuple: tuple = None, kcenter_limits_tuple: tuple = None):
         cov_mask, ps_mask_flat, newshape_masked = self.masked_cov_and_ps(kperp_limits_tuple, kpar_limits_tuple, kcenter_limits_tuple)
@@ -301,7 +311,7 @@ class HiraxOutput:
     def corr_from_cov_diag(self):
         
         kpar_params, kperp_params, kcenter_params = self.k_space_parameters()
-        cov = self.relPS_cov
+        cov = self.cov
         corr = np.zeros_like(cov)
         for i, iv in enumerate(cov):
             for j, jv in enumerate(cov[i]):
@@ -309,14 +319,6 @@ class HiraxOutput:
                 
         corr_rs = np.log10(self.off_dia_sum(corr).reshape(kpar_params['kpar_size'],kperp_params['kperp_size']))
         return corr_rs
-    
-
-
-
-
-
-
-
 
 
 
