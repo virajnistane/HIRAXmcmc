@@ -8,8 +8,9 @@ import numpy as np
 
 from configobj import ConfigObj
 
-from scipy.integrate import cumtrapz
+# from scipy.integrate import cumtrapz
 from scipy.interpolate import interp1d
+# from scipy.integrate import cumulative_trapezoid, trapezoid
 
 import hiraxmcmc
 from hiraxmcmc.util.basicfunctions import *

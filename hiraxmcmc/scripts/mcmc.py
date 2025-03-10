@@ -23,9 +23,11 @@ from datetime import date
 from pygit2 import Repository
 
 import json
+import pdb
 
 """ Personal modules """
 
+# from ..core.hiraxoutput import HiraxOutput
 
 import hiraxmcmc
 from hiraxmcmc.util.basicfunctions import *
@@ -36,7 +38,7 @@ from hiraxmcmc.util.loadpreviousresults import LoadOlderResults
 from hiraxmcmc.util.directorymanagement import DirManage
 from hiraxmcmc.util.thetacovupdate import ThetaCovUpdate
 from hiraxmcmc.util.chains import Chains
-## from extractforML import extractForML
+
 
 
 """ CAMB """
@@ -93,7 +95,7 @@ if rank_mpi == 0:
 # IIIIIIIIIIII   N      N    P             UUUU          T
 # =============================================================================
 
-input_override = 0
+input_override = 1
 
 try:
     assert not(input_override)
@@ -221,6 +223,9 @@ except:
 
 
 
+
+pdb.set_trace()
+
 # =============================================================================
 # 
 # =============================================================================
@@ -291,10 +296,13 @@ if rank_mpi == 0:
 
 MCMCmodulespath = os.path.dirname(hiraxmcmc.__file__)
 
+mcmcrepo = os.path.join(os.path.curdir, '..')
+print(os.path.abspath(mcmcrepo))
+
 if rank_mpi==0:
     print('MCMCmodulespath: ',MCMCmodulespath)
     if os.getenv('WHEREAMI') == 'local':
-        print('MCMCmodule - current git branch: ',Repository('/Users/Viraj.Nistane/Desktop/phdmywork/HIRAX/HIRAXmcmc/').head.shorthand)
+        print('MCMCmodule - current git branch: ',Repository(os.path.abspath(mcmcrepo)).head.shorthand)
     elif os.getenv('WHEREAMI') == 'cluster':
         try:
             print('MCMCmodule - current git branch: ',Repository('/home/s/sievers/nistanev/HIRAXmcmc/').head.shorthand)
@@ -398,9 +406,6 @@ for index, freqlimits1 in enumerate(auto_hiraxoutput_kw_list):
     
 
 numfc = len(list(inputforhiraxoutput.keys()))
-
-
-
 
 
 hirax_output = {}
