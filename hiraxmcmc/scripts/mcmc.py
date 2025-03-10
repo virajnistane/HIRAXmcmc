@@ -95,7 +95,7 @@ if rank_mpi == 0:
 # IIIIIIIIIIII   N      N    P             UUUU          T
 # =============================================================================
 
-input_override = 1
+input_override = 0
 
 try:
     assert not(input_override)
@@ -158,8 +158,9 @@ except:
         INPUT = {'current_run_index': 1,
                   'params_to_vary': ['h', 'omb', 'Oml'],
                   'mmode_output': {'freq_channel': {'start': 400, 'end': 500},
-                                  'klmode': 'kl_5thresh_nofg',
-                                  'power_spectrum_estimator_type': 'minvar'},
+                                   'beam': 'gaussian',  # or 'cst'
+                                    'klmode': 'dk_5thresh_fg_1000thresh',
+                                    'power_spectrum_estimator_type': 'unwindowed'},
                   'mcmc': {'nsteps': 20000,
                            'do_update_thetacov': 'yes',
                            'dothetacovupdateafterevery': 100,
@@ -203,7 +204,7 @@ except:
                 json.dump(INPUT, f, indent=4)
             raise ValueError
             
-        if 0:
+        if 1:
             INPUT['mcmc'] = {'nsteps': 200,
                              'do_update_thetacov': 'yes',
                              'dothetacovupdateafterevery': 10,
@@ -224,7 +225,7 @@ except:
 
 
 
-pdb.set_trace()
+# pdb.set_trace()
 
 # =============================================================================
 # 
@@ -373,13 +374,19 @@ try:
     redshiftlist = []
     auto_hiraxoutput_selection_dir = []
     for freqval in np.arange(INPUT['mmode_output']['freq_channel']['start'], INPUT['mmode_output']['freq_channel']['end'], 100):
-        kw = str(freqval)+'_'+str(freqval+100)
-        auto_hiraxoutput_kw_list.append(kw)
+
+        # pdb.set_trace()
+
+        freq_kw = str(freqval)+'_'+str(freqval+100)
+        beam_kw = INPUT['mmode_output']['beam']
+        auto_hiraxoutput_kw_list.append(freq_kw)
         fqmid = freqval+50
         redshiftlist.append(freq2z(fqmid))
-        auto_hiraxoutput_selection_dir.append(find_subdirs_containing(kw, 
-                                                                      os.path.abspath(os.path.join(MCMCmodulespath,'mmoderesults')),
-                                                                      fullpathoutput=True)[0])
+        # auto_hiraxoutput_selection_dir.append(find_subdirs_containing(kw, 
+        #                                                               os.path.abspath(os.path.join(MCMCmodulespath,'mmoderesults')),
+        #                                                               fullpathoutput=True)[0])
+        auto_hiraxoutput_selection_dir = [os.path.abspath(os.path.join('mmoderesults',i)) for i in os.listdir(os.path.abspath(os.path.join(MCMCmodulespath,'mmoderesults'))) if (freq_kw in i) and (beam_kw in i)]
+
 except:
     raise('Invalid frequency channel input')
 
@@ -401,6 +408,8 @@ for index, freqlimits1 in enumerate(auto_hiraxoutput_kw_list):
     inputforhiraxoutput[freqlimits1]['estimator_type'] = INPUT['mmode_output']['power_spectrum_estimator_type']
     # inputforhiraxoutput[freqlimits1]['redshift'] = redshiftlist[index]
     
+    # pdb.set_trace()
+
     btdir = os.path.join(find_subdirs_containing('drift_prod', auto_hiraxoutput_selection_dir[index], fullpathoutput=True)[0],'bt')
     inputforhiraxoutput[freqlimits1]['klmode'] = INPUT['mmode_output']['klmode']
     
@@ -414,7 +423,7 @@ errs = {}
 
 for index1, freqlimits in enumerate(auto_hiraxoutput_kw_list):
     hirax_output[freqlimits] = HiraxOutput(inputforhiraxoutput[freqlimits])
-    covhirax[freqlimits] = hirax_output[freqlimits].relPS_cov
+    covhirax[freqlimits] = hirax_output[freqlimits].cov
     errs[freqlimits] = hirax_output[freqlimits].relPS_err
 
 

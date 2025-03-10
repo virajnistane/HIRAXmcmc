@@ -84,7 +84,6 @@ class HiraxOutput:
             self.psetypeshort = 'uw'
         
         self.psfileload = None
-        self.psmcfile_fullpath = None
         # try:
         #     psfile = [i for i in find_files_containing(self.klmode, 
         #                                                os.path.join(self.hiraxrundir_fullpath, 
@@ -212,7 +211,7 @@ class HiraxOutput:
 
         # errs = np.sqrt(abs(np.diag(self.cov))).reshape(kpar_params['kpar_size'],kperp_params['kperp_size'])
 
-        if self.psmcfile_fullpath != None:
+        if self.psfileload != None:
             errs = np.sqrt(abs(np.diag(self.cov))).reshape(kperp_params['kperp_size'],kpar_params['kpar_size']).T
         else:
             errs = np.sqrt(abs(np.diag(self.cov))).reshape(kperp_params['kperp_size'],kpar_params['kpar_size']).T
