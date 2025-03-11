@@ -10,8 +10,9 @@
             "start": 400,
             "end": 500
         },
-        "klmode": "kl_5thresh_nofg",
-        "power_spectrum_estimator_type": "minvar"
+        "beam": "gaussian",
+        "klmode": "dk_5thresh_fg_1000thresh",
+        "power_spectrum_estimator_type": "unwindowed"
     },
     "mcmc": {
         "nsteps": 20000,
