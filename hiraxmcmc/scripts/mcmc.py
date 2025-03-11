@@ -386,7 +386,7 @@ try:
         # auto_hiraxoutput_selection_dir.append(find_subdirs_containing(kw, 
         #                                                               os.path.abspath(os.path.join(MCMCmodulespath,'mmoderesults')),
         #                                                               fullpathoutput=True)[0])
-        auto_hiraxoutput_selection_dir = [os.path.abspath(os.path.join('mmoderesults',i)) for i in os.listdir(os.path.abspath(os.path.join(MCMCmodulespath,'mmoderesults'))) if (freq_kw in i) and (beam_kw in i)]
+        auto_hiraxoutput_selection_dir = [os.path.abspath(os.path.join(MCMCmodulespath,'mmoderesults',i)) for i in os.listdir(os.path.abspath(os.path.join(MCMCmodulespath,'mmoderesults'))) if (freq_kw in i) and (beam_kw in i)]
 
 except:
     raise('Invalid frequency channel input')
