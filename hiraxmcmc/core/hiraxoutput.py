@@ -275,7 +275,8 @@ class HiraxOutput:
                     * (kcenter > kcenter_limits['l'])
                     * (kcenter < kcenter_limits['u'])
                     )
-    
+        self.xmasked = xmasked
+        
         xmaskedflat = np.array(xmasked.flatten())
         ymasked = np.outer(xmaskedflat,xmaskedflat)
         
