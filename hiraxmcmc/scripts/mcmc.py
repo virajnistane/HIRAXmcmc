@@ -126,6 +126,7 @@ except:
         # INPUT = {'current_run_index': 1,
         #           'params_to_vary': ['qpar(z)', 'qperp(z)', 'f(z)'],
         #           'mmode_output': {'freq_channel': {'start': 400, 'end': 500},
+        #                             'beam': 'gaussian',  # or 'cst'
         #                             'klmode': 'kl_5thresh_nofg',
         #                             'power_spectrum_estimator_type': 'minvar'},
         #           'mcmc': {'nsteps': 100000,
@@ -204,7 +205,7 @@ except:
                 json.dump(INPUT, f, indent=4)
             raise ValueError
             
-        if 1:
+        if 0:
             INPUT['mcmc'] = {'nsteps': 200,
                              'do_update_thetacov': 'yes',
                              'dothetacovupdateafterevery': 10,
