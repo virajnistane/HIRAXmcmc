@@ -158,7 +158,7 @@ except:
         
         INPUT = {'current_run_index': 1,
                   'params_to_vary': ['h', 'omb', 'Oml'],
-                  'mmode_output': {'freq_channel': {'start': 400, 'end': 500},
+                  'mmode_output': {'freq_channel': {'start': 400, 'end': 800},
                                    'beam': 'gaussian',  # or 'cst'
                                     'klmode': 'dk_5thresh_fg_1000thresh',
                                     'power_spectrum_estimator_type': 'unwindowed'},
@@ -221,6 +221,10 @@ except:
             with open('../inputfiles/input_example_cosmo_local.json','w') as f:
                 json.dump(INPUT, f, indent=4)
             raise ValueError
+        
+        inputparamsload_filename = 'test_empty.json'
+        inputparamsload_file_relpath = os.path.abspath(os.path.join(os.path.curdir, '../..'))
+        
 
 
 
@@ -386,7 +390,7 @@ try:
         # auto_hiraxoutput_selection_dir.append(find_subdirs_containing(kw, 
         #                                                               os.path.abspath(os.path.join(MCMCmodulespath,'mmoderesults')),
         #                                                               fullpathoutput=True)[0])
-        auto_hiraxoutput_selection_dir = [os.path.abspath(os.path.join(MCMCmodulespath,'mmoderesults',i)) for i in os.listdir(os.path.abspath(os.path.join(MCMCmodulespath,'mmoderesults'))) if (freq_kw in i) and (beam_kw in i)]
+        auto_hiraxoutput_selection_dir.append([os.path.abspath(os.path.join(MCMCmodulespath,'mmoderesults',i)) for i in os.listdir(os.path.abspath(os.path.join(MCMCmodulespath,'mmoderesults'))) if (freq_kw in i) and (beam_kw in i)][0])
 
 except:
     raise('Invalid frequency channel input')
