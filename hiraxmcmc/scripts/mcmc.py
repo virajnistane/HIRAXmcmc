@@ -308,7 +308,7 @@ print(os.path.abspath(mcmcrepo))
 if rank_mpi==0:
     print('MCMCmodulespath: ',MCMCmodulespath)
     if os.getenv('WHEREAMI') == 'local':
-        print('MCMCmodule - current git branch: ',Repository(os.path.abspath(mcmcrepo)).head.shorthand)
+        print('MCMCmodule - current git branch: ',Repository('/home/nviraj/Work/HIRAX/HIRAXmcmc/').head.shorthand)
     elif os.getenv('WHEREAMI') == 'cluster':
         try:
             print('MCMCmodule - current git branch: ',Repository('/home/s/sievers/nistanev/HIRAXmcmc/').head.shorthand)
