@@ -155,13 +155,12 @@ def find_files_begin_with(str1,dirname,fullpathoutput=False):
 
     """
     entries = []
-    for entry in [name for name in os.listdir(dirname) 
-                  if os.path.isfile(os.path.join(dirname,name))]:   # the list only includes directories     
+    listfiles = [name for name in os.listdir(dirname) if os.path.isfile(os.path.join(dirname,name))]
+    for entry in listfiles:
         if entry[:len(str1)]==str1:
-            if fullpathoutput:
-                entries.append(os.path.abspath(os.path.join(dirname,entry))) # os.path.join(dirname, entry))
-            else:
-                entries.append(entry)
+            entries.append(entry)
+    if fullpathoutput:
+        entries = [os.path.abspath(os.path.join(dirname,entry)) for entry in entries]
     return entries
 
 
@@ -184,13 +183,18 @@ def find_files_containing(str1,dirname, fullpathoutput=False):
         List of the file names found 
     """
     entries = []
-    for entry in [name for name in os.listdir(dirname) 
-                  if os.path.isfile(os.path.join(dirname,name))]:   # the list only includes files     
-        if str1 in entry:
-            if fullpathoutput:
-                entries.append(os.path.abspath(os.path.join(dirname,entry))) # os.path.join(dirname, entry))
-            else:
+    listfiles = [name for name in os.listdir(dirname) if os.path.isfile(os.path.join(dirname,name))]
+    for entry in listfiles:
+        try:
+            assert type(str1) == str
+            if str1 in entry:
                 entries.append(entry)
+        except:
+            assert type(str1) == list
+            if all([elem in entry for elem in str1]):
+                entries.append(entry)
+    if fullpathoutput:
+        entries = [os.path.abspath(os.path.join(dirname,entry)) for entry in entries]
     return entries
 
 
@@ -216,15 +220,14 @@ def find_subdirs_begin_with(str1,dirname, fullpathoutput=False):
 
     """
     entries = []
-    for entry in [name for name in os.listdir(dirname) 
-                  if os.path.isdir(os.path.join(dirname,name))]:   # the list only includes directories     
+    listsubdirs = [subdir for subdir in os.listdir(os.path.abspath(dirname)) if os.path.isdir(os.path.join(dirname,subdir))]   # the list only includes directories
+    for entry in listsubdirs:    
         if entry[:len(str1)]==str1:
             if fullpathoutput:
                 entries.append(os.path.abspath(os.path.join(dirname,entry))) # os.path.join(dirname, entry))
             else:
                 entries.append(entry)
     return entries
-
 
 def find_subdirs_containing(str1,dirname,fullpathoutput=False):
     """
@@ -244,15 +247,20 @@ def find_subdirs_containing(str1,dirname,fullpathoutput=False):
         List of the subdir names found (not full paths)
     """
     entries = []
-    for entry in [name for name in os.listdir(os.path.abspath(dirname))
-                  if os.path.isdir(os.path.join(dirname,name))]:   # the list only includes directories     
-        if str1 in entry:
-            if fullpathoutput:
-                entries.append(os.path.abspath(os.path.join(dirname,entry)))
-            else:
+    listsubdirs = [name for name in os.listdir(os.path.abspath(dirname)) if os.path.isdir(os.path.join(dirname,name))]
+    for entry in listsubdirs:
+        try:
+            assert type(str1) == str
+            if str1 in entry:
                 entries.append(entry)
+        except:
+            assert type(str1) == list# the list only includes directories 
+            if all([elem in entry for elem in str1]):
+                entries.append(entry)
+    if fullpathoutput:
+        entries = [os.path.abspath(os.path.join(dirname,entry)) for entry in entries]
     return entries
-
+            
 # =============================================================================
 # Matrix sections
 # =============================================================================

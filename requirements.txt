@@ -3,8 +3,9 @@ scipy
 cython
 h5py
 camb
-classy
+#classy
 configobj
-pygit2
+pygit2==1.6.1
 mpi4py
 zarr
+pyyaml

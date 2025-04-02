@@ -1,7 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from scipy.integrate import cumtrapz, trapz
+try:
+    # for newer versions of scipy
+    from scipy.integrate import cumulative_trapezoid, trapezoid
+except:
+    # for older versions of scipy
+    from scipy.integrate import cumtrapz as cumulative_trapezoid
+    from scipy.integrate import trapz as trapezoid
+
+
 from scipy.constants import speed_of_light as cc
 import numpy as np
 
