@@ -45,7 +45,7 @@ class Chi2Func:
         try:
             if INPUT != None:
                 assert INPUT['likelihood']['PS_cov']['override'] == 'no'
-            self.covhirax = self.hirax_output.relPS_cov
+            self.covhirax = self.hirax_output.cov
             self.errs = self.hirax_output.relPS_err
             if rank_mpi == 0:
                 print('Covariance in likelihood used from m-mode sims')
@@ -65,8 +65,10 @@ class Chi2Func:
         # self.kperpstart = self.kperp_all['kperp_bands'][:-1]
         # self.kperpend = self.kperp_all['kperp_bands'][1:]
         
-        self.relPS_amp_fromHirax = self.hirax_output.relPS_amp
-        
+        try:
+            self.relPS_amp_fromHirax = self.hirax_output.relPS_amp
+        except:
+            self.relPS_amp_fromHirax = None   
         
         
         # print("Inside the chi2_function instance, hiraxrundirname is ",hirax_output.hiraxrundir_name)
@@ -74,20 +76,20 @@ class Chi2Func:
         """ select k-bins """
         
         if 400<z2freq(self.redshift)<500:
-            kperplimits=(0.02, 0.06)
-            kparlimits=(0.05,0.18)
+            kperplimits=(0.03, 0.08)
+            kparlimits=(0.05,0.22)
             kcenterlimits=(0.05,0.2)
         elif 500<z2freq(self.redshift)<600:
-            kperplimits=(0.02, 0.07)
-            kparlimits=(0.05,0.18)
+            kperplimits=(0.03, 0.12)
+            kparlimits=(0.05,0.22)
             kcenterlimits=(0.05,0.2)
         elif 600<z2freq(self.redshift)<700:
-            kperplimits=(0.03, 0.1)
-            kparlimits=(0.05,0.18)
+            kperplimits=(0.04, 0.16)
+            kparlimits=(0.05,0.22)
             kcenterlimits=(0.05,0.2)
         elif 700<z2freq(self.redshift)<800:
-            kperplimits=(0.04, 0.12)
-            kparlimits=(0.05,0.18)
+            kperplimits=(0.05, 0.18)
+            kparlimits=(0.05,0.22)
             kcenterlimits=(0.05,0.2)
 
         

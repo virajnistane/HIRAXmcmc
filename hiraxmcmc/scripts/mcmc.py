@@ -23,9 +23,11 @@ from datetime import date
 from pygit2 import Repository
 
 import json
+import pdb
 
 """ Personal modules """
 
+# from ..core.hiraxoutput import HiraxOutput
 
 import hiraxmcmc
 from hiraxmcmc.util.basicfunctions import *
@@ -36,7 +38,7 @@ from hiraxmcmc.util.loadpreviousresults import LoadOlderResults
 from hiraxmcmc.util.directorymanagement import DirManage
 from hiraxmcmc.util.thetacovupdate import ThetaCovUpdate
 from hiraxmcmc.util.chains import Chains
-## from extractforML import extractForML
+
 
 
 """ CAMB """
@@ -124,6 +126,7 @@ except:
         # INPUT = {'current_run_index': 1,
         #           'params_to_vary': ['qpar(z)', 'qperp(z)', 'f(z)'],
         #           'mmode_output': {'freq_channel': {'start': 400, 'end': 500},
+        #                             'beam': 'gaussian',  # or 'cst'
         #                             'klmode': 'kl_5thresh_nofg',
         #                             'power_spectrum_estimator_type': 'minvar'},
         #           'mcmc': {'nsteps': 100000,
@@ -155,9 +158,10 @@ except:
         
         INPUT = {'current_run_index': 1,
                   'params_to_vary': ['h', 'omb', 'Oml'],
-                  'mmode_output': {'freq_channel': {'start': 400, 'end': 500},
-                                  'klmode': 'kl_5thresh_nofg',
-                                  'power_spectrum_estimator_type': 'minvar'},
+                  'mmode_output': {'freq_channel': {'start': 400, 'end': 800},
+                                   'beam': 'gaussian',  # or 'cst'
+                                    'klmode': 'dk_5thresh_fg_1000thresh',
+                                    'power_spectrum_estimator_type': 'unwindowed'},
                   'mcmc': {'nsteps': 20000,
                            'do_update_thetacov': 'yes',
                            'dothetacovupdateafterevery': 100,
@@ -217,9 +221,16 @@ except:
             with open('../inputfiles/input_example_cosmo_local.json','w') as f:
                 json.dump(INPUT, f, indent=4)
             raise ValueError
+        
+        inputparamsload_filename = 'test_empty.json'
+        inputparamsload_file_relpath = os.path.abspath(os.path.join(os.path.curdir, '../..'))
+        
 
 
 
+
+
+# pdb.set_trace()
 
 # =============================================================================
 # 
@@ -291,10 +302,13 @@ if rank_mpi == 0:
 
 MCMCmodulespath = os.path.dirname(hiraxmcmc.__file__)
 
+mcmcrepo = os.path.join(os.path.curdir, '..')
+print(os.path.abspath(mcmcrepo))
+
 if rank_mpi==0:
     print('MCMCmodulespath: ',MCMCmodulespath)
     if os.getenv('WHEREAMI') == 'local':
-        print('MCMCmodule - current git branch: ',Repository('/Users/Viraj.Nistane/Desktop/phdmywork/HIRAX/HIRAXmcmc/').head.shorthand)
+        print('MCMCmodule - current git branch: ',Repository(os.path.abspath(mcmcrepo)).head.shorthand)
     elif os.getenv('WHEREAMI') == 'cluster':
         try:
             print('MCMCmodule - current git branch: ',Repository('/home/s/sievers/nistanev/HIRAXmcmc/').head.shorthand)
@@ -365,13 +379,19 @@ try:
     redshiftlist = []
     auto_hiraxoutput_selection_dir = []
     for freqval in np.arange(INPUT['mmode_output']['freq_channel']['start'], INPUT['mmode_output']['freq_channel']['end'], 100):
-        kw = str(freqval)+'_'+str(freqval+100)
-        auto_hiraxoutput_kw_list.append(kw)
+
+        # pdb.set_trace()
+
+        freq_kw = str(freqval)+'_'+str(freqval+100)
+        beam_kw = INPUT['mmode_output']['beam']
+        auto_hiraxoutput_kw_list.append(freq_kw)
         fqmid = freqval+50
         redshiftlist.append(freq2z(fqmid))
-        auto_hiraxoutput_selection_dir.append(find_subdirs_containing(kw, 
-                                                                      os.path.abspath(os.path.join(MCMCmodulespath,'mmoderesults')),
-                                                                      fullpathoutput=True)[0])
+        # auto_hiraxoutput_selection_dir.append(find_subdirs_containing(kw, 
+        #                                                               os.path.abspath(os.path.join(MCMCmodulespath,'mmoderesults')),
+        #                                                               fullpathoutput=True)[0])
+        auto_hiraxoutput_selection_dir.append([os.path.abspath(os.path.join(MCMCmodulespath,'mmoderesults',i)) for i in os.listdir(os.path.abspath(os.path.join(MCMCmodulespath,'mmoderesults'))) if (freq_kw in i) and (beam_kw in i)][0])
+
 except:
     raise('Invalid frequency channel input')
 
@@ -393,14 +413,13 @@ for index, freqlimits1 in enumerate(auto_hiraxoutput_kw_list):
     inputforhiraxoutput[freqlimits1]['estimator_type'] = INPUT['mmode_output']['power_spectrum_estimator_type']
     # inputforhiraxoutput[freqlimits1]['redshift'] = redshiftlist[index]
     
+    # pdb.set_trace()
+
     btdir = os.path.join(find_subdirs_containing('drift_prod', auto_hiraxoutput_selection_dir[index], fullpathoutput=True)[0],'bt')
     inputforhiraxoutput[freqlimits1]['klmode'] = INPUT['mmode_output']['klmode']
     
 
 numfc = len(list(inputforhiraxoutput.keys()))
-
-
-
 
 
 hirax_output = {}
@@ -409,7 +428,7 @@ errs = {}
 
 for index1, freqlimits in enumerate(auto_hiraxoutput_kw_list):
     hirax_output[freqlimits] = HiraxOutput(inputforhiraxoutput[freqlimits])
-    covhirax[freqlimits] = hirax_output[freqlimits].relPS_cov
+    covhirax[freqlimits] = hirax_output[freqlimits].cov
     errs[freqlimits] = hirax_output[freqlimits].relPS_err
 
 

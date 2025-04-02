@@ -8,4 +8,8 @@ dist
 hiraxmcmc/inputfiles/**/
 hiraxmcmc/core/output/
 hiraxmcmc/**/__pycache__/
+<<<<<<< HEAD
 .vscode/
+=======
+hiraxmcmc/.vscode/
+>>>>>>> f74b2e1bf0dea8d80ca9f182138449f2f6553a2c
