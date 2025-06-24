@@ -27,36 +27,42 @@ telescope:
     elevation_stop: 10
     npointings: 9
 kltransform:
--   type: DoubleKL
-    name: dk_5thresh_fg_1000thresh
-    threshold: 5.0
-    use_thermal: true
-    use_foregrounds: true
-    use_polarised: true
-    foreground_threshold: 1000.0
+#-   type: DoubleKL
+#    name: dk_5thresh_fg_1000thresh
+#    threshold: 5.0
+#    use_thermal: true
+#    use_foregrounds: true
+#    use_polarised: true
+#    foreground_threshold: 1000.0
 -   type: KLTransform
     name: kl_5thresh_nofg
     threshold: 5.0
     use_thermal: true
     use_foregrounds: false
     use_polarised: true
+-   type: KLTransform
+    name: kl_0thresh_nofg
+    threshold: 0.0
+    use_thermal: true
+    use_foregrounds: false
+    use_polarised: true
 psfisher:
--   type: MonteCarlo
-    name: psmc_dk_5thresh_fg_1000thresh_1threshold
-    klname: dk_5thresh_fg_1000thresh
-    threshold: 1.0
-    bandtype: cartesian
-    nsamples: 20000
-    kpar_bands:
-    -   spacing: linear
-        start: 0.0
-        stop: 0.3
-        num: 31
-    kperp_bands:
-    -   spacing: linear
-        start: 0.0
-        stop: 0.15
-        num: 15
+#-   type: MonteCarlo
+#    name: psmc_dk_5thresh_fg_1000thresh_1threshold
+#    klname: dk_5thresh_fg_1000thresh
+#    threshold: 1.0
+#    bandtype: cartesian
+#    nsamples: 20000
+#    kpar_bands:
+#    -   spacing: linear
+#        start: 0.0
+#        stop: 0.3
+#        num: 31
+#    kperp_bands:
+#    -   spacing: linear
+#        start: 0.0
+#        stop: 0.20
+#        num: 15
 -   type: MonteCarlo
     name: psmc_kl_5thresh_nofg_1threshold
     klname: kl_5thresh_nofg
@@ -71,5 +77,21 @@ psfisher:
     kperp_bands:
     -   spacing: linear
         start: 0.0
-        stop: 0.15
+        stop: 0.20
+        num: 15
+-   type: MonteCarlo
+    name: psmc_kl_0thresh_nofg_1threshold
+    klname: kl_0thresh_nofg
+    threshold: 1.0
+    bandtype: cartesian
+    nsamples: 20000
+    kpar_bands:
+    -   spacing: linear
+        start: 0.0
+        stop: 0.3
+        num: 31
+    kperp_bands:
+    -   spacing: linear
+        start: 0.0
+        stop: 0.20
         num: 15
