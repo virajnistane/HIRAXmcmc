@@ -408,6 +408,36 @@ def newcovmatrix_advanced(oldcovmatrix, params2vary, ordered_params_list):
     
     return nm
 
+def rearrange_matrix(matrix, params_order_old, params_order_new):
+    """
+    Rearranges the given matrix according to the new order of parameters. 
+    Parameters
+    ----------
+    matrix : numpy array
+        The matrix to be rearranged.
+    params_order_old : list
+        The original order of parameters corresponding to the matrix.
+    params_order_new : list
+        The new order of parameters to which the matrix should be rearranged.
+    Returns
+    -------
+    newmatrix : numpy array
+        The rearranged matrix according to the new order of parameters.
+    Raises
+    ------
+    ValueError
+        If the length of params_order_old and params_order_new do not match, or if
+        if any parameter in params_order_new is not present in params_order_old.
+    """
+    if len(params_order_old) != len(params_order_new):
+        raise ValueError("Length of params_order_old and params_order_new must match.")
+    if not all(param in params_order_old for param in params_order_new):
+        raise ValueError("All parameters in params_order_new must be present in params_order_old.")
+    # Find the indices of the new order in the old order
+    indices = [params_order_old.index(param) for param in params_order_new]
+    # Create a new matrix with the indices of the new order
+    newmatrix = matrix[np.ix_(indices, indices)]
+    return newmatrix
 
 def find_dir(name, path):
     """
