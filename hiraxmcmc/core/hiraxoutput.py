@@ -279,6 +279,7 @@ class HiraxOutput:
         
         xmaskedflat = np.array(xmasked.flatten())
         ymasked = np.outer(xmaskedflat,xmaskedflat)
+        self.ymasked = ymasked
         
         cov_masked = self.cov[ymasked]
         newshape_masked = int(cov_masked.shape[0]**0.5)
