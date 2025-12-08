@@ -5,7 +5,7 @@ h5py
 camb
 #classy
 configobj
-pygit2==1.6.1
+pygit2
 mpi4py
 zarr
 pyyaml

@@ -128,7 +128,7 @@ def paramv_within_priors(priors, currentparams):
     templist = []
     for elem in list(priors.keys()):
         templist.append(bool(priors[elem][0] < currentparams[elem] < priors[elem][1]))
-    return bool(np.product(templist))
+    return bool(np.prod(templist))
     
 # =============================================================================
 # search for files/subdirs
@@ -315,7 +315,7 @@ def checkconditionforlist(inputlist, allelements_have_subpart=None, allelements_
                 templist.append(True)
             else:
                 templist.append(False)
-        return bool(np.product(templist))
+        return bool(np.prod(templist))
     elif allelements_equalto != None:
         templist = []
         for elem in inputlist:
@@ -323,7 +323,7 @@ def checkconditionforlist(inputlist, allelements_have_subpart=None, allelements_
                 templist.append(True)
             else:
                 templist.append(False)
-        return bool(np.product(templist))
+        return bool(np.prod(templist))
     elif allelements_are_of_type != None:
         templist = []
         for elem in inputlist:
@@ -331,7 +331,7 @@ def checkconditionforlist(inputlist, allelements_have_subpart=None, allelements_
                 templist.append(True)
             else:
                 templist.append(False)
-        return bool(np.product(templist))
+        return bool(np.prod(templist))
 
 
 def newcovmatrix(oldcovmatrix, givenparams, ordered_params_list):
