@@ -5,7 +5,7 @@ import os,sys
 import numpy as np
 import numpy.linalg as la
 
-from scipy.constants import speed_of_light as cc
+from scipy.constants import speed_of_light as cc # type: ignore
 
 import hiraxmcmc
 

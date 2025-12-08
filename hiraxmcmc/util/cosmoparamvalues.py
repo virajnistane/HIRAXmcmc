@@ -6,11 +6,11 @@ try:
     from scipy.integrate import cumulative_trapezoid, trapezoid
 except:
     # for older versions of scipy
-    from scipy.integrate import cumtrapz as cumulative_trapezoid
+    from scipy.integrate import cumtrapz as cumulative_trapezoid # type: ignore
     from scipy.integrate import trapz as trapezoid
 
 
-from scipy.constants import speed_of_light as cc
+from scipy.constants import speed_of_light as cc # type: ignore
 import numpy as np
 
 from hiraxmcmc.util.basicfunctions import *
