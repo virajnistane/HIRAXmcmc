@@ -344,7 +344,7 @@ class ParametersFixed:
                                    + self._Oml * a**(-3*(1+self._w0+self._wa)) * np.exp(3*self._wa * (a-1))
                                    + self._Omk * a**-2 
                                    + self._Omr * a**-4)
-        rz = cc/1e3 / self._H0 * trapz(ea_fun(aa_arr)**(-1) * aa_arr**(-2), aa_arr[::-1])#, initial=0)
+        rz = cc/1e3 / self._H0 * trapezoid(ea_fun(aa_arr)**(-1) * aa_arr**(-2), aa_arr[::-1])#, initial=0)
         if omk < 0:
             return (1+z)**(-1) * cc/1e3/self._H0 * 1/np.sqrt(
                 abs(omk)) * np.sin(np.sqrt(abs(omk))*self._H0/(cc/1e3) * rz)
