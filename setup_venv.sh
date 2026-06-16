@@ -72,7 +72,13 @@ ensure_uv() {
 echo "Bootstrapping HIRAXmcmc development environment..."
 ensure_uv
 
-if [[ -d ".venv" ]]; then
+if [[ "${UV_SYSTEM_SITE_PACKAGES:-}" == "1" || "${UV_SYSTEM_SITE_PACKAGES:-}" == "true" || "${UV_SYSTEM_SITE_PACKAGES:-}" == "yes" ]]; then
+    if [[ -d ".venv" ]]; then
+        echo "Recreating .venv with --system-site-packages enabled."
+        rm -rf .venv
+    fi
+    uv venv --system-site-packages .venv
+elif [[ -d ".venv" ]]; then
     echo "Detected existing .venv; reusing it."
 fi
 

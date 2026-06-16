@@ -9,10 +9,12 @@ An MCMC pipeline for cosmological parameter estimation from the 21cm estimated p
 ## Installation
 1. Clone the repository using ```git clone ...```
 2. Change the working directory to the HIRAXmcmc directory
-3. Run bootstrap script (installs uv if missing, then creates/syncs .venv with dev deps): ```./setup_venv.sh```
-4. Activate the env: ```source .venv/bin/activate```
-5. Build distribution files: ```uv build```
-6. Install the built wheel: ```uv pip install dist/hiraxmcmc*.whl```
+3. Create local env config: ```cp .env.example .env```
+4. (Optional) Edit ```.env``` for custom uv install/cache paths and set ```UV_SYSTEM_SITE_PACKAGES=true``` to create ```.venv``` with system site packages
+5. Run bootstrap script (installs uv if missing, then creates/syncs .venv with dev deps): ```./setup_venv.sh```
+6. Activate the env: ```source .venv/bin/activate```
+7. Build distribution files: ```uv build```
+8. Install the built wheel: ```uv pip install dist/hiraxmcmc*.whl```
 
 ## Basic run - example
 1. Copy an example input file from the location ```</path/to/cloned-rep/>hiraxmcmc/inputfiles/input_example_fcdep.json``` to wherever you desire. This particular file *input_example_fcdep.json* is for a mcmc run for redshift dependent parameters, h(z), dA(z), and f(z) for a particular frequency channel of the HIRAX m-mode sims run.
