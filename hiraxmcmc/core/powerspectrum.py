@@ -6,10 +6,10 @@ import numpy as np
 ## import time
 
 
-from configobj import ConfigObj
+from configobj import ConfigObj # type: ignore
 
 # from scipy.integrate import cumtrapz
-from scipy.interpolate import interp1d
+from scipy.interpolate import interp1d # type: ignore
 # from scipy.integrate import cumulative_trapezoid, trapezoid
 
 import hiraxmcmc
@@ -22,10 +22,10 @@ from hiraxmcmc.util.cosmoparamvalues import ParametersFixed
 # from camb.sources import GaussianSourceWindow, SplinedSourceWindow
 camb_path = os.path.realpath(os.path.join(os.getcwd(),'..'))
 sys.path.insert(0,camb_path)
-import camb
+import camb # type: ignore
 from camb import model #, initialpower
 
-from classy import Class
+from classy import Class # type: ignore
 
 
 
