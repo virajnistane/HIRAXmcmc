@@ -11,6 +11,16 @@ if [[ -f ".env" ]]; then
     set +a
 fi
 
+if [[ -n "${UV_INSTALL_DIR:-}" && ! -d "$UV_INSTALL_DIR" ]]; then
+    echo "Creating UV_INSTALL_DIR: $UV_INSTALL_DIR"
+    mkdir -p "$UV_INSTALL_DIR"
+fi
+
+if [[ -n "${UV_CACHE_DIR:-}" && ! -d "$UV_CACHE_DIR" ]]; then
+    echo "Creating UV_CACHE_DIR: $UV_CACHE_DIR"
+    mkdir -p "$UV_CACHE_DIR"
+fi
+
 ensure_uv() {
     if command -v uv >/dev/null 2>&1; then
         return
@@ -22,38 +32,38 @@ ensure_uv() {
         exit 1
     fi
 
-    if [[ -n "${UV_INSTALL_PATH:-}" ]]; then
-        echo "Using UV_INSTALL_PATH=${UV_INSTALL_PATH}"
-        curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR="$UV_INSTALL_PATH" sh
+    if [[ -n "${UV_INSTALL_DIR:-}" ]]; then
+        echo "Using UV_INSTALL_DIR=${UV_INSTALL_DIR}"
+        curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR="$UV_INSTALL_DIR" sh
 
         if [[ "${SHELL:-}" == *"fish"* ]]; then
-            if [[ -f "$UV_INSTALL_PATH/env.fish" ]]; then
+            if [[ -f "$UV_INSTALL_DIR/env.fish" ]]; then
                 if [[ -n "${UV_CACHE_DIR:-}" ]]; then
-                    if grep -q '^set -gx UV_CACHE_DIR ' "$UV_INSTALL_PATH/env.fish"; then
-                        sed -i "s|^set -gx UV_CACHE_DIR .*$|set -gx UV_CACHE_DIR \"$UV_CACHE_DIR\"|" "$UV_INSTALL_PATH/env.fish"
+                    if grep -q '^set -gx UV_CACHE_DIR ' "$UV_INSTALL_DIR/env.fish"; then
+                        sed -i "s|^set -gx UV_CACHE_DIR .*$|set -gx UV_CACHE_DIR \"$UV_CACHE_DIR\"|" "$UV_INSTALL_DIR/env.fish"
                     else
-                        printf '\nset -gx UV_CACHE_DIR "%s"\n' "$UV_CACHE_DIR" >> "$UV_INSTALL_PATH/env.fish"
+                        printf '\nset -gx UV_CACHE_DIR "%s"\n' "$UV_CACHE_DIR" >> "$UV_INSTALL_DIR/env.fish"
                     fi
                 fi
                 # shellcheck disable=SC1090
-                source "$UV_INSTALL_PATH/env.fish"
+                source "$UV_INSTALL_DIR/env.fish"
             fi
         else
-            if [[ -f "$UV_INSTALL_PATH/env" ]]; then
+            if [[ -f "$UV_INSTALL_DIR/env" ]]; then
                 if [[ -n "${UV_CACHE_DIR:-}" ]]; then
-                    if grep -q '^export UV_CACHE_DIR=' "$UV_INSTALL_PATH/env"; then
-                        sed -i "s|^export UV_CACHE_DIR=.*$|export UV_CACHE_DIR=\"$UV_CACHE_DIR\"|" "$UV_INSTALL_PATH/env"
+                    if grep -q '^export UV_CACHE_DIR=' "$UV_INSTALL_DIR/env"; then
+                        sed -i "s|^export UV_CACHE_DIR=.*$|export UV_CACHE_DIR=\"$UV_CACHE_DIR\"|" "$UV_INSTALL_DIR/env"
                     else
-                        printf '\nexport UV_CACHE_DIR="%s"\n' "$UV_CACHE_DIR" >> "$UV_INSTALL_PATH/env"
+                        printf '\nexport UV_CACHE_DIR="%s"\n' "$UV_CACHE_DIR" >> "$UV_INSTALL_DIR/env"
                     fi
                 fi
                 # shellcheck disable=SC1090
-                source "$UV_INSTALL_PATH/env"
+                source "$UV_INSTALL_DIR/env"
             fi
         fi
 
         if ! command -v uv >/dev/null 2>&1; then
-            export PATH="$UV_INSTALL_PATH:$UV_INSTALL_PATH/bin:$PATH"
+            export PATH="$UV_INSTALL_DIR:$UV_INSTALL_DIR/bin:$PATH"
         fi
     else
         curl -LsSf https://astral.sh/uv/install.sh | sh
