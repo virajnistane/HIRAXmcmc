@@ -9,6 +9,7 @@ dist
 .ruff_cache/
 .venv/
 venv/
+.env
 __pycache__/
 *.py[cod]
 .coverage
