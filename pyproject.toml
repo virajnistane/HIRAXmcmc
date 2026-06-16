@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hiraxmcmc"
+version = "0.1.2"
+description = "MCMC pipeline for parameter estimation from 21cm PS in HIRAX m-mode simulations"
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [
+    { name = "Viraj Nistane" },
+]
+license = { text = "MIT" }
+dependencies = [
+    "numpy",
+    "scipy",
+    "cython",
+    "h5py",
+    "camb",
+    "configobj",
+    "pygit2",
+    "mpi4py",
+    "zarr",
+    "pyyaml",
+    "uv>=0.11.21",
+]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["hiraxmcmc", "hiraxmcmc.*"]
