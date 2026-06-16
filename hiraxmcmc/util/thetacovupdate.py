@@ -254,12 +254,19 @@ class ThetaCovUpdate:
         
         
         
-        acceptance_rate = len(firstparam_trulyaccepted[-lastHowManyValues_forAcceptanceRate:]
-                              [np.where(np.ma.masked_not_equal(firstparam_trulyaccepted[-lastHowManyValues_forAcceptanceRate:],0).mask)[0]]
-                              )/len(onlyParamsAccepted[0][-lastHowManyValues_forAcceptanceRate:])
+        # acceptance_rate = len(firstparam_trulyaccepted[-lastHowManyValues_forAcceptanceRate:]
+        #                       [np.where(np.ma.masked_not_equal(firstparam_trulyaccepted[-lastHowManyValues_forAcceptanceRate:],0).mask)[0]]
+        #                       )/len(onlyParamsAccepted[0][-lastHowManyValues_forAcceptanceRate:])
         
-        
-        
+        # Get the slice first
+        firstparam_slice = firstparam_trulyaccepted[-lastHowManyValues_forAcceptanceRate:]
+        # Create mask for non-zero elements
+        mask = firstparam_slice != 0
+        # Count non-zero elements
+        num_nonzero = np.count_nonzero(mask)
+        # Calculate acceptance rate
+        acceptance_rate = num_nonzero / len(onlyParamsAccepted[0][-lastHowManyValues_forAcceptanceRate:])
+                
         
         
         print("\n rank %s is at ii= %s\n"%(self.rankmpi, currentstep)); sys.stdout.flush()

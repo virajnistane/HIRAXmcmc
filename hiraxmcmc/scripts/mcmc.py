@@ -311,7 +311,7 @@ if rank_mpi==0:
         print('MCMCmodule - current git branch: ',Repository('/home/nviraj/Work/HIRAX/HIRAXmcmc/').head.shorthand)
     elif os.getenv('WHEREAMI') == 'cluster':
         try:
-            print('MCMCmodule - current git branch: ',Repository('/home/s/sievers/nistanev/HIRAXmcmc/').head.shorthand)
+            print('MCMCmodule - current git branch: ',Repository('/home/nistanev/HIRAXmcmc/').head.shorthand)
         except:
             print('Not on Niagara')
 
