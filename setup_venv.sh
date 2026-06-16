@@ -88,10 +88,15 @@ ensure_uv() {
     fi
 }
 
+is_true() {
+    local value="${1:-}"
+    [[ "$value" == "1" || "$value" == "true" || "$value" == "yes" ]]
+}
+
 echo "Bootstrapping HIRAXmcmc development environment..."
 ensure_uv
 
-if [[ "${UV_SYSTEM_SITE_PACKAGES:-}" == "1" || "${UV_SYSTEM_SITE_PACKAGES:-}" == "true" || "${UV_SYSTEM_SITE_PACKAGES:-}" == "yes" ]]; then
+if is_true "${UV_SYSTEM_SITE_PACKAGES:-}"; then
     if [[ -d ".venv" ]]; then
         echo "Recreating .venv with --system-site-packages enabled."
         rm -rf .venv
@@ -102,6 +107,21 @@ elif [[ -d ".venv" ]]; then
 fi
 
 uv sync --group dev
+
+USE_SYSTEM_MPI4PY="${UV_USE_SYSTEM_MPI4PY:-}"
+if [[ -z "$USE_SYSTEM_MPI4PY" && "${LOADEDMODULES:-}" == *"mpi4py"* ]]; then
+    USE_SYSTEM_MPI4PY="true"
+    echo "Detected loaded mpi4py module in LOADEDMODULES; preferring system/module mpi4py."
+fi
+
+if is_true "$USE_SYSTEM_MPI4PY"; then
+    if ! is_true "${UV_SYSTEM_SITE_PACKAGES:-}"; then
+        echo "Warning: UV_USE_SYSTEM_MPI4PY is enabled without UV_SYSTEM_SITE_PACKAGES; system mpi4py may not be visible in .venv."
+    fi
+
+    echo "Using system/module mpi4py: removing mpi4py from .venv if present."
+    uv pip uninstall -y mpi4py >/dev/null 2>&1 || true
+fi
 
 echo "Environment ready."
 echo "Use: source .venv/bin/activate"
