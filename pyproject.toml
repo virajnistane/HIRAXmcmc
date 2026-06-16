@@ -23,7 +23,13 @@ dependencies = [
     "mpi4py",
     "zarr",
     "pyyaml",
-    "uv>=0.11.21",
+]
+
+[dependency-groups]
+dev = [
+    "build",
+    "pytest",
+    "twine",
 ]
 
 [tool.setuptools]

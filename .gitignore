@@ -5,6 +5,15 @@ hiraxmcmc.egg-info
 build
 dist
 .pytest_cache
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.coverage
+htmlcov/
+.uv-cache/
 hiraxmcmc/inputfiles/**/
 hiraxmcmc/core/output/
 hiraxmcmc/**/__pycache__/
