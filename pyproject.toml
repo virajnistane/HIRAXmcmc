@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hiraxmcmc"
-version = "0.1.2"
+version = "1.0.0"
 description = "MCMC pipeline for parameter estimation from 21cm PS in HIRAX m-mode simulations"
 readme = "README.md"
 requires-python = ">=3.12"
