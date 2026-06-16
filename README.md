@@ -10,7 +10,7 @@ An MCMC pipeline for cosmological parameter estimation from the 21cm estimated p
 1. Clone the repository using ```git clone ...```
 2. Change the working directory to the HIRAXmcmc directory
 3. Create local env config: ```cp .env.example .env```
-4. (Optional) Edit ```.env``` for custom uv install/cache paths; set ```UV_SYSTEM_SITE_PACKAGES=true``` to create ```.venv``` with system site packages, and set ```UV_USE_SYSTEM_MPI4PY=true``` to prefer module/system mpi4py over venv mpi4py
+4. (Optional) Edit ```.env``` for custom uv install/cache paths; set ```UV_LINK_MODE=copy``` if cache and ```.venv``` are on different filesystems; set ```UV_SYSTEM_SITE_PACKAGES=true``` to create ```.venv``` with system site packages, and set ```UV_USE_SYSTEM_MPI4PY=true``` to prefer module/system mpi4py over venv mpi4py
 5. Run bootstrap script (installs uv if missing, then creates/syncs .venv with dev deps): ```./setup_venv.sh```
 6. Activate the env: ```source .venv/bin/activate```
 7. Build distribution files: ```uv build```
