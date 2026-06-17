@@ -39,6 +39,17 @@ apply_uv_runtime_env() {
 
 apply_uv_runtime_env
 
+_sed_inplace() {
+    local tmp
+    tmp="$(mktemp)" || return 1
+    if sed "$1" "$2" > "$tmp"; then
+        mv -- "$tmp" "$2"
+    else
+        rm -f "$tmp"
+        return 1
+    fi
+}
+
 apply_uv_install_env() {
     if [[ -z "${UV_INSTALL_DIR:-}" ]]; then
         return
@@ -48,19 +59,19 @@ apply_uv_install_env() {
         if [[ -f "$UV_INSTALL_DIR/env.fish" ]]; then
             if [[ -n "${UV_CACHE_DIR:-}" ]]; then
                 if grep -q '^set -gx UV_CACHE_DIR ' "$UV_INSTALL_DIR/env.fish"; then
-                    sed -i "s|^set -gx UV_CACHE_DIR .*$|set -gx UV_CACHE_DIR \"$UV_CACHE_DIR\"|" "$UV_INSTALL_DIR/env.fish"
+                    _sed_inplace "s|^set -gx UV_CACHE_DIR .*$|set -gx UV_CACHE_DIR \"$UV_CACHE_DIR\"|" "$UV_INSTALL_DIR/env.fish"
                 else
                     printf '\nset -gx UV_CACHE_DIR "%s"\n' "$UV_CACHE_DIR" >> "$UV_INSTALL_DIR/env.fish"
                 fi
             fi
             if [[ -n "${UV_LINK_MODE:-}" ]]; then
                 if grep -q '^set -gx UV_LINK_MODE ' "$UV_INSTALL_DIR/env.fish"; then
-                    sed -i "s|^set -gx UV_LINK_MODE .*$|set -gx UV_LINK_MODE \"$UV_LINK_MODE\"|" "$UV_INSTALL_DIR/env.fish"
+                    _sed_inplace "s|^set -gx UV_LINK_MODE .*$|set -gx UV_LINK_MODE \"$UV_LINK_MODE\"|" "$UV_INSTALL_DIR/env.fish"
                 else
                     printf '\nset -gx UV_LINK_MODE "%s"\n' "$UV_LINK_MODE" >> "$UV_INSTALL_DIR/env.fish"
                 fi
             else
-                sed -i '/^set -gx UV_LINK_MODE /d' "$UV_INSTALL_DIR/env.fish"
+                _sed_inplace '/^set -gx UV_LINK_MODE /d' "$UV_INSTALL_DIR/env.fish"
             fi
             # shellcheck disable=SC1090
             source "$UV_INSTALL_DIR/env.fish"
@@ -69,19 +80,19 @@ apply_uv_install_env() {
         if [[ -f "$UV_INSTALL_DIR/env" ]]; then
             if [[ -n "${UV_CACHE_DIR:-}" ]]; then
                 if grep -q '^export UV_CACHE_DIR=' "$UV_INSTALL_DIR/env"; then
-                    sed -i "s|^export UV_CACHE_DIR=.*$|export UV_CACHE_DIR=\"$UV_CACHE_DIR\"|" "$UV_INSTALL_DIR/env"
+                    _sed_inplace "s|^export UV_CACHE_DIR=.*$|export UV_CACHE_DIR=\"$UV_CACHE_DIR\"|" "$UV_INSTALL_DIR/env"
                 else
                     printf '\nexport UV_CACHE_DIR="%s"\n' "$UV_CACHE_DIR" >> "$UV_INSTALL_DIR/env"
                 fi
             fi
             if [[ -n "${UV_LINK_MODE:-}" ]]; then
                 if grep -q '^export UV_LINK_MODE=' "$UV_INSTALL_DIR/env"; then
-                    sed -i "s|^export UV_LINK_MODE=.*$|export UV_LINK_MODE=\"$UV_LINK_MODE\"|" "$UV_INSTALL_DIR/env"
+                    _sed_inplace "s|^export UV_LINK_MODE=.*$|export UV_LINK_MODE=\"$UV_LINK_MODE\"|" "$UV_INSTALL_DIR/env"
                 else
                     printf '\nexport UV_LINK_MODE="%s"\n' "$UV_LINK_MODE" >> "$UV_INSTALL_DIR/env"
                 fi
             else
-                sed -i '/^export UV_LINK_MODE=/d' "$UV_INSTALL_DIR/env"
+                _sed_inplace '/^export UV_LINK_MODE=/d' "$UV_INSTALL_DIR/env"
             fi
             # shellcheck disable=SC1090
             source "$UV_INSTALL_DIR/env"
@@ -132,17 +143,22 @@ is_true() {
 echo "Bootstrapping HIRAXmcmc development environment..."
 ensure_uv
 
+_uv_flags=()
+[[ -n "${UV_CACHE_DIR:-}" ]] && _uv_flags+=(--cache-dir "$UV_CACHE_DIR")
+[[ -n "${UV_LINK_MODE:-}" ]] && _uv_flags+=(--link-mode "$UV_LINK_MODE")
+
 if is_true "${UV_SYSTEM_SITE_PACKAGES:-}"; then
     if [[ -d ".venv" ]]; then
         echo "Recreating .venv with --system-site-packages enabled."
         rm -rf .venv
     fi
-    uv venv --system-site-packages .venv
+    uv venv "${_uv_flags[@]}" --system-site-packages .venv
 elif [[ -d ".venv" ]]; then
     echo "Detected existing .venv; reusing it."
 fi
 
 _cc_wrapper="" _cxx_wrapper="" _saved_cc="${CC:-}" _saved_cxx="${CXX:-}"
+trap 'rm -f "$_cc_wrapper" "$_cxx_wrapper"' EXIT
 if [[ -f ".venv/bin/python" ]]; then
     _sysconfig_cflags="$(".venv/bin/python" -c \
         'import sysconfig; print(sysconfig.get_config_var("CFLAGS") or "")' \
@@ -159,7 +175,7 @@ if [[ -f ".venv/bin/python" ]]; then
     fi
 fi
 
-uv sync --group dev --group analysis
+uv sync "${_uv_flags[@]}" --group dev --group analysis
 
 if [[ -n "$_cc_wrapper" ]]; then
     rm -f "$_cc_wrapper" "$_cxx_wrapper"
