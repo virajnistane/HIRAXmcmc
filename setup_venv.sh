@@ -11,11 +11,22 @@ if [[ -f ".env" ]]; then
     set +a
 fi
 
-for optional_var in UV_INSTALL_DIR UV_CACHE_DIR UV_LINK_MODE UV_SYSTEM_SITE_PACKAGES UV_USE_SYSTEM_MPI4PY; do
+for optional_var in LOAD_MODULES UV_INSTALL_DIR UV_CACHE_DIR UV_LINK_MODE UV_SYSTEM_SITE_PACKAGES UV_USE_SYSTEM_MPI4PY; do
     if [[ -z "${!optional_var:-}" ]]; then
         unset "$optional_var"
     fi
 done
+
+if [[ -n "${LOAD_MODULES:-}" ]]; then
+    if command -v module >/dev/null 2>&1; then
+        echo "Loading modules: $LOAD_MODULES"
+        # module is a shell function — must eval the output
+        # shellcheck disable=SC2086
+        module load $LOAD_MODULES
+    else
+        echo "Warning: LOAD_MODULES set but 'module' command not available; skipping." >&2
+    fi
+fi
 
 if [[ -n "${UV_INSTALL_DIR:-}" && ! -d "$UV_INSTALL_DIR" ]]; then
     echo "Creating UV_INSTALL_DIR: $UV_INSTALL_DIR"
@@ -104,6 +115,7 @@ apply_uv_install_env() {
                 fi
                 echo "Set UV_CACHE_DIR in $_shell_rc"
             fi
+            source "$_shell_rc"
             unset _shell_rc
         fi
     fi
