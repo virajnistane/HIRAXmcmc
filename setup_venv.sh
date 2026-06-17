@@ -27,6 +27,18 @@ if [[ -n "${UV_CACHE_DIR:-}" && ! -d "$UV_CACHE_DIR" ]]; then
     mkdir -p "$UV_CACHE_DIR"
 fi
 
+apply_uv_runtime_env() {
+    if [[ -n "${UV_CACHE_DIR:-}" ]]; then
+        export UV_CACHE_DIR
+    fi
+
+    if [[ -n "${UV_LINK_MODE:-}" ]]; then
+        export UV_LINK_MODE
+    fi
+}
+
+apply_uv_runtime_env
+
 apply_uv_install_env() {
     if [[ -z "${UV_INSTALL_DIR:-}" ]]; then
         return
