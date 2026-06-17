@@ -20,9 +20,11 @@ done
 if [[ -n "${LOAD_MODULES:-}" ]]; then
     if command -v module >/dev/null 2>&1; then
         echo "Loading modules: $LOAD_MODULES"
-        # module is a shell function — must eval the output
+        set +u
+        # module is a shell function that sources system files not written for nounset
         # shellcheck disable=SC2086
         module load $LOAD_MODULES
+        set -u
     else
         echo "Warning: LOAD_MODULES set but 'module' command not available; skipping." >&2
     fi
