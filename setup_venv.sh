@@ -132,12 +132,16 @@ is_true() {
 echo "Bootstrapping HIRAXmcmc development environment..."
 ensure_uv
 
+_uv_flags=()
+[[ -n "${UV_CACHE_DIR:-}" ]] && _uv_flags+=(--cache-dir "$UV_CACHE_DIR")
+[[ -n "${UV_LINK_MODE:-}" ]] && _uv_flags+=(--link-mode "$UV_LINK_MODE")
+
 if is_true "${UV_SYSTEM_SITE_PACKAGES:-}"; then
     if [[ -d ".venv" ]]; then
         echo "Recreating .venv with --system-site-packages enabled."
         rm -rf .venv
     fi
-    uv venv --system-site-packages .venv
+    uv venv "${_uv_flags[@]}" --system-site-packages .venv
 elif [[ -d ".venv" ]]; then
     echo "Detected existing .venv; reusing it."
 fi
@@ -159,7 +163,7 @@ if [[ -f ".venv/bin/python" ]]; then
     fi
 fi
 
-uv sync --group dev --group analysis
+uv sync "${_uv_flags[@]}" --group dev --group analysis
 
 if [[ -n "$_cc_wrapper" ]]; then
     rm -f "$_cc_wrapper" "$_cxx_wrapper"
