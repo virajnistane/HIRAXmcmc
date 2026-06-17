@@ -117,7 +117,6 @@ apply_uv_install_env() {
                 fi
                 echo "Set UV_CACHE_DIR in $_shell_rc"
             fi
-            source "$_shell_rc"
             unset _shell_rc
         fi
     fi
