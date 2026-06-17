@@ -223,3 +223,8 @@ fi
 
 echo "Environment ready."
 echo "Use: source .venv/bin/activate"
+if [[ -n "${LOAD_MODULES:-}" ]]; then
+    echo "Note: modules were loaded inside the script process and are not active in your shell."
+    echo "To load them in your current shell, run:"
+    echo "  module load $LOAD_MODULES"
+fi
