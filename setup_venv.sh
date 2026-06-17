@@ -40,56 +40,72 @@ apply_uv_runtime_env() {
 apply_uv_runtime_env
 
 apply_uv_install_env() {
-    if [[ -z "${UV_INSTALL_DIR:-}" ]]; then
-        return
-    fi
+    if [[ -n "${UV_INSTALL_DIR:-}" ]]; then
+        if [[ "${SHELL:-}" == *"fish"* ]]; then
+            if [[ -f "$UV_INSTALL_DIR/env.fish" ]]; then
+                if [[ -n "${UV_CACHE_DIR:-}" ]]; then
+                    if grep -q '^set -gx UV_CACHE_DIR ' "$UV_INSTALL_DIR/env.fish"; then
+                        sed -i "s|^set -gx UV_CACHE_DIR .*$|set -gx UV_CACHE_DIR \"$UV_CACHE_DIR\"|" "$UV_INSTALL_DIR/env.fish"
+                    else
+                        printf '\nset -gx UV_CACHE_DIR "%s"\n' "$UV_CACHE_DIR" >> "$UV_INSTALL_DIR/env.fish"
+                    fi
+                fi
+                if [[ -n "${UV_LINK_MODE:-}" ]]; then
+                    if grep -q '^set -gx UV_LINK_MODE ' "$UV_INSTALL_DIR/env.fish"; then
+                        sed -i "s|^set -gx UV_LINK_MODE .*$|set -gx UV_LINK_MODE \"$UV_LINK_MODE\"|" "$UV_INSTALL_DIR/env.fish"
+                    else
+                        printf '\nset -gx UV_LINK_MODE "%s"\n' "$UV_LINK_MODE" >> "$UV_INSTALL_DIR/env.fish"
+                    fi
+                else
+                    sed -i '/^set -gx UV_LINK_MODE /d' "$UV_INSTALL_DIR/env.fish"
+                fi
+                # shellcheck disable=SC1090
+                source "$UV_INSTALL_DIR/env.fish"
+            fi
+        else
+            if [[ -f "$UV_INSTALL_DIR/env" ]]; then
+                if [[ -n "${UV_CACHE_DIR:-}" ]]; then
+                    if grep -q '^export UV_CACHE_DIR=' "$UV_INSTALL_DIR/env"; then
+                        sed -i "s|^export UV_CACHE_DIR=.*$|export UV_CACHE_DIR=\"$UV_CACHE_DIR\"|" "$UV_INSTALL_DIR/env"
+                    else
+                        printf '\nexport UV_CACHE_DIR="%s"\n' "$UV_CACHE_DIR" >> "$UV_INSTALL_DIR/env"
+                    fi
+                fi
+                if [[ -n "${UV_LINK_MODE:-}" ]]; then
+                    if grep -q '^export UV_LINK_MODE=' "$UV_INSTALL_DIR/env"; then
+                        sed -i "s|^export UV_LINK_MODE=.*$|export UV_LINK_MODE=\"$UV_LINK_MODE\"|" "$UV_INSTALL_DIR/env"
+                    else
+                        printf '\nexport UV_LINK_MODE="%s"\n' "$UV_LINK_MODE" >> "$UV_INSTALL_DIR/env"
+                    fi
+                else
+                    sed -i '/^export UV_LINK_MODE=/d' "$UV_INSTALL_DIR/env"
+                fi
+                # shellcheck disable=SC1090
+                source "$UV_INSTALL_DIR/env"
+            fi
+        fi
 
-    if [[ "${SHELL:-}" == *"fish"* ]]; then
-        if [[ -f "$UV_INSTALL_DIR/env.fish" ]]; then
-            if [[ -n "${UV_CACHE_DIR:-}" ]]; then
-                if grep -q '^set -gx UV_CACHE_DIR ' "$UV_INSTALL_DIR/env.fish"; then
-                    sed -i "s|^set -gx UV_CACHE_DIR .*$|set -gx UV_CACHE_DIR \"$UV_CACHE_DIR\"|" "$UV_INSTALL_DIR/env.fish"
-                else
-                    printf '\nset -gx UV_CACHE_DIR "%s"\n' "$UV_CACHE_DIR" >> "$UV_INSTALL_DIR/env.fish"
-                fi
-            fi
-            if [[ -n "${UV_LINK_MODE:-}" ]]; then
-                if grep -q '^set -gx UV_LINK_MODE ' "$UV_INSTALL_DIR/env.fish"; then
-                    sed -i "s|^set -gx UV_LINK_MODE .*$|set -gx UV_LINK_MODE \"$UV_LINK_MODE\"|" "$UV_INSTALL_DIR/env.fish"
-                else
-                    printf '\nset -gx UV_LINK_MODE "%s"\n' "$UV_LINK_MODE" >> "$UV_INSTALL_DIR/env.fish"
-                fi
-            else
-                sed -i '/^set -gx UV_LINK_MODE /d' "$UV_INSTALL_DIR/env.fish"
-            fi
-            # shellcheck disable=SC1090
-            source "$UV_INSTALL_DIR/env.fish"
+        if ! command -v uv >/dev/null 2>&1; then
+            export PATH="$UV_INSTALL_DIR:$UV_INSTALL_DIR/bin:$PATH"
         fi
     else
-        if [[ -f "$UV_INSTALL_DIR/env" ]]; then
-            if [[ -n "${UV_CACHE_DIR:-}" ]]; then
-                if grep -q '^export UV_CACHE_DIR=' "$UV_INSTALL_DIR/env"; then
-                    sed -i "s|^export UV_CACHE_DIR=.*$|export UV_CACHE_DIR=\"$UV_CACHE_DIR\"|" "$UV_INSTALL_DIR/env"
-                else
-                    printf '\nexport UV_CACHE_DIR="%s"\n' "$UV_CACHE_DIR" >> "$UV_INSTALL_DIR/env"
-                fi
+        if [[ -n "${UV_CACHE_DIR:-}" ]]; then
+            _shell_rc=""
+            if [[ -f "$HOME/.bash_profile" ]]; then
+                _shell_rc="$HOME/.bash_profile"
+            elif [[ -f "$HOME/.bashrc" ]]; then
+                _shell_rc="$HOME/.bashrc"
             fi
-            if [[ -n "${UV_LINK_MODE:-}" ]]; then
-                if grep -q '^export UV_LINK_MODE=' "$UV_INSTALL_DIR/env"; then
-                    sed -i "s|^export UV_LINK_MODE=.*$|export UV_LINK_MODE=\"$UV_LINK_MODE\"|" "$UV_INSTALL_DIR/env"
+            if [[ -n "$_shell_rc" ]]; then
+                if grep -q '^export UV_CACHE_DIR=' "$_shell_rc"; then
+                    sed -i "s|^export UV_CACHE_DIR=.*$|export UV_CACHE_DIR=\"$UV_CACHE_DIR\"|" "$_shell_rc"
                 else
-                    printf '\nexport UV_LINK_MODE="%s"\n' "$UV_LINK_MODE" >> "$UV_INSTALL_DIR/env"
+                    printf '\nexport UV_CACHE_DIR="%s"\n' "$UV_CACHE_DIR" >> "$_shell_rc"
                 fi
-            else
-                sed -i '/^export UV_LINK_MODE=/d' "$UV_INSTALL_DIR/env"
+                echo "Set UV_CACHE_DIR in $_shell_rc"
             fi
-            # shellcheck disable=SC1090
-            source "$UV_INSTALL_DIR/env"
+            unset _shell_rc
         fi
-    fi
-
-    if ! command -v uv >/dev/null 2>&1; then
-        export PATH="$UV_INSTALL_DIR:$UV_INSTALL_DIR/bin:$PATH"
     fi
 }
 
