@@ -24,13 +24,26 @@ dependencies = [
     "mpi4py",
     "zarr",
     "pyyaml",
+    "shapely",
 ]
 
 [dependency-groups]
 dev = [
     "build",
+    "ipykernel",
     "pytest",
     "twine",
+]
+
+analysis = [
+    "pandas",
+    "matplotlib",
+    "openpyxl",
+    "healpy",
+    "getdist",
+    "easygui",
+    "array_to_latex",
+    "hirax_tools @ git+https://github.com/virajnistane/hirax_tools",
 ]
 
 [tool.setuptools]

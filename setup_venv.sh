@@ -11,6 +11,12 @@ if [[ -f ".env" ]]; then
     set +a
 fi
 
+for optional_var in UV_INSTALL_DIR UV_CACHE_DIR UV_LINK_MODE UV_SYSTEM_SITE_PACKAGES UV_USE_SYSTEM_MPI4PY; do
+    if [[ -z "${!optional_var:-}" ]]; then
+        unset "$optional_var"
+    fi
+done
+
 if [[ -n "${UV_INSTALL_DIR:-}" && ! -d "$UV_INSTALL_DIR" ]]; then
     echo "Creating UV_INSTALL_DIR: $UV_INSTALL_DIR"
     mkdir -p "$UV_INSTALL_DIR"
@@ -41,6 +47,8 @@ apply_uv_install_env() {
                 else
                     printf '\nset -gx UV_LINK_MODE "%s"\n' "$UV_LINK_MODE" >> "$UV_INSTALL_DIR/env.fish"
                 fi
+            else
+                sed -i '/^set -gx UV_LINK_MODE /d' "$UV_INSTALL_DIR/env.fish"
             fi
             # shellcheck disable=SC1090
             source "$UV_INSTALL_DIR/env.fish"
@@ -60,6 +68,8 @@ apply_uv_install_env() {
                 else
                     printf '\nexport UV_LINK_MODE="%s"\n' "$UV_LINK_MODE" >> "$UV_INSTALL_DIR/env"
                 fi
+            else
+                sed -i '/^export UV_LINK_MODE=/d' "$UV_INSTALL_DIR/env"
             fi
             # shellcheck disable=SC1090
             source "$UV_INSTALL_DIR/env"
@@ -120,7 +130,31 @@ elif [[ -d ".venv" ]]; then
     echo "Detected existing .venv; reusing it."
 fi
 
-uv sync --group dev
+_cc_wrapper="" _cxx_wrapper="" _saved_cc="${CC:-}" _saved_cxx="${CXX:-}"
+if [[ -f ".venv/bin/python" ]]; then
+    _sysconfig_cflags="$(".venv/bin/python" -c \
+        'import sysconfig; print(sysconfig.get_config_var("CFLAGS") or "")' \
+        2>/dev/null)"
+    if [[ "$_sysconfig_cflags" == *"-fdebug-default-version"* ]] && \
+       ! echo "" | ${CXX:-c++} -fdebug-default-version=4 -x c++ - -o /dev/null 2>/dev/null; then
+        _cc_wrapper="$(mktemp /tmp/uv_cc_wrap_XXXXXX)"
+        _cxx_wrapper="$(mktemp /tmp/uv_cxx_wrap_XXXXXX)"
+        printf '#!/usr/bin/env bash\nargs=()\nfor arg in "$@"; do [[ "$arg" == -fdebug-default-version=* ]] || args+=("$arg"); done\nexec "%s" "${args[@]}"\n' "${CC:-cc}" > "$_cc_wrapper"
+        printf '#!/usr/bin/env bash\nargs=()\nfor arg in "$@"; do [[ "$arg" == -fdebug-default-version=* ]] || args+=("$arg"); done\nexec "%s" "${args[@]}"\n' "${CXX:-c++}" > "$_cxx_wrapper"
+        chmod +x "$_cc_wrapper" "$_cxx_wrapper"
+        export CC="$_cc_wrapper" CXX="$_cxx_wrapper"
+        echo "Note: wrapping compiler to filter -fdebug-default-version (unsupported by system compiler)."
+    fi
+fi
+
+uv sync --group dev --group analysis
+
+if [[ -n "$_cc_wrapper" ]]; then
+    rm -f "$_cc_wrapper" "$_cxx_wrapper"
+    if [[ -n "$_saved_cc" ]]; then export CC="$_saved_cc"; else unset CC; fi
+    if [[ -n "$_saved_cxx" ]]; then export CXX="$_saved_cxx"; else unset CXX; fi
+fi
+unset _cc_wrapper _cxx_wrapper _saved_cc _saved_cxx _sysconfig_cflags
 
 USE_SYSTEM_MPI4PY="${UV_USE_SYSTEM_MPI4PY:-}"
 if [[ -z "$USE_SYSTEM_MPI4PY" && "${LOADEDMODULES:-}" == *"mpi4py"* ]]; then
@@ -135,6 +169,11 @@ if is_true "$USE_SYSTEM_MPI4PY"; then
 
     echo "Using system/module mpi4py: removing mpi4py from .venv if present."
     uv pip uninstall -y mpi4py >/dev/null 2>&1 || true
+fi
+
+if .venv/bin/python -m ipykernel --version >/dev/null 2>&1; then
+    .venv/bin/python -m ipykernel install --user --name hiraxmcmc --display-name "HIRAXmcmc"
+    echo "Jupyter kernel 'HIRAXmcmc' registered."
 fi
 
 echo "Environment ready."
